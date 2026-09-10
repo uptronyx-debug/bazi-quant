@@ -1,0 +1,2413 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八字五行(量化版)</title>
+    <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --text-main: #e0e0e0;
+            --accent: #00d2ff;
+            --border: #333;
+            --good-color: #2e7d32;
+            --bad-color: #555555;
+            --card-bg: rgba(20, 20, 20, 0.6);
+
+            /* ===== 命理語意色彩 Design Tokens =====
+               全站沖/合/刑/庫/引動等關係一律引用這組變數，未來要調色只需改這裡。 */
+            --color-chong: #ff5252;    /* 沖 */
+            --color-hai: #ff9800;      /* 害 */
+            --color-xing: #9b59b6;     /* 刑（含自刑／三刑） */
+            --color-liuhe: #00d2ff;    /* 六合（天干／地支） */
+            --color-sanhe: #8e44ad;    /* 三合局 */
+            --color-banhe: #9b59b6;    /* 半合局 */
+            --color-sanhui: #d35400;   /* 三會局 */
+            --color-ku: #ff9800;       /* 墓庫／開庫引動 */
+            --color-origin: #00d2ff;   /* 原局引動／通根透干 */
+            --color-dayun: #f39c12;    /* 大運引動 */
+            --color-liunian: #2ed573;  /* 流年引動 */
+            --color-neutral: #888;     /* 無明顯反應／外來 */
+            --score-good: #2ed573;     /* 量化評分：強／佳 */
+            --score-warn: #ff9800;     /* 量化評分：普通 */
+            --score-bad: #ff5252;      /* 量化評分：弱／差 */
+            --color-liuri-overall: #00d2ff;  /* 流日圖表：整體運勢 */
+            --color-liuri-wealth: #ffb347;   /* 流日圖表：財運 */
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            background-color: var(--panel-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 650px;
+            border: 1px solid var(--border);
+        }
+        h2 { color: var(--accent); text-align: center; margin-top: 0; }
+        
+        .form-group {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px;
+        }
+        input, select, button {
+            width: 100%; padding: 12px; box-sizing: border-box;
+            background-color: #2a2a2a; border: 1px solid var(--border);
+            color: white; border-radius: 6px; font-size: 16px;
+        }
+        button {
+            background-color: var(--accent); color: #000; font-weight: bold; cursor: pointer;
+            grid-column: span 2; transition: 0.3s;
+        }
+        button:hover { background-color: #0099cc; }
+        
+        .result-box {
+            margin-top: 25px; padding: 20px; background-color: #232323;
+            border-left: 4px solid var(--accent); border-radius: 4px; display: none;
+        }
+
+        .input-mode-toggle { text-align: center; margin-bottom: 20px; font-size: 15px; }
+        .input-mode-toggle label { cursor: pointer; margin: 0 10px; color: #aaa; transition: 0.2s; }
+        .input-mode-toggle label:hover, .input-mode-toggle input:checked + span { color: var(--accent); font-weight: bold; }
+        
+        .bazi-table-wrapper { background: #1a1a1a; border-radius: 6px; padding: 15px 5px; margin-bottom: 20px; overflow-x: auto; }
+        .bazi-table { width: 100%; border-collapse: collapse; text-align: center; white-space: nowrap; }
+        .bazi-table td { padding: 6px 4px; vertical-align: middle; }
+        .bazi-table .bt-header { color: #aaa; font-size: 13px; font-weight: bold; padding-bottom: 8px; }
+        .bazi-table .bt-shishen { font-size: 12px; font-weight: bold; }
+        .bazi-table .bt-ganzhi { font-size: 22px; font-weight: bold; }
+        .bazi-table .bt-hidden-bg { background: rgba(255,255,255,0.03); border-radius: 6px; padding: 5px 0; margin-top: 2px; height: 100%; min-width: 45px; }
+        .bazi-table .bt-hidden-item { display: flex; justify-content: center; gap: 4px; margin-bottom: 2px; }
+
+        /* --- 核心能量儀表板專用樣式 --- */
+        .dashboard-container {
+            background: linear-gradient(145deg, #181818, #222);
+            border: 1px solid #444;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .dashboard-header {
+            text-align: center; font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 15px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .dashboard-header::before, .dashboard-header::after {
+            content: ''; height: 1px; flex-grow: 1; background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+        .dash-grid-top {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;
+        }
+        .dash-grid-bottom {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+        .dash-card {
+            background: var(--card-bg); border: 1px solid #333; border-radius: 8px; padding: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .dash-card-title {
+            font-size: 12px; color: #999; margin-bottom: 12px; font-weight: bold;
+            width: 100%; border-bottom: 1px dashed #444; padding-bottom: 6px;
+            letter-spacing: 0.5px; text-transform: none;
+        }
+        .dash-footnote {
+            font-size: 11px; color: #777; line-height: 1.7; margin-top: 4px;
+            padding: 8px 10px; border-top: 1px dashed #333;
+        }
+        .dash-score-badge {
+            position: absolute; top: 8px; left: 8px; background: rgba(255,255,255,0.1); 
+            font-size: 10px; padding: 2px 6px; border-radius: 4px; color: #ddd;
+        }
+        @media (max-width: 500px) {
+            .dash-grid-top, .dash-grid-bottom { grid-template-columns: 1fr; }
+        }
+        
+        .dayun-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; text-align: center; }
+        .dayun-item { background: #2a2a2a; padding: 10px 5px; border-radius: 6px; border: 1px solid #444; }
+        .table-container { max-height: 400px; overflow-y: auto; border: 1px solid #333; border-radius: 6px; position: relative; }
+        .table-container::-webkit-scrollbar { width: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #1a1a1a; }
+        .table-container::-webkit-scrollbar-thumb { background: #444; border-radius: 4px; }
+        .liunian-table { width: 100%; border-collapse: collapse; margin-bottom: 0; background: #1a1a1a; font-size: 14px; }
+        .liunian-table th, .liunian-table td { padding: 10px; text-align: center; border-bottom: 1px solid #333; }
+        .liunian-table th { background: #2a2a2a; color: var(--accent); font-weight: normal; position: sticky; top: 0; z-index: 2; border-bottom: 2px solid #555; }
+        
+        .score-box { background: rgba(0, 210, 255, 0.1); padding: 10px; border-radius: 6px; margin-bottom: 15px; text-align: center; border: 1px dashed var(--accent); }
+        
+        .ai-btn-group { display: flex; gap: 10px; margin-top: 25px; }
+        .ai-btn-group button { padding: 15px; font-size: 16px; font-weight: bold; border-radius: 8px; border: none; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-top: 0; }
+        
+        #copyPromptBtn { background: #333; color: var(--accent); border: 1px solid var(--accent); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        #copyPromptBtn:hover { background: #444; transform: translateY(-2px); }
+
+        /* 新增：得令得地得勢 區塊樣式 */
+        .dash-status-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 4px;
+            font-size: 11px;
+            align-items: center;
+        }
+        .dash-status-label {
+            color: #aaa;
+        }
+        .dash-status-value {
+            font-weight: bold;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        .status-on { background: rgba(46, 213, 115, 0.15); color: #2ed573; border: 1px solid #2ed573; }
+        .status-off { background: rgba(255, 82, 82, 0.15); color: #ff5252; border: 1px solid #ff5252; }
+        .status-partial { background: rgba(255, 152, 0, 0.15); color: #ff9800; border: 1px solid #ff9800; }
+
+        /* ===== 手風琴收合區塊 ===== */
+        details.acc-section {
+            background: linear-gradient(145deg, #181818, #222);
+            border: 1px solid #444;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        details.acc-section summary.acc-summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            font-weight: bold;
+            color: #fff;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        details.acc-section summary.acc-summary::-webkit-details-marker,
+        details.acc-section summary.acc-summary::marker { display: none; content: ''; }
+        details.acc-section summary.acc-summary:hover { background: rgba(255,255,255,0.04); }
+        details.acc-section .acc-chevron { color: #00d2ff; transition: transform 0.2s; font-size: 12px; flex-shrink: 0; margin-left: 10px; }
+        details.acc-section[open] .acc-chevron { transform: rotate(180deg); }
+        details.acc-section .acc-body { padding: 0 14px 16px 14px; border-top: 1px solid #333; padding-top: 14px; }
+        @media (max-width: 500px) {
+            details.acc-section summary.acc-summary { font-size: 14px; padding: 12px 14px; }
+        }
+
+        /* ===== 流日面板：單一長條圖，一行顯示10天趨勢 ===== */
+        .liuri-legend { display: flex; gap: 16px; font-size: 11px; color: #ccc; margin-bottom: 8px; }
+        .liuri-legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+        .liuri-chart-wrap { width: 100%; overflow: visible; }
+        .liuri-today-callout { font-size: 12px; color: #ccc; margin-top: 10px; padding: 8px 10px; background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.25); border-radius: 6px; }
+
+        /* ===== 近月動態流月掃描：真表格對齊（badge 欄自動依內容最寬對齊，不再跑版） ===== */
+        table.lm-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        table.lm-table tr.lm-month-row td {
+            color: var(--accent); font-weight: bold; font-size: 11px;
+            padding: 10px 0 3px 0; border-top: 1px solid #2a2a2a;
+        }
+        table.lm-table tr.lm-month-row:first-child td { border-top: none; padding-top: 0; }
+        table.lm-table td.lm-badge-cell { white-space: nowrap; vertical-align: top; padding: 2px 10px 8px 0; width: 1%; }
+        table.lm-table td.lm-desc-cell { color: #ddd; font-size: 13px; vertical-align: top; padding: 2px 0 8px 0; }
+        @media (max-width: 420px) {
+            table.lm-table td.lm-badge-cell { white-space: normal; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>八字五行(量化版)</h2>
+    <div class="input-mode-toggle">
+        <label><input type="radio" name="inputMode" value="date" checked onchange="toggleInputMode()"> <span>依出生日期</span></label>
+        <label><input type="radio" name="inputMode" value="bazi" onchange="toggleInputMode()"> <span>手動輸入八字</span></label>
+    </div>
+
+    <!-- 出生日期輸入介面 -->
+    <div class="form-group" id="dateInputGroup" style="display: flex !important; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+            <div style="position: relative;">
+                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">年</span>
+                <input type="number" id="year" style="padding-left: 36px; padding-right: 8px;">
+            </div>
+            <div style="position: relative;">
+                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">月</span>
+                <input type="number" id="month" style="padding-left: 36px; padding-right: 8px;">
+            </div>
+            <div style="position: relative;">
+                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">日</span>
+                <input type="number" id="day" style="padding-left: 36px; padding-right: 8px;">
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div style="position: relative;">
+                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">時</span>
+                <input type="number" id="hour" style="padding-left: 36px; padding-right: 8px;">
+            </div>
+            <div style="position: relative;">
+                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">分</span>
+                <input type="number" id="minute" style="padding-left: 36px; padding-right: 8px;">
+            </div>
+        </div>
+        <div style="background-color: #2a2a2a; padding: 15px; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px;">
+            <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 15px;">
+                <input type="checkbox" id="useSplitZi" style="width: 18px; height: 18px; margin-right: 8px;">
+                <span style="flex:1;">區分早晚子時 <span style="font-size:12px; color:#aaa;">(23:00~00:00 日柱算當日)</span></span>
+            </label>
+            <div style="height: 1px; background: #3c3c3c;"></div>
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 15px; min-width: 120px;">
+                    <input type="checkbox" id="useTrueSolar" style="width: 18px; height: 18px; margin-right: 8px;" onchange="toggleTrueSolar()">
+                    啟用真太陽時
+                </label>
+                <div id="solarTimeSettings" style="display: none; flex: 1; align-items: center; gap: 8px; min-width: 150px;">
+                    <span style="color: #aaa; font-size: 13px; white-space: nowrap;">經度:</span>
+                    <input type="number" id="longitude" value="121.5" step="0.1" style="padding: 8px; font-size: 14px; flex: 1; min-width: 60px;">
+                    <span style="font-size: 12px; color: #888; white-space: nowrap;">(台灣 121.5)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 手動八字輸入介面 -->
+    <div class="form-group" id="baziInputGroup" style="display: none; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+        <div style="background-color: #2a2a2a; padding: 15px; border-radius: 6px; border: 1px solid var(--border);">
+            <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <span style="color:#aaa; font-size:14px; font-weight:bold; text-align:center;">年柱</span>
+                <select id="yg" style="padding: 10px; font-size:15px;"></select>
+                <select id="yz" style="padding: 10px; font-size:15px;"></select>
+            </div>
+            <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <span style="color:#aaa; font-size:14px; font-weight:bold; text-align:center;">月柱</span>
+                <select id="mg" style="padding: 10px; font-size:15px;"></select>
+                <select id="mz" style="padding: 10px; font-size:15px;"></select>
+            </div>
+            <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <span style="color:#aaa; font-size:14px; font-weight:bold; text-align:center;">日柱</span>
+                <select id="dg" style="padding: 10px; font-size:15px;"></select>
+                <select id="dz" style="padding: 10px; font-size:15px;"></select>
+            </div>
+            <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 10px; align-items: center;">
+                <span style="color:#aaa; font-size:14px; font-weight:bold; text-align:center;">時柱</span>
+                <select id="tg" style="padding: 10px; font-size:15px;"></select>
+                <select id="tz" style="padding: 10px; font-size:15px;"></select>
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+            <div style="position: relative;">
+                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 13px;">西元年</span>
+                <input type="number" id="baziYear" title="出生年份，用來推算流年" style="padding-left: 60px; padding-right: 8px;">
+            </div>
+            <div style="position: relative;">
+                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 13px;">起運歲</span>
+                <input type="number" id="baziStartAge" value="1" title="大運幾歲開始交運 (虛歲)" style="padding-left: 60px; padding-right: 8px;">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group" style="margin-bottom: 0;">
+        <select id="gender" style="grid-column: span 2;">
+            <option value="1">男性</option>
+            <option value="0">女性</option>
+        </select>
+    </div>
+    <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px;">
+        <button onclick="calculateBazi()">執行運算</button>
+    </div>
+
+    <div class="result-box" id="resultBox">
+        <!-- 1. 排盤基本資料 (常駐顯示，不收合) -->
+        <div id="baziGrid"></div>
+        
+        <!-- 2. 核心能量儀表板 (預設展開) -->
+        <div id="energyDashboardOutput"></div>
+
+        <!-- 3. 流日速覽 (新增，預設展開) -->
+        <div id="liuriOutput"></div>
+
+        <!-- 4. 原局結構拆解 (天地通透) -->
+        <details class="acc-section">
+            <summary class="acc-summary">☯️ 天地通透（藏干通根與透干）<span class="acc-chevron">▾</span></summary>
+            <div class="acc-body">
+                <div id="tonggenOutput"></div> 
+                <div style="height: 1px; background: linear-gradient(90deg, transparent, #444, transparent); margin: 20px 0;"></div>
+                <div id="touganOutput"></div> 
+            </div>
+        </details>
+        
+        <div id="hebanOutput"></div>
+        <div id="chongxingOutput"></div>
+        <div id="sikuOutput"></div>
+        
+        <!-- 5. 歲運交感與引動 (動態時間軸) -->
+        <div id="dayunLiunianOutput"></div>
+        <div id="dynamicTonggenTouganOutput"></div>
+        
+        <!-- 6. 落地戰術指南 -->
+        <div id="monthlyTacticsOutput"></div>
+        
+        <!-- 7. AI 深度總結（永遠常駐顯示，不放進手風琴） -->
+        <div class="ai-btn-group" id="aiBtnContainer" style="display:none;">
+            <button id="copyPromptBtn" style="flex:1;" onclick="copyPromptForAI()">📋 一鍵複製提示詞，貼給 AI 解盤</button>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+    window.currentBaziDataForAI = null;
+
+    window.onload = function() {
+        if (typeof Solar === 'undefined') {
+            document.querySelector('.container').innerHTML =
+                '<h2 style="color:#ff5252;">⚠️ 排盤引擎載入失敗</h2>' +
+                '<p style="color:#ccc; line-height:1.7;">無法載入 lunar-javascript 這個排盤核心套件（通常是 CDN 連線被擋、公司/學校網路防火牆，或暫時斷線）。<br>' +
+                '請確認網路連線正常後重新整理頁面；若在企業網路環境仍失敗，建議改用手機網路或連上其他 Wi-Fi 測試。</p>';
+            return;
+        }
+        const stems = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+        const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+        const ganSelects = ['yg', 'mg', 'dg', 'tg'];
+        const zhiSelects = ['yz', 'mz', 'dz', 'tz'];
+        
+        ganSelects.forEach(id => {
+            const el = document.getElementById(id);
+            stems.forEach(g => { el.appendChild(new Option(g, g)); });
+        });
+
+        zhiSelects.forEach(id => {
+            const el = document.getElementById(id);
+            branches.forEach(z => { el.appendChild(new Option(z, z)); });
+        });
+
+        const now = new Date();
+        document.getElementById('year').value = now.getFullYear();
+        document.getElementById('month').value = now.getMonth() + 1;
+        document.getElementById('day').value = now.getDate();
+        document.getElementById('hour').value = now.getHours();
+        document.getElementById('minute').value = now.getMinutes();
+        document.getElementById('baziYear').value = now.getFullYear();
+
+        try {
+            const solarNow = Solar.fromYmdHms(now.getFullYear(), now.getMonth() + 1, now.getDate(), now.getHours(), now.getMinutes(), 0);
+            const baziNow = solarNow.getLunar().getEightChar();
+            
+            document.getElementById('yg').value = baziNow.getYearGan();
+            document.getElementById('yz').value = baziNow.getYearZhi();
+            document.getElementById('mg').value = baziNow.getMonthGan();
+            document.getElementById('mz').value = baziNow.getMonthZhi();
+            document.getElementById('dg').value = baziNow.getDayGan();
+            document.getElementById('dz').value = baziNow.getDayZhi();
+            document.getElementById('tg').value = baziNow.getTimeGan();
+            document.getElementById('tz').value = baziNow.getTimeZhi();
+        } catch (e) {
+            document.getElementById('yg').value = '己'; document.getElementById('yz').value = '巳';
+            document.getElementById('mg').value = '己'; document.getElementById('mz').value = '巳';
+            document.getElementById('dg').value = '丁'; document.getElementById('dz').value = '丑';
+            document.getElementById('tg').value = '乙'; document.getElementById('tz').value = '巳';
+        }
+    };
+
+    function toggleTrueSolar() {
+        const isChecked = document.getElementById('useTrueSolar').checked;
+        document.getElementById('solarTimeSettings').style.display = isChecked ? 'flex' : 'none';
+    }
+
+    function toggleInputMode() {
+        const mode = document.querySelector('input[name="inputMode"]:checked').value;
+        if (mode === 'date') {
+            document.getElementById('dateInputGroup').style.display = 'flex';
+            document.getElementById('baziInputGroup').style.display = 'none';
+        } else {
+            document.getElementById('dateInputGroup').style.display = 'none';
+            document.getElementById('baziInputGroup').style.display = 'flex';
+        }
+    }
+
+    const ganElementMap = { '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水' };
+    const zhiElementMap = { '子':'水', '丑':'土', '寅':'木', '卯':'木', '辰':'土', '巳':'火', '午':'火', '未':'土', '申':'金', '酉':'金', '戌':'土', '亥':'水' };
+    const elementColors = { '木': '#4caf50', '火': '#f44336', '土': '#ff9800', '金': '#ffd700', '水': '#2196f3' };
+    const stemPolarity = { '甲':1, '乙':0, '丙':1, '丁':0, '戊':1, '己':0, '庚':1, '辛':0, '壬':1, '癸':0 };
+
+    const wuxingRel = {
+        '木': { sheng: '火', ke: '土' }, '火': { sheng: '土', ke: '金' },
+        '土': { sheng: '金', ke: '水' }, '金': { sheng: '水', ke: '木' },
+        '水': { sheng: '木', ke: '火' }
+    };
+
+    const ganChongMap = { '甲':'庚', '庚':'甲', '乙':'辛', '辛':'乙', '丙':'壬', '壬':'丙', '丁':'癸', '癸':'丁' };
+    const zhiChongMap = { '子':'午', '午':'子', '丑':'未', '未':'丑', '寅':'申', '申':'寅', '卯':'酉', '酉':'卯', '辰':'戌', '戌':'辰', '巳':'亥', '亥':'巳' };
+    const zhiHaiMap = { '子':'未', '未':'子', '丑':'午', '午':'丑', '寅':'巳', '巳':'寅', '卯':'辰', '辰':'卯', '申':'亥', '亥':'申', '酉':'戌', '戌':'酉' };
+    const ganHeMap = { '甲':'己', '己':'甲', '乙':'庚', '庚':'乙', '丙':'辛', '辛':'丙', '丁':'壬', '壬':'丁', '戊':'癸', '癸':'戊' };
+    const zhiHeMap = { '子':'丑', '丑':'子', '寅':'亥', '亥':'寅', '卯':'戌', '戌':'卯', '辰':'酉', '酉':'辰', '巳':'申', '申':'巳', '午':'未', '未':'午' };
+
+    const zhiHiddenWeights = {
+        '子': { '癸': 1.0 },
+        '丑': { '己': 0.34, '癸': 0.33, '辛': 0.33 },
+        '寅': { '甲': 0.50, '丙': 0.40, '戊': 0.10 },
+        '卯': { '乙': 1.0 },
+        '辰': { '戊': 0.34, '乙': 0.33, '癸': 0.33 },
+        '巳': { '丙': 0.50, '戊': 0.40, '庚': 0.10 },
+        '午': { '丁': 0.50, '己': 0.50 },
+        '未': { '己': 0.40, '丁': 0.40, '乙': 0.20 },
+        '申': { '庚': 0.50, '壬': 0.40, '戊': 0.10 },
+        '酉': { '辛': 1.0 },
+        '戌': { '戊': 0.45, '丁': 0.45, '辛': 0.10 },
+        '亥': { '壬': 0.60, '甲': 0.40 }
+    };
+
+    // ===== 人元司令分野表（用於精確判斷「得令」，與上方藏干比重系統為獨立用途）=====
+    // 資料來源：三命通會／淵海子平通行版「十二月令人元司令分野表」，
+    // 以出生月支起始的「節」（非中氣）為 0 天基準，逐段累加天數判斷「當令司令神」。
+    // 各校版本天數略有 1~3 日出入屬正常現象（節氣交接精確度、地域曆法差異所致）。
+    const renYuanSiLing = {
+        '寅': [['戊', 7], ['丙', 7], ['甲', 16]],
+        '卯': [['甲', 10], ['乙', 20]],
+        '辰': [['乙', 9], ['癸', 3], ['戊', 18]],
+        '巳': [['戊', 5], ['庚', 9], ['丙', 16]],
+        '午': [['丙', 10], ['己', 9], ['丁', 11]],
+        '未': [['丁', 9], ['乙', 3], ['己', 18]],
+        '申': [['己', 7], ['戊', 3], ['壬', 3], ['庚', 17]],
+        '酉': [['庚', 10], ['辛', 20]],
+        '戌': [['辛', 9], ['丁', 3], ['戊', 18]],
+        '亥': [['戊', 7], ['甲', 5], ['壬', 18]],
+        '子': [['壬', 10], ['癸', 20]],
+        '丑': [['癸', 9], ['辛', 3], ['己', 18]]
+    };
+    // 對應每個月支「起運」的節氣名稱（十二「節」，非十二「中氣」）
+    const monthJieName = {
+        '寅': '立春', '卯': '驚蟄', '辰': '清明', '巳': '立夏', '午': '芒種', '未': '小暑',
+        '申': '立秋', '酉': '白露', '戌': '寒露', '亥': '立冬', '子': '大雪', '丑': '小寒'
+    };
+
+    /**
+     * 依據出生的真實節氣交接日，精確計算「本月人元司令神」。
+     * birthSolar: lunar-javascript 的 Solar 物件（僅在「依出生日期」模式下可取得）
+     * monthZhi: 月支文字，例如 '寅'
+     * 若無法取得節氣資料（例如手動輸入八字、無出生日期時），回傳 null，呼叫端應改用簡易月支五行法 fallback。
+     */
+    function getSiLingGan(birthSolar, monthZhi) {
+        try {
+            if (!birthSolar || typeof Solar === 'undefined') return null;
+            const jieName = monthJieName[monthZhi];
+            if (!jieName) return null;
+
+            const y = birthSolar.getYear();
+            // 取前一年、當年、後一年三份節氣表，避免跨年邊界（例如子月、丑月）找不到節氣日期
+            let candidateDates = [];
+            [y - 1, y, y + 1].forEach(yy => {
+                const table = Solar.fromYmd(yy, 6, 1).getLunar().getJieQiTable();
+                if (table && table[jieName]) candidateDates.push(table[jieName]);
+            });
+            if (candidateDates.length === 0) return null;
+
+            const toKey = (s) => s.getYear() * 10000 + s.getMonth() * 100 + s.getDay();
+            const birthKey = toKey(birthSolar);
+            // 找「不晚於出生日」且最近的一個節氣日期
+            let validDates = candidateDates.filter(s => toKey(s) <= birthKey);
+            if (validDates.length === 0) return null;
+            validDates.sort((a, b) => toKey(b) - toKey(a));
+            const jieDate = validDates[0];
+
+            const daysPassed = birthSolar.getJulianDay() - jieDate.getJulianDay();
+            if (daysPassed < 0) return null;
+
+            const segments = renYuanSiLing[monthZhi];
+            if (!segments) return null;
+            let acc = 0;
+            for (let i = 0; i < segments.length; i++) {
+                acc += segments[i][1];
+                if (daysPassed < acc || i === segments.length - 1) return segments[i][0];
+            }
+            return segments[segments.length - 1][0];
+        } catch (e) {
+            console.warn('getSiLingGan 計算失敗，改用簡易月支五行法:', e);
+            return null;
+        }
+    }
+
+    // 十二「節」名稱清單（依時間順序，用於流月精確區間標示）
+    const jieOrderNames = ['立春', '驚蟄', '清明', '立夏', '芒種', '小暑', '立秋', '白露', '寒露', '立冬', '大雪', '小寒'];
+    const jieNameToZhi = {};
+    Object.keys(monthJieName).forEach(zhi => { jieNameToZhi[monthJieName[zhi]] = zhi; });
+
+    /**
+     * 依任意一個取樣日期，回傳該日所屬的節氣月精確區間（起訖節氣名稱＋國曆日期）。
+     * 回傳 null 代表節氣資料抓取失敗，呼叫端應 fallback 回國曆年月顯示。
+     */
+    function getJieQiRange(sampleSolar) {
+        try {
+            if (!sampleSolar || typeof Solar === 'undefined') return null;
+            const y = sampleSolar.getYear();
+            let allJie = [];
+            [y - 1, y, y + 1].forEach(yy => {
+                const table = Solar.fromYmd(yy, 6, 1).getLunar().getJieQiTable();
+                jieOrderNames.forEach(name => { if (table && table[name]) allJie.push({ name: name, solar: table[name] }); });
+            });
+            if (allJie.length === 0) return null;
+
+            const toKey = (s) => s.getYear() * 10000 + s.getMonth() * 100 + s.getDay();
+            allJie.sort((a, b) => toKey(a.solar) - toKey(b.solar));
+            const sampleKey = toKey(sampleSolar);
+
+            let startIdx = -1;
+            for (let i = 0; i < allJie.length; i++) {
+                if (toKey(allJie[i].solar) <= sampleKey) startIdx = i; else break;
+            }
+            if (startIdx === -1 || !allJie[startIdx + 1]) return null;
+
+            const start = allJie[startIdx];
+            const end = allJie[startIdx + 1];
+            const fmt = (s) => `${s.getYear()}/${s.getMonth()}/${s.getDay()}`;
+            return {
+                startLabel: `${fmt(start.solar)} ${start.name}`,
+                endLabel: `${fmt(end.solar)} ${end.name}`,
+                monthZhi: jieNameToZhi[start.name]
+            };
+        } catch (e) {
+            console.warn('getJieQiRange 計算失敗，改用國曆年月顯示:', e);
+            return null;
+        }
+    }
+
+    let __accSectionIdCounter = 0;
+    /**
+     * 將區塊內容包裝成可收合的手風琴（原生 <details>，手機相容性佳、免額外 JS 事件）。
+     * title: 摘要列顯示文字（含 emoji）；bodyHtml: 收合區內容；openByDefault: 是否預設展開。
+     */
+    function wrapAccordion(title, bodyHtml, openByDefault) {
+        __accSectionIdCounter++;
+        return `
+            <details class="acc-section" id="acc-${__accSectionIdCounter}" ${openByDefault ? 'open' : ''}>
+                <summary class="acc-summary">${title}<span class="acc-chevron">▾</span></summary>
+                <div class="acc-body">${bodyHtml}</div>
+            </details>
+        `;
+    }
+
+    function getOriginalChongXingHai(pillars) {
+        let alerts = [];
+        let zhis = pillars.map(p => p.zhi);
+        
+        if (zhis.includes('寅') && zhis.includes('巳') && zhis.includes('申')) alerts.push(`<span style="color:#ff5252;">• 原局地支：無恩三刑 (寅巳申)</span>`);
+        if (zhis.includes('丑') && zhis.includes('戌') && zhis.includes('未')) alerts.push(`<span style="color:#ff5252;">• 原局地支：恃勢三刑 (丑戌未)</span>`);
+
+        for(let i=0; i<3; i++) {
+            for(let j=i+1; j<4; j++) {
+                let z1 = pillars[i].zhi, z2 = pillars[j].zhi;
+                let p1Name = pillars[i].name, p2Name = pillars[j].name;
+                let dist = (j - i === 1) ? '相鄰' : (j - i === 2 ? '隔柱' : '遙隔');
+                
+                if(zhiChongMap[z1] === z2) alerts.push(`<span style="color:#ff5252;">• 原局六沖：${p1Name}「${z1}」與 ${p2Name}「${z2}」相沖 (${dist})</span>`);
+                if(zhiHaiMap[z1] === z2) alerts.push(`<span style="color:#ff9800;">• 原局六害：${p1Name}「${z1}」與 ${p2Name}「${z2}」相害 (${dist})</span>`);
+                if((z1 === '子' && z2 === '卯') || (z1 === '卯' && z2 === '子')) alerts.push(`<span style="color:#ff9800;">• 原局相刑：${p1Name}「${z1}」與 ${p2Name}「${z2}」無禮之刑 (${dist})</span>`);
+                if(z1 === z2 && ['辰','午','酉','亥'].includes(z1) && dist !== '遙隔') alerts.push(`<span style="color:#ff9800;">• 原局自刑：${p1Name}與${p2Name}「${z1}」自刑 (${dist})</span>`);
+                if(!zhis.includes('寅') || !zhis.includes('巳') || !zhis.includes('申')) {
+                    if((z1 === '寅' && z2 === '巳') || (z1 === '巳' && z2 === '寅') || (z1 === '巳' && z2 === '申') || (z1 === '申' && z2 === '巳')) alerts.push(`<span style="color:#ff9800;">• 原局相刑：${p1Name}「${z1}」與 ${p2Name}「${z2}」無恩相刑 (${dist})</span>`);
+                }
+                if(!zhis.includes('丑') || !zhis.includes('戌') || !zhis.includes('未')) {
+                    if((z1 === '丑' && z2 === '戌') || (z1 === '戌' && z2 === '丑') || (z1 === '戌' && z2 === '未') || (z1 === '未' && z2 === '戌')) alerts.push(`<span style="color:#ff9800;">• 原局相刑：${p1Name}「${z1}」與 ${p2Name}「${z2}」恃勢相刑 (${dist})</span>`);
+                }
+            }
+        }
+        return [...new Set(alerts)];
+    }
+
+    function getExternalChongXingHai(tZhi, pillars, label) {
+        let alerts = [];
+        let baseZhis = pillars.map(p => p.zhi);
+        let allZhis = [...baseZhis, tZhi];
+        
+        if (allZhis.includes('寅') && allZhis.includes('巳') && allZhis.includes('申')) {
+            if (tZhi === '寅' || tZhi === '巳' || tZhi === '申') {
+                let needed = ['寅', '巳', '申'].filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#ff5252;">• ${label}「${tZhi}」引爆無恩三刑 (寅巳申)！</span>`);
+            }
+        }
+        if (allZhis.includes('丑') && allZhis.includes('戌') && allZhis.includes('未')) {
+             if (tZhi === '丑' || tZhi === '戌' || tZhi === '未') {
+                let needed = ['丑', '戌', '未'].filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#ff5252;">• ${label}「${tZhi}」引爆恃勢三刑 (丑戌未)！</span>`);
+            }
+        }
+
+        pillars.forEach(p => {
+            let z2 = p.zhi;
+            if(zhiChongMap[tZhi] === z2) alerts.push(`<span style="color:#ff5252;">• ${label}「${tZhi}」沖 ${p.name}「${z2}」</span>`);
+            if(zhiHaiMap[tZhi] === z2) alerts.push(`<span style="color:#ff9800;">• ${label}「${tZhi}」害 ${p.name}「${z2}」</span>`);
+            if((tZhi === '子' && z2 === '卯') || (tZhi === '卯' && z2 === '子')) alerts.push(`<span style="color:#ff9800;">• ${label}「${tZhi}」與 ${p.name}「${z2}」引發無禮之刑</span>`);
+            if(tZhi === z2 && ['辰','午','酉','亥'].includes(tZhi)) alerts.push(`<span style="color:#ff9800;">• ${label}「${tZhi}」引動 ${p.name}「${z2}」自刑</span>`);
+            
+            let isSanXingTriggered = false;
+            if (['寅','巳','申'].includes(tZhi)) {
+                let needed = ['寅', '巳', '申'].filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) isSanXingTriggered = true;
+            }
+            if (!isSanXingTriggered && ((tZhi === '寅' && z2 === '巳') || (tZhi === '巳' && z2 === '寅') || (tZhi === '巳' && z2 === '申') || (tZhi === '申' && z2 === '巳'))) alerts.push(`<span style="color:#ff9800;">• ${label}「${tZhi}」與 ${p.name}「${z2}」發生無恩相刑</span>`);
+            
+            let isShiShiTriggered = false;
+            if (['丑','戌','未'].includes(tZhi)) {
+                 let needed = ['丑', '戌', '未'].filter(z => z !== tZhi);
+                 if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) isShiShiTriggered = true;
+            }
+            if (!isShiShiTriggered && ((tZhi === '丑' && z2 === '戌') || (tZhi === '戌' && z2 === '丑') || (tZhi === '戌' && z2 === '未') || (tZhi === '未' && z2 === '戌'))) alerts.push(`<span style="color:#ff9800;">• ${label}「${tZhi}」與 ${p.name}「${z2}」發生恃勢相刑</span>`);
+        });
+        return [...new Set(alerts)];
+    }
+
+    function calculateXuYulanScore(baziMap, dayElement) {
+        const shengMap = { '木':'火', '火':'土', '土':'金', '金':'水', '水':'木' };
+        const helpfulElements = [dayElement];
+        for (let k in shengMap) if (shengMap[k] === dayElement) helpfulElements.push(k);
+        const isHelpful = (el) => helpfulElements.includes(el);
+
+        let state = [
+            { id: 'YG', el: ganElementMap[baziMap.year.gan], score: 0, max: 5 },
+            { id: 'YZ', el: zhiElementMap[baziMap.year.zhi], score: 0, max: 20 },
+            { id: 'MG', el: ganElementMap[baziMap.month.gan], score: 0, max: 5 },
+            { id: 'MZ', el: zhiElementMap[baziMap.month.zhi], score: 0, max: 35 },
+            { id: 'DG', el: ganElementMap[baziMap.day.gan], score: 0, max: 0 },
+            { id: 'DZ', el: zhiElementMap[baziMap.day.zhi], score: 0, max: 20 },
+            { id: 'TG', el: ganElementMap[baziMap.time.gan], score: 0, max: 5 },
+            { id: 'TZ', el: zhiElementMap[baziMap.time.zhi], score: 0, max: 10 }
+        ];
+
+        const getChar = (idx) => [baziMap.year, baziMap.month, baziMap.day, baziMap.time][idx];
+
+        state.forEach(item => { if (isHelpful(item.el)) item.score = item.max; });
+        state[4].score = 0; 
+
+        if (shengMap[state[3].el] === state[2].el && shengMap[state[2].el] === dayElement) state[3].score = state[3].max;
+        if (shengMap[state[7].el] === state[6].el && shengMap[state[6].el] === dayElement) state[7].score = state[7].max;
+        if (shengMap[state[0].el] === state[2].el && shengMap[state[2].el] === dayElement) state[0].score = state[0].max;
+        if (shengMap[state[1].el] === state[0].el && shengMap[state[0].el] === state[2].el && shengMap[state[2].el] === dayElement) state[1].score = state[1].max;
+
+        const hasElementAdjacent = (pillarIdx, targetEl) => {
+            if (state[pillarIdx*2].el === targetEl) return true; 
+            if (pillarIdx > 0 && (state[(pillarIdx-1)*2].el === targetEl || state[(pillarIdx-1)*2+1].el === targetEl)) return true;
+            if (pillarIdx < 3 && (state[(pillarIdx+1)*2].el === targetEl || state[(pillarIdx+1)*2+1].el === targetEl)) return true;
+            return false;
+        };
+
+        for(let p = 0; p < 4; p++) {
+            let zhiChar = getChar(p).zhi;
+            if (!['辰', '戌', '丑', '未'].includes(zhiChar)) continue; 
+            
+            let zhiState = state[p*2+1];
+            let ganState = state[p*2];
+
+            if (zhiChar === '辰') {
+                if (ganState.el === '木') zhiState.el = '木';
+                else if (ganState.el === '水') zhiState.el = '水';
+                else zhiState.el = '土';
+                if (hasElementAdjacent(p, '水')) zhiState.el = '水';
+            } else if (zhiChar === '戌') { 
+                if (ganState.el === '火') zhiState.el = '火';
+                else zhiState.el = '土';
+                if (hasElementAdjacent(p, '火')) zhiState.el = '火';
+            } else if (zhiChar === '丑') {
+                if (ganState.el === '金') zhiState.el = '金';
+                else if (ganState.el === '水') zhiState.el = '水';
+                else zhiState.el = '土';
+                if (hasElementAdjacent(p, '金')) zhiState.el = '金';
+                if (hasElementAdjacent(p, '水')) zhiState.el = '水';
+            } else if (zhiChar === '未') {
+                if (ganState.el === '火') zhiState.el = '火';
+                else if (ganState.el === '木') zhiState.el = '木';
+                else zhiState.el = '土';
+                if (hasElementAdjacent(p, '火')) zhiState.el = '火';
+                if (hasElementAdjacent(p, '木')) zhiState.el = '木';
+            }
+
+            zhiState.score = isHelpful(zhiState.el) ? zhiState.max : 0;
+        }
+
+        const allZhis = [getChar(0).zhi, getChar(1).zhi, getChar(2).zhi, getChar(3).zhi];
+        const sanHui = [{r:['寅','卯','辰'], e:'木'}, {r:['巳','午','未'], e:'火'}, {r:['申','酉','戌'], e:'金'}, {r:['亥','子','丑'], e:'水'}];
+        sanHui.forEach(hui => {
+            if (hui.r.every(c => allZhis.includes(c))) {
+                for(let i=0; i<4; i++) {
+                    if (hui.r.includes(allZhis[i])) {
+                        state[i*2+1].el = hui.e;
+                        state[i*2+1].score = isHelpful(hui.e) ? state[i*2+1].max : 0;
+                    }
+                }
+            }
+        });
+
+        const sanHe = [{r:['申','子','辰'], e:'水'}, {r:['亥','卯','未'], e:'木'}, {r:['寅','午','戌'], e:'火'}, {r:['巳','酉','丑'], e:'金'}];
+        sanHe.forEach(he => {
+            let matches = [];
+            for(let i=0; i<4; i++) if (he.r.includes(allZhis[i])) matches.push({idx: i, branch: allZhis[i]});
+            let uniqueBranches = [...new Set(matches.map(m => m.branch))];
+            if (uniqueBranches.length >= 2) {
+                if (isHelpful(he.e)) { 
+                    matches.forEach(m => {
+                        state[m.idx*2+1].el = he.e;
+                        state[m.idx*2+1].score = state[m.idx*2+1].max;
+                    });
+                }
+            }
+        });
+
+        let total = 0;
+        state.forEach(s => total += s.score);
+        return total;
+    }
+
+    function getOriginalHeju(zhis) {
+        let alerts = [];
+        const sanhui = [['寅','卯','辰','木'], ['巳','午','未','火'], ['申','酉','戌','金'], ['亥','子','丑','水']];
+        sanhui.forEach(hui => {
+            if (zhis.includes(hui[0]) && zhis.includes(hui[1]) && zhis.includes(hui[2])) alerts.push(`<span style="color:#d35400;">• 原局地支：三會${hui[3]}局 (${hui[0]}${hui[1]}${hui[2]})</span>`);
+        });
+        const sanhe = [['申','子','辰','水'], ['亥','卯','未','木'], ['寅','午','戌','火'], ['巳','酉','丑','金']];
+        sanhe.forEach(he => {
+            if (zhis.includes(he[0]) && zhis.includes(he[1]) && zhis.includes(he[2])) {
+                alerts.push(`<span style="color:#8e44ad;">• 原局地支：三合${he[3]}局 (${he[0]}${he[1]}${he[2]})</span>`);
+            } else {
+                if (zhis.includes(he[0]) && zhis.includes(he[1])) alerts.push(`<span style="color:#9b59b6;">• 原局地支：半合${he[3]}局 (${he[0]}${he[1]})</span>`);
+                if (zhis.includes(he[1]) && zhis.includes(he[2])) alerts.push(`<span style="color:#9b59b6;">• 原局地支：半合${he[3]}局 (${he[1]}${he[2]})</span>`);
+            }
+        });
+        return [...new Set(alerts)];
+    }
+
+    function getExternalHeju(tZhi, baseZhis, label) {
+        let alerts = [];
+        const sanhui = [['寅','卯','辰','木'], ['巳','午','未','火'], ['申','酉','戌','金'], ['亥','子','丑','水']];
+        sanhui.forEach(hui => {
+            if (hui.includes(tZhi)) {
+                let needed = hui.slice(0,3).filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#d35400;">• ${label}「${tZhi}」引動三會${hui[3]}局 (${hui[0]}${hui[1]}${hui[2]})</span>`);
+            }
+        });
+        const sanhe = [['申','子','辰','水'], ['亥','卯','未','木'], ['寅','午','戌','火'], ['巳','酉','丑','金']];
+        sanhe.forEach(he => {
+            if (he.includes(tZhi)) {
+                let needed = he.slice(0,3).filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) {
+                    alerts.push(`<span style="color:#8e44ad;">• ${label}「${tZhi}」引動三合${he[3]}局 (${he[0]}${he[1]}${he[2]})</span>`);
+                } else {
+                    if (tZhi === he[0] && baseZhis.includes(he[1])) alerts.push(`<span style="color:#9b59b6;">• ${label}「${tZhi}」引動半合${he[3]}局 (${he[0]}${he[1]})</span>`);
+                    if (tZhi === he[2] && baseZhis.includes(he[1])) alerts.push(`<span style="color:#9b59b6;">• ${label}「${tZhi}」引動半合${he[3]}局 (${he[1]}${he[2]})</span>`);
+                    if (tZhi === he[1]) {
+                        if (baseZhis.includes(he[0])) alerts.push(`<span style="color:#9b59b6;">• ${label}「${tZhi}」引動半合${he[3]}局 (${he[0]}${he[1]})</span>`);
+                        if (baseZhis.includes(he[2])) alerts.push(`<span style="color:#9b59b6;">• ${label}「${tZhi}」引動半合${he[3]}局 (${he[1]}${he[2]})</span>`);
+                    }
+                }
+            }
+        });
+        return [...new Set(alerts)];
+    }
+
+    function checkLiunianHeju(tGan, tZhi, baseGans, baseZhis, pillarNames) {
+        let alerts = [];
+        for(let i=0; i<4; i++) {
+            if(ganHeMap[tGan] === baseGans[i]) alerts.push(`<span style="color:#00d2ff; border:1px solid #00d2ff; padding:1px 3px; border-radius:3px; font-size:11px;">合${pillarNames[i]}干</span>`);
+            if(zhiHeMap[tZhi] === baseZhis[i]) alerts.push(`<span style="color:#00d2ff; background:rgba(0,210,255,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">合${pillarNames[i]}支</span>`);
+        }
+        
+        const sanhui = [['寅','卯','辰','木'], ['巳','午','未','火'], ['申','酉','戌','金'], ['亥','子','丑','水']];
+        sanhui.forEach(hui => {
+            if (hui.includes(tZhi)) {
+                let needed = hui.slice(0,3).filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#d35400; background:rgba(211,84,0,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">三會${hui[3]}</span>`);
+            }
+        });
+        const sanhe = [['申','子','辰','水'], ['亥','卯','未','木'], ['寅','午','戌','火'], ['巳','酉','丑','金']];
+        sanhe.forEach(he => {
+            if (he.includes(tZhi)) {
+                let needed = he.slice(0,3).filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) {
+                    alerts.push(`<span style="color:#8e44ad; background:rgba(142,68,173,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">三合${he[3]}</span>`);
+                } else {
+                    if (tZhi === he[0] && baseZhis.includes(he[1])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                    if (tZhi === he[2] && baseZhis.includes(he[1])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                    if (tZhi === he[1]) {
+                        if (baseZhis.includes(he[0])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                        if (baseZhis.includes(he[2])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                    }
+                }
+            }
+        });
+        return [...new Set(alerts)].join(' ');
+    }
+    
+    const checkDayunHeju = (tZhi, baseZhis) => {
+        let alerts = [];
+        const sanhui = [['寅','卯','辰','木'], ['巳','午','未','火'], ['申','酉','戌','金'], ['亥','子','丑','水']];
+        sanhui.forEach(hui => {
+            if (hui.includes(tZhi)) {
+                let needed = hui.slice(0,3).filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#d35400; background:rgba(211,84,0,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">三會${hui[3]}</span>`);
+            }
+        });
+        const sanhe = [['申','子','辰','水'], ['亥','卯','未','木'], ['寅','午','戌','火'], ['巳','酉','丑','金']];
+        sanhe.forEach(he => {
+            if (he.includes(tZhi)) {
+                let needed = he.slice(0,3).filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) {
+                    alerts.push(`<span style="color:#8e44ad; background:rgba(142,68,173,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">三合${he[3]}</span>`);
+                } else {
+                    if (tZhi === he[0] && baseZhis.includes(he[1])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                    if (tZhi === he[2] && baseZhis.includes(he[1])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                    if (tZhi === he[1]) {
+                        if (baseZhis.includes(he[0])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                        if (baseZhis.includes(he[2])) alerts.push(`<span style="color:#9b59b6; background:rgba(155,89,182,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">半合${he[3]}</span>`);
+                    }
+                }
+            }
+        });
+        return [...new Set(alerts)].join(' ');
+    };
+
+    const checkDayunChongXing = (tGan, tZhi, baseGans, baseZhis, pNames) => {
+        let alerts = [];
+        let allZhis = [...baseZhis, tZhi];
+        
+        if (allZhis.includes('寅') && allZhis.includes('巳') && allZhis.includes('申')) {
+            if (tZhi === '寅' || tZhi === '巳' || tZhi === '申') {
+                let needed = ['寅', '巳', '申'].filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#ff5252; background:rgba(255,82,82,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">無恩三刑</span>`);
+            }
+        }
+        if (allZhis.includes('丑') && allZhis.includes('戌') && allZhis.includes('未')) {
+             if (tZhi === '丑' || tZhi === '戌' || tZhi === '未') {
+                let needed = ['丑', '戌', '未'].filter(z => z !== tZhi);
+                if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#ff5252; background:rgba(255,82,82,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">恃勢三刑</span>`);
+            }
+        }
+
+        for(let i=0; i<4; i++) {
+            if(ganChongMap[tGan] === baseGans[i]) alerts.push(`<span style="color:#ff5252; border:1px solid #ff5252; padding:1px 3px; border-radius:3px; font-size:11px;">沖${pNames[i]}干</span>`);
+        }
+
+        for(let i=0; i<4; i++) {
+            let z2 = baseZhis[i];
+            let pName = pNames[i];
+            if(zhiChongMap[tZhi] === z2) alerts.push(`<span style="color:#ff5252; background:rgba(255,82,82,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">沖${pName}支</span>`);
+        }
+        return [...new Set(alerts)].join(' ');
+    };
+
+    function getTraditionalRoots(targetGan, targetIndex, allZhis, pNames) {
+        let roots = [];
+        let targetElement = ganElementMap[targetGan]; 
+        let maxScore = 0;
+        let finalLabel = "虛浮無根";
+
+        allZhis.forEach((zhi, index) => {
+            let hideGansObj = zhiHiddenWeights[zhi] || {};
+            let sortedGans = Object.keys(hideGansObj).sort((a, b) => hideGansObj[b] - hideGansObj[a]);
+            let foundIndex = sortedGans.findIndex(hg => ganElementMap[hg] === targetElement);
+            
+            if (foundIndex !== -1) {
+                let rootType = foundIndex === 0 ? "本氣" : (foundIndex === 1 ? "中氣" : "餘氣");
+                roots.push({ pillarName: pNames[index], zhi: zhi, type: rootType });
+                let score = 0;
+                let distance = Math.abs(targetIndex - index);
+                
+                if (index === 1 && foundIndex === 0) score = 10;
+                else if (distance === 0 && foundIndex === 0) score = 8;
+                else if ((distance === 0 && foundIndex === 1) || (distance === 1 && foundIndex === 0)) score = 5;
+                else if (distance > 1 && foundIndex === 0) score = 4;
+                else score = 2;
+
+                if (score > maxScore) maxScore = score;
+            }
+        });
+
+        if (maxScore >= 10) finalLabel = "月令強根";
+        else if (maxScore >= 8) finalLabel = "自坐強根";
+        else if (maxScore >= 4) finalLabel = "有根";
+        else if (maxScore > 0) finalLabel = "弱根";
+
+        return { roots: roots, label: finalLabel };
+    }
+    
+    const getTenGodForElement = (targetEl, dayEl) => {
+        if (targetEl === dayEl) return '比劫';
+        if (wuxingRel[dayEl].sheng === targetEl) return '食傷';
+        if (wuxingRel[dayEl].ke === targetEl) return '財星';
+        if (wuxingRel[targetEl].ke === dayEl) return '官殺';
+        if (wuxingRel[targetEl].sheng === dayEl) return '印星';
+        return '';
+    };
+
+    /**
+     * 流日「整體運勢」與「財運」量化評分（自訂簡化演算法，僅供快速比較參考，非傳統命理定論）。
+     * ganTenGod：日干精確十神（比肩/劫財/食神/傷官/偏財/正財/七殺/正官/偏印/正印）
+     * zhiBroadTenGod：日支粗分十神（比劫/食傷/財星/官殺/印星）
+     */
+    function computeLiuriScore(ganTenGod, zhiBroadTenGod) {
+        let overall = 50, wealth = 50;
+        const helpfulGan = ['比肩', '劫財', '正印', '偏印'];
+        if (helpfulGan.includes(ganTenGod)) overall += 18;
+        if (zhiBroadTenGod === '比劫' || zhiBroadTenGod === '印星') overall += 15;
+        if (ganTenGod === '食神' || ganTenGod === '傷官') overall += 8;
+        if (zhiBroadTenGod === '食傷') overall += 6;
+        if (ganTenGod === '正財' || ganTenGod === '偏財') overall += 5;
+        if (zhiBroadTenGod === '財星') overall += 4;
+        if (ganTenGod === '七殺' || ganTenGod === '正官') overall -= 10;
+        if (zhiBroadTenGod === '官殺') overall -= 8;
+
+        // 財運：財星最旺、食傷生財次之；比劫剋財最忌；印星洩食傷、間接耗財源
+        if (ganTenGod === '正財' || ganTenGod === '偏財') wealth += 30;
+        if (zhiBroadTenGod === '財星') wealth += 22;
+        if (ganTenGod === '食神' || ganTenGod === '傷官') wealth += 14;
+        if (zhiBroadTenGod === '食傷') wealth += 10;
+        if (ganTenGod === '比肩' || ganTenGod === '劫財') wealth -= 22;
+        if (zhiBroadTenGod === '比劫') wealth -= 16;
+        if (ganTenGod === '正印' || ganTenGod === '偏印') wealth -= 8;
+        if (zhiBroadTenGod === '印星') wealth -= 6;
+
+        overall = Math.max(5, Math.min(95, Math.round(overall)));
+        wealth = Math.max(5, Math.min(95, Math.round(wealth)));
+        return { overall, wealth };
+    }
+
+    /**
+     * 依當日十神屬性給出一句「可執行的」建議文字，取代單純的分數顯示。
+     */
+    function getLiuriSuggestion(ganTenGod) {
+        const map = {
+            '比肩': '人際互動旺，適合聚會交流，但避免合夥財務、借貸往來，防比肩奪利。',
+            '劫財': '破財訊號較明顯，大額消費、借貸出借宜謹慎，避免衝動決策。',
+            '食神': '心情較放鬆、表達力佳，適合創作、談合作、享受生活，忌過度耗費心神。',
+            '傷官': '想法多、易鋒芒外露，適合腦力激盪，但溝通宜收斂，避免與上司衝突。',
+            '正財': '利於穩健進財、記帳理財、簽訂長期契約，行動務實為佳。',
+            '偏財': '機會財、業外收入運較旺，適合投資評估、拓展人脈，但忌貪快求多。',
+            '正官': '責任感提升，適合處理公事、面談、簽約，行事宜按部就班守規矩。',
+            '七殺': '壓力與挑戰感較重，決策宜謹慎保守，避免衝突對抗或高風險操作。',
+            '正印': '適合學習、簽約用印、靜心規劃，貴人運佳，宜多請益前輩。',
+            '偏印': '適合獨處思考、專業鑽研，但社交互動易顯冷淡，避免過度多疑。'
+        };
+        return map[ganTenGod] || '今日五行氣場平順，依既定計畫行事即可。';
+    }
+
+    // 全域版精確十神（含陰陽），供格局／用神判定使用（與 calculateBaziCore 內的 getSpecificShiShen 邏輯相同）
+    function getPreciseTenGod(targetGan, dGan) {
+        if (!targetGan || targetGan === '-') return '';
+        const tEl = ganElementMap[targetGan], dEl = ganElementMap[dGan];
+        const samePol = stemPolarity[targetGan] === stemPolarity[dGan];
+        if (tEl === dEl) return samePol ? '比肩' : '劫財';
+        if (wuxingRel[dEl].sheng === tEl) return samePol ? '食神' : '傷官';
+        if (wuxingRel[dEl].ke === tEl) return samePol ? '偏財' : '正財';
+        if (wuxingRel[tEl].ke === dEl) return samePol ? '七殺' : '正官';
+        if (wuxingRel[tEl].sheng === dEl) return samePol ? '偏印' : '正印';
+        return '';
+    }
+
+    /**
+     * 子平格局定式＋用神／忌神判定（簡化版，僅供參考，非嚴格對應單一流派）。
+     * 格局：以月令（月支）藏干為主氣，優先採「已透干」者定格；比肩／劫財月令另定建祿／羊刃（月劫）；
+     *       極強極弱（從強格／從弱格）時覆蓋為變格，不依正格常規論。
+     * 用神／忌神：先判斷是否需要調候（月支寒暖＋原局水火比例），調候優先於扶抑；
+     *            否則依身強／身弱／從強／從弱四種狀態各自對應（從格的用神方向與正格身強身弱恰好相反）。
+     */
+    function determineGeJuAndYongShen(mz, dGan, dayElement, baseGans, strengthLabel, elementCount, totalElements) {
+        // ---- 1. 格局：月令司令神（本氣優先，若有其他藏干已透干則以透干者優先） ----
+        const hideGansObj = zhiHiddenWeights[mz] || {};
+        const sortedCandidates = Object.keys(hideGansObj).sort((a, b) => hideGansObj[b] - hideGansObj[a]);
+        const benQiGan = sortedCandidates[0];
+        const transparentCandidate = sortedCandidates.find(c => baseGans.includes(c));
+        const geJuGan = transparentCandidate || benQiGan;
+        const isTou = baseGans.includes(geJuGan);
+        const geJuTenGod = getPreciseTenGod(geJuGan, dGan);
+
+        const geJuNameMap = {
+            '正官': '正官格', '七殺': '七殺格', '正財': '正財格', '偏財': '偏財格',
+            '食神': '食神格', '傷官': '傷官格', '正印': '正印格', '偏印': '偏印格'
+        };
+        let geJuBaseName;
+        if (geJuTenGod === '比肩') {
+            geJuBaseName = '建祿格';
+        } else if (geJuTenGod === '劫財') {
+            geJuBaseName = (stemPolarity[dGan] === 1) ? '羊刃格' : '月劫格';
+        } else {
+            geJuBaseName = geJuNameMap[geJuTenGod] || '雜氣格';
+        }
+
+        let geJuName = geJuBaseName;
+        let isExtreme = (strengthLabel === '從強格' || strengthLabel === '從弱格');
+        if (isExtreme) {
+            geJuName = `${strengthLabel}（不依正格論，原局月令本屬${geJuBaseName}）`;
+        }
+        const geJuNote = `月支「${mz}」藏干以「${geJuGan}」定格${isTou ? '，且已透干（格局清晰）' : '，未透干，僅以藏干本氣論格'}`;
+
+        // ---- 2. 調候判斷（優先於扶抑） ----
+        const pct = (el) => totalElements > 0 ? (elementCount[el] / totalElements) * 100 : 0;
+        const winterZhi = ['亥', '子', '丑'], summerZhi = ['巳', '午', '未'];
+        let tiaohou = null;
+        if (winterZhi.includes(mz) && pct('火') < 12) {
+            tiaohou = { need: ['火', '木'], avoid: ['水', '金'], reason: `月支「${mz}」屬冬季寒月，原局火僅約 ${pct('火').toFixed(0)}%，調候優先，需以火（次選木生火）為用` };
+        } else if (summerZhi.includes(mz) && pct('水') < 12) {
+            tiaohou = { need: ['水', '金'], avoid: ['火', '木'], reason: `月支「${mz}」屬夏季炎月，原局水僅約 ${pct('水').toFixed(0)}%，調候優先，需以水（次選金生水）為用` };
+        }
+
+        // ---- 3. 扶抑用神／忌神（十神類別 → 換算對應五行） ----
+        const genEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
+        const catToEl = {
+            '比劫': dayElement,
+            '印': genEl,
+            '食傷': wuxingRel[dayElement].sheng,
+            '財': wuxingRel[dayElement].ke,
+            '官殺': Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement)
+        };
+        const toElements = (cats) => [...new Set(cats.map(c => catToEl[c]))];
+
+        let yongCats, jiCats, logicNote;
+        if (strengthLabel === '從強格') {
+            yongCats = ['比劫', '印']; jiCats = ['財', '官殺', '食傷'];
+            logicNote = '從強格：日主氣勢已成一方獨大，用神反取比劫、印星以順其勢；財官食傷逆勢而為，稱忌神。';
+        } else if (strengthLabel === '身強') {
+            yongCats = ['財', '官殺', '食傷']; jiCats = ['比劫', '印'];
+            logicNote = '身強：日主偏旺，用神取財官食傷剋洩耗身；印比為忌神，恐助身過旺。';
+        } else if (strengthLabel === '身弱') {
+            yongCats = ['比劫', '印']; jiCats = ['財', '官殺', '食傷'];
+            logicNote = '身弱：日主偏弱，用神取比劫印星生扶日主；財官食傷為忌神，恐耗身過度。';
+        } else { // 從弱格
+            yongCats = ['財', '官殺', '食傷']; jiCats = ['比劫', '印'];
+            logicNote = '從弱格：日主氣勢已從他方，用神反取財官食傷順其強勢；比劫印星欲扶身反而逆勢，稱忌神。';
+        }
+
+        let yongElements = toElements(yongCats), jiElements = toElements(jiCats);
+        let tiaohouActive = false;
+        if (tiaohou) {
+            tiaohouActive = true;
+            yongElements = tiaohou.need;
+            jiElements = tiaohou.avoid;
+            logicNote = `【調候優先於扶抑】${tiaohou.reason}。扶抑判斷僅供次要參考：${logicNote}`;
+        }
+
+        return {
+            geJuName, geJuBaseName, geJuGan, geJuTenGod, geJuNote, isExtreme,
+            yongElements, jiElements, yongCats, jiCats, logicNote, tiaohouActive
+        };
+    }
+
+    function generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender) {
+        const today = new Date();
+        let currentYear = today.getFullYear();
+        let currentMonth = today.getMonth(); 
+
+        let tactics = { love: [], career: [], wealth: [], health: [], family: [] };
+        
+        const baseGans = [yg, mg, dg, tg];
+        const baseZhis = [yz, mz, dz, tz];
+        const pNames = ['年', '月', '日', '時'];
+
+        const addTactic = (cat, monthStr, badge, desc) => {
+            tactics[cat].push(`
+                <tr class="lm-month-row"><td colspan="2">${monthStr}</td></tr>
+                <tr class="lm-event-row">
+                    <td class="lm-badge-cell">${badge}</td>
+                    <td class="lm-desc-cell">${desc}</td>
+                </tr>
+            `);
+        };
+
+        for(let i = -6; i <= 12; i++) {
+            let d = new Date(currentYear, currentMonth + i, 15);
+            let y = d.getFullYear();
+            let m = d.getMonth() + 1;
+            
+            const solar = Solar.fromYmd(y, m, 15);
+            const lunar = solar.getLunar();
+            const bazi = lunar.getEightChar();
+            let mGan = bazi.getMonthGan();
+            let mZhi = bazi.getMonthZhi();
+
+            const jieRange = getJieQiRange(solar);
+            let monthStr = jieRange
+                ? `${jieRange.startLabel} ~ ${jieRange.endLabel} (${mGan}${mZhi})`
+                : `${y}年${m}月 (${mGan}${mZhi})`; // 節氣資料抓取失敗時的備援顯示
+
+            let mGanEl = ganElementMap[mGan];
+            let tgGan = getTenGodForElement(mGanEl, dayElement);
+            let isWealth = tgGan === '財星';
+            let isShiShang = tgGan === '食傷';
+            let isGuanSha = tgGan === '官殺';
+            let isBiJie = tgGan === '比劫';
+
+            let originPillars = [];
+            baseGans.forEach((bg, idx) => { if(bg !== '-' && bg === mGan) originPillars.push(`${pNames[idx]}干`); });
+            baseZhis.forEach((bz, idx) => { if(bz !== '-' && Object.keys(zhiHiddenWeights[bz] || {}).includes(mGan)) originPillars.push(`${pNames[idx]}支`); });
+
+            let originBadge = originPillars.length > 0 
+                ? `<b style="color:var(--color-origin); font-size:11px;">📍原局引動(${originPillars.join('/')})</b>` 
+                : `<b style="color:var(--color-neutral); font-size:11px;">☄️流月外來</b>`;
+            
+            // 動態判斷透干強度描述
+            let hasGan = originPillars.some(p => p.includes('干'));
+            let hasZhi = originPillars.some(p => p.includes('支'));
+            let actionDesc = "透干";
+            if (hasGan && hasZhi) actionDesc = "通根透干";
+            else if (hasZhi && !hasGan) actionDesc = "藏干引透";
+            else if (hasGan && !hasZhi) actionDesc = "天干明透";
+
+            const clashBadge = (target) => `<b style="color:var(--color-chong); font-size:11px;">💥沖${target}</b>`;
+            const combineBadge = (target) => `<b style="color:var(--color-liuhe); font-size:11px;">🌀合${target}</b>`;
+            const kuBadge = (target) => `<b style="color:var(--color-ku); font-size:11px;">🔑沖開${target}</b>`;
+            const xingBadge = (target) => `<b style="color:var(--color-xing); font-size:11px;">🌀${target}自刑</b>`;
+
+
+            if (zhiChongMap[dz] === mZhi) addTactic('love', monthStr, clashBadge('日支'), `沖動夫妻宮 (${dz}${mZhi}沖)`);
+            if (zhiHeMap[dz] === mZhi) addTactic('love', monthStr, combineBadge('日支'), `合動夫妻宮 (${dz}${mZhi}合)`);
+            if ((gender === 1 && isWealth) || (gender === 0 && isGuanSha)) addTactic('love', monthStr, originBadge, `✨ 配偶星「${mGan}」${actionDesc}`);
+
+            if (zhiChongMap[mz] === mZhi) addTactic('career', monthStr, clashBadge('月支'), `沖動事業宮 (${mz}${mZhi}沖)`);
+            if (isShiShang) addTactic('career', monthStr, originBadge, `💡 食傷「${mGan}」${actionDesc}`);
+            if (isGuanSha) addTactic('career', monthStr, originBadge, `⚠️ 官殺「${mGan}」${actionDesc}`);
+
+            if (zhiChongMap[tz] === mZhi) addTactic('wealth', monthStr, clashBadge('時支'), `沖動投資/子女宮 (${tz}${mZhi}沖)`);
+            if (zhiHeMap[tz] === mZhi) addTactic('wealth', monthStr, combineBadge('時支'), `合動時柱 (${tz}${mZhi}合)`);
+            if (isBiJie) addTactic('wealth', monthStr, originBadge, `💸 比劫「${mGan}」${actionDesc}`);
+            if (['辰','戌','丑','未'].includes(mZhi)) {
+                let clashIndex = baseZhis.indexOf(zhiChongMap[mZhi]);
+                if (clashIndex !== -1) {
+                    addTactic('wealth', monthStr, kuBadge(`${pNames[clashIndex]}庫`), `財庫引動 (${baseZhis[clashIndex]}${mZhi}沖)`);
+                }
+            }
+
+            if (zhiChongMap[dz] === mZhi) addTactic('health', monthStr, clashBadge('日支'), `根基逢沖 (${dz}${mZhi}沖)`);
+            else if (zhiChongMap[mz] === mZhi) addTactic('health', monthStr, clashBadge('月支'), `提綱逢沖 (${mz}${mZhi}沖)`);
+            if (['辰','午','酉','亥'].includes(mZhi) && mZhi === dz) addTactic('health', monthStr, xingBadge('日支'), `自刑引動 (${dz}${mZhi}刑)`);
+
+            if (zhiChongMap[yz] === mZhi) addTactic('family', monthStr, clashBadge('年支'), `沖動父母宮 (${yz}${mZhi}沖)`);
+            if (zhiHeMap[yz] === mZhi) addTactic('family', monthStr, combineBadge('年支'), `合動父母宮 (${yz}${mZhi}合)`);
+        }
+
+        const formatList = (list, emptyMsg) => list.length > 0 ? `<table class="lm-table">${list.join('')}</table>` : `<div style="font-size:13px; color:#888; margin-top:5px; padding-left:10px;">${emptyMsg}</div>`;
+
+        return `
+            <div class="score-box" style="text-align: left; padding: 20px; border-color: #555; background: rgba(0,0,0,0.3); margin-top: 0; margin-bottom: 0; border-radius: 8px;">
+                <div style="margin-bottom: 15px;">
+                    <b style="color:#ff9800; font-size:14px;">💖 感情 / 婚姻 (觀測日支與配偶星)</b>
+                    ${formatList(tactics.love, '此週期感情宮位無明顯劇烈引動')}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <b style="color:#2ed573; font-size:14px;">📈 事業 / 職場 (觀測月柱與官殺食傷)</b>
+                    ${formatList(tactics.career, '此週期事業宮位無明顯劇烈引動')}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <b style="color:#00d2ff; font-size:14px;">💰 財運 / 投資 (觀測時柱與比劫財星)</b>
+                    ${formatList(tactics.wealth, '此週期無明顯財庫沖動或破財徵兆')}
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <b style="color:#ff5252; font-size:14px;">🏥 健康 / 情緒 (觀測日月支逢沖刑)</b>
+                    ${formatList(tactics.health, '此週期根基穩固，無重大沖刑')}
+                </div>
+                <div>
+                    <b style="color:#a29bfe; font-size:14px;">🏡 家庭 / 長輩 (觀測年柱)</b>
+                    ${formatList(tactics.family, '此週期家庭宮位平順')}
+                </div>
+            </div>
+        `;
+    }
+
+    function calculateBaziCore() {
+        const mode = document.querySelector('input[name="inputMode"]:checked').value;
+        const gender = parseInt(document.getElementById('gender').value);
+        const genderStr = gender === 1 ? '元男' : '元女';
+        const currentYear = new Date().getFullYear();
+
+        let yg, yz, mg, mz, dg, dz, tg, tz;
+        let startYearOfLife;
+        let daYunData = [];
+        let solarInfoHtml = '';
+        let birthSolarForJieQi = null; // 僅在「依出生日期」模式下有值，供精確得令（人元司令分野）計算使用
+
+        if (mode === 'date') {
+            let y = parseInt(document.getElementById('year').value);
+            let m = parseInt(document.getElementById('month').value);
+            let d = parseInt(document.getElementById('day').value);
+            let h = parseInt(document.getElementById('hour').value);
+            let min = parseInt(document.getElementById('minute').value) || 0;
+
+            let useTrueSolar = document.getElementById('useTrueSolar').checked;
+            let useSplitZi = document.getElementById('useSplitZi').checked;
+
+            let dateObj = new Date(y, m - 1, d, h, min, 0);
+
+            if (useTrueSolar) {
+                let lon = parseFloat(document.getElementById('longitude').value) || 120;
+                let lonDiff = (lon - 120) * 4; 
+                
+                let isLeap = (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+                let daysInMonth = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                let dayOfYear = d;
+                for(let i=1; i<m; i++) dayOfYear += daysInMonth[i];
+                
+                let B = (360 / 365.24) * (dayOfYear - 81) * (Math.PI / 180);
+                let eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+                
+                let totalOffset = lonDiff + eot;
+                
+                dateObj.setMinutes(dateObj.getMinutes() + totalOffset);
+                
+                let sign = totalOffset >= 0 ? '+' : '';
+                solarInfoHtml = `<div style="text-align:center; margin-bottom:15px; font-size:13px; color:#aaa; background:#1a1a1a; padding:8px 12px; border-radius:6px; border:1px solid #333;">
+                    <b style="color:#00d2ff;">☀️ 真太陽時校正：</b> 經度 ${lon}° (時差 ${sign}${totalOffset.toFixed(1)} 分鐘)<br>
+                    <span style="color:#e0e0e0; margin-top: 4px; display: inline-block;">實際出生時間換算：${dateObj.getFullYear()}年${dateObj.getMonth() + 1}月${dateObj.getDate()}日 ${dateObj.getHours()}時${dateObj.getMinutes()}分</span>
+                </div>`;
+            }
+
+            y = dateObj.getFullYear();
+            m = dateObj.getMonth() + 1;
+            d = dateObj.getDate();
+            h = dateObj.getHours();
+            let finalMin = dateObj.getMinutes();
+
+            const solar = Solar.fromYmdHms(y, m, d, h, finalMin, 0);
+            birthSolarForJieQi = solar;
+            const lunar = solar.getLunar();
+            const baZi = lunar.getEightChar();
+            
+            yg = baZi.getYearGan(); yz = baZi.getYearZhi();
+            mg = baZi.getMonthGan(); mz = baZi.getMonthZhi();
+            tg = baZi.getTimeGan(); tz = baZi.getTimeZhi();
+            
+            // 【早晚子時 絕對控制邏輯】
+            if (h === 23) {
+                if (useSplitZi) {
+                    let tempDate = new Date(dateObj.getTime());
+                    tempDate.setHours(22);
+                    let tempSolar = Solar.fromYmdHms(tempDate.getFullYear(), tempDate.getMonth() + 1, tempDate.getDate(), tempDate.getHours(), tempDate.getMinutes(), 0);
+                    dg = tempSolar.getLunar().getEightChar().getDayGan();
+                    dz = tempSolar.getLunar().getEightChar().getDayZhi();
+                } else {
+                    let tempDate = new Date(dateObj.getTime());
+                    tempDate.setDate(tempDate.getDate() + 1);
+                    tempDate.setHours(1);
+                    let tempSolar = Solar.fromYmdHms(tempDate.getFullYear(), tempDate.getMonth() + 1, tempDate.getDate(), tempDate.getHours(), tempDate.getMinutes(), 0);
+                    dg = tempSolar.getLunar().getEightChar().getDayGan();
+                    dz = tempSolar.getLunar().getEightChar().getDayZhi();
+                }
+            } else {
+                dg = baZi.getDayGan(); 
+                dz = baZi.getDayZhi();
+            }
+
+            startYearOfLife = y;
+
+            const yun = baZi.getYun(gender);
+            yun.getDaYun().forEach(dy => {
+                if (dy.getIndex() > 0 && dy.getIndex() <= 10) {
+                    const gz = dy.getGanZhi();
+                    daYunData.push({ index: dy.getIndex(), startYear: dy.getStartYear(), startAge: dy.getStartAge(), gan: gz.charAt(0), zhi: gz.charAt(1), ganZhi: gz });
+                }
+            });
+        } else {
+            yg = document.getElementById('yg').value; yz = document.getElementById('yz').value;
+            mg = document.getElementById('mg').value; mz = document.getElementById('mz').value;
+            dg = document.getElementById('dg').value; dz = document.getElementById('dz').value;
+            tg = document.getElementById('tg').value; tz = document.getElementById('tz').value;
+            
+            startYearOfLife = parseInt(document.getElementById('baziYear').value) || (currentYear - 30);
+            let yunStartAge = parseInt(document.getElementById('baziStartAge').value) || 1;
+
+            const isYangYear = stemPolarity[yg] === 1;
+            const isMale = gender === 1;
+            const direction = (isYangYear === isMale) ? 1 : -1;
+
+            const stems = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
+            const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
+
+            for (let i = 1; i <= 10; i++) {
+                let gIdx = (stems.indexOf(mg) + i * direction) % 10;
+                if(gIdx < 0) gIdx += 10;
+                let zIdx = (branches.indexOf(mz) + i * direction) % 12;
+                if(zIdx < 0) zIdx += 12;
+
+                let dGan = stems[gIdx], dZhi = branches[zIdx];
+                daYunData.push({ index: i, startYear: startYearOfLife + yunStartAge - 1 + ((i-1) * 10), startAge: yunStartAge + ((i-1) * 10), gan: dGan, zhi: dZhi, ganZhi: dGan + dZhi });
+            }
+        }
+
+        const dayGan = dg;
+        const dayElement = ganElementMap[dayGan];
+        const allBaseZhis = [yz, mz, dz, tz]; 
+
+        let currentDaYun = daYunData.find(dy => currentYear >= dy.startYear && currentYear < dy.startYear + 10);
+        let dyGan = '-', dyZhi = '-';
+        
+        if (currentDaYun) { dyGan = currentDaYun.gan; dyZhi = currentDaYun.zhi; } 
+        else if (daYunData.length > 0) { dyGan = daYunData[0].gan; dyZhi = daYunData[0].zhi; }
+
+        const lnSolar = Solar.fromYmd(currentYear, 7, 1);
+        const lnBaZi = lnSolar.getLunar().getEightChar();
+        const lnGan = lnBaZi.getYearGan(); const lnZhi = lnBaZi.getYearZhi();
+
+        function getSpecificShiShen(targetGan, dGan) {
+            if (!targetGan || targetGan === '-') return '-';
+            const tEl = ganElementMap[targetGan], dEl = ganElementMap[dGan];
+            const samePol = stemPolarity[targetGan] === stemPolarity[dGan];
+            if (tEl === dEl) return samePol ? '比肩' : '劫財';
+            if (wuxingRel[dEl].sheng === tEl) return samePol ? '食神' : '傷官';
+            if (wuxingRel[dEl].ke === tEl) return samePol ? '偏財' : '正財';
+            if (wuxingRel[tEl].ke === dEl) return samePol ? '七殺' : '正官';
+            if (wuxingRel[tEl].sheng === dEl) return samePol ? '偏印' : '正印';
+            return '';
+        }
+
+        function buildPillarObj(name, gan, zhi, isDay = false) {
+            let hideGansObj = zhiHiddenWeights[zhi] || {};
+            let hideGans = Object.keys(hideGansObj).sort((a, b) => hideGansObj[b] - hideGansObj[a]);
+            if(hideGans.length === 0 && zhi !== '-') hideGans = [gan]; 
+            return {
+                name: name, gan: gan, zhi: zhi,
+                ganShiShen: isDay ? genderStr : getSpecificShiShen(gan, dayGan),
+                hideGan: hideGans, hideShiShen: hideGans.map(hg => getSpecificShiShen(hg, dayGan))
+            };
+        }
+
+        const displayPillars = [
+            buildPillarObj('流年', lnGan, lnZhi), buildPillarObj('大運', dyGan, dyZhi),
+            buildPillarObj('時柱', tg, tz), buildPillarObj('日柱', dg, dz, true),
+            buildPillarObj('月柱', mg, mz), buildPillarObj('年柱', yg, yz)
+        ];
+
+        let gridHtml = `<div class="bazi-table-wrapper"><table class="bazi-table"><tr>`;
+        displayPillars.forEach((p, i) => {
+            let style = i === 1 ? 'border-right: 1px solid #444; padding-right: 12px;' : (i === 2 ? 'padding-left: 12px;' : '');
+            gridHtml += `<td class="bt-header" style="${style}">${p.name}</td>`;
+        });
+        gridHtml += `</tr><tr>`;
+        displayPillars.forEach((p, i) => {
+            let style = i === 1 ? 'border-right: 1px solid #444; padding-right: 12px;' : (i === 2 ? 'padding-left: 12px;' : '');
+            let color = p.name === '日柱' ? '#2ed573' : (elementColors[ganElementMap[p.gan]] || '#888');
+            gridHtml += `<td class="bt-shishen" style="${style} color:${color};">${p.ganShiShen}</td>`;
+        });
+        
+        gridHtml += `</tr><tr>`;
+        displayPillars.forEach((p, i) => {
+            let style = i === 1 ? 'border-right: 1px solid #444; padding-right: 12px;' : (i === 2 ? 'padding-left: 12px;' : '');
+            let color = elementColors[ganElementMap[p.gan]] || '#888';
+            gridHtml += `<td class="bt-ganzhi" style="${style} color:${color};">${p.gan}</td>`;
+        });
+        
+        gridHtml += `</tr><tr>`;
+        displayPillars.forEach((p, i) => {
+            let style = i === 1 ? 'border-right: 1px solid #444; padding-right: 12px;' : (i === 2 ? 'padding-left: 12px;' : '');
+            let color = elementColors[zhiElementMap[p.zhi]] || '#888';
+            gridHtml += `<td class="bt-ganzhi" style="${style} color:${color};">${p.zhi}</td>`;
+        });
+        gridHtml += `</tr><tr>`;
+        displayPillars.forEach((p, i) => {
+            let style = i === 1 ? 'border-right: 1px solid #444; padding-right: 12px;' : (i === 2 ? 'padding-left: 12px;' : '');
+            let hiddenHtml = '<div class="bt-hidden-bg">';
+            for(let j=0; j<p.hideGan.length; j++) {
+                let hGan = p.hideGan[j];
+                let hColor = elementColors[ganElementMap[hGan]] || '#888';
+                hiddenHtml += `<div class="bt-hidden-item"><span style="color:${hColor}; font-size:12px; font-weight:bold;">${hGan}</span><span style="color:${hColor}; font-size:12px; font-weight:bold;">${p.hideShiShen[j]}</span></div>`;
+            }
+            hiddenHtml += '</div>';
+            gridHtml += `<td style="${style} vertical-align:top;">${hiddenHtml}</td>`;
+        });
+        gridHtml += `</tr></table></div>`;
+        document.getElementById('baziGrid').innerHTML = solarInfoHtml + gridHtml;
+
+        const baziMap = { year: { gan: yg, zhi: yz }, month: { gan: mg, zhi: mz }, day: { gan: dg, zhi: dz }, time: { gan: tg, zhi: tz } };
+        const totalScore = calculateXuYulanScore(baziMap, dayElement);
+        let strengthLabel = '';
+        if (totalScore > 80) strengthLabel = '從強格'; else if (totalScore >= 45) strengthLabel = '身強'; else if (totalScore >= 20) strengthLabel = '身弱'; else strengthLabel = '從弱格';
+
+        // ------------------------------------------------------------------------------------------
+        // --- 整合全新「核心能量儀表板」---
+        // ------------------------------------------------------------------------------------------
+
+        // [Dash 1: 得令/得地/得勢 (Command, Root, Power) - 全新設計]
+        const isStrong = (strengthLabel === '身強' || strengthLabel === '從強格');
+        
+        // 1. 判斷得令（優先採用「人元司令分野」精確法：依真實節氣交接日推算當令司令神；
+        //    若無出生日期可用（如手動輸入八字模式），退回「月支主氣」簡易法）
+        const genEl = Object.keys(wuxingRel).find(key => wuxingRel[key].sheng === dayElement);
+        const siLingGan = getSiLingGan(birthSolarForJieQi, mz);
+        let deLingEl, deLingSourceNote;
+        if (siLingGan) {
+            deLingEl = ganElementMap[siLingGan];
+            deLingSourceNote = `節氣司令神：${siLingGan}（${deLingEl}）`;
+        } else {
+            deLingEl = zhiElementMap[mz];
+            deLingSourceNote = `月支主氣：${mz}（${deLingEl}，簡易法）`;
+        }
+        const isDeLing = (deLingEl === dayElement || deLingEl === genEl);
+        
+        // 2. 判斷得地 (日主在地支是否有根)
+        const pNames = ['年', '月', '日', '時'];
+        let dayMasterRootsEval = getTraditionalRoots(dg, 2, allBaseZhis, pNames);
+        let hasRoots = dayMasterRootsEval.roots.length > 0;
+        let rootQuality = "無根";
+        let rootClass = "status-off";
+        if (hasRoots) {
+            if (dayMasterRootsEval.label.includes("強根")) {
+                rootQuality = "強根";
+                rootClass = "status-on";
+            } else {
+                rootQuality = "有根";
+                rootClass = "status-partial";
+            }
+        }
+
+        // 3. 判斷得勢 (印比數量佔比)
+        const originalPillars = [
+            buildPillarObj('年柱', yg, yz), buildPillarObj('月柱', mg, mz),
+            buildPillarObj('日柱', dg, dz, true), buildPillarObj('時柱', tg, tz)
+        ];
+        const baseZhis = originalPillars.map(p => p.zhi);
+        const baseGans = originalPillars.map(p => p.gan);
+
+        // ===== 流日速覽（過去 3 日＋未來 7 日，共 10 天，單一長條圖一行呈現趨勢） =====
+        (function renderLiuriPanel() {
+            try {
+                if (typeof Solar === 'undefined') { document.getElementById('liuriOutput').innerHTML = ''; return; }
+                const todayD = new Date();
+                const weekChar = ['日', '一', '二', '三', '四', '五', '六'];
+                const days = [];
+                for (let offset = -3; offset <= 6; offset++) { // 過去3日 + 今日起未來7日 = 共10天
+                    const d = new Date(todayD.getFullYear(), todayD.getMonth(), todayD.getDate() + offset);
+                    const solarD = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0);
+                    const baziD = solarD.getLunar().getEightChar();
+                    const dGanD = baziD.getDayGan(), dZhiD = baziD.getDayZhi();
+                    const ganTenGod = getSpecificShiShen(dGanD, dayGan);
+                    const zhiMainEl = zhiElementMap[dZhiD];
+                    const zhiBroadTenGod = getTenGodForElement(zhiMainEl, dayElement);
+                    const scores = computeLiuriScore(ganTenGod, zhiBroadTenGod);
+                    const chongXingBadges = checkDayunChongXing(dGanD, dZhiD, baseGans, baseZhis, pNames);
+                    const hejuBadges = checkDayunHeju(dZhiD, baseZhis);
+                    days.push({
+                        gan: dGanD, zhi: dZhiD, ganTenGod,
+                        cGan: elementColors[ganElementMap[dGanD]], cZhi: elementColors[zhiMainEl],
+                        isToday: offset === 0,
+                        dateShort: `${d.getMonth() + 1}/${d.getDate()}`,
+                        weekLabel: weekChar[d.getDay()],
+                        overall: scores.overall, wealth: scores.wealth,
+                        chongXingBadges, hejuBadges
+                    });
+                }
+
+                // ---- 組裝 SVG 分組長條圖：X軸=10天，每天兩條bar（整體／財運），風格比照「原局五行」的漸層細長條 ----
+                const w = 360, h = 200;
+                const padL = 22, padR = 8, padT = 14, padB = 46;
+                const plotW = w - padL - padR, plotH = h - padT - padB;
+                const n = days.length;
+                const groupW = plotW / n;
+                const barW = groupW * 0.22; // 變細，呼應「原局五行」的細長條風格
+                const gap = (groupW - barW * 2) / 3;
+                const baseY = padT + plotH;
+                const barRadius = barW / 2; // 圓角比照原局五行的膠囊造型
+
+                let svg = `<svg viewBox="0 0 ${w} ${h}" width="100%" height="auto" style="display:block; max-width:100%;">`;
+                svg += `
+                    <defs>
+                        <linearGradient id="liuriOverallGrad" x1="0" y1="1" x2="0" y2="0">
+                            <stop offset="0%" stop-color="var(--color-liuri-overall)" stop-opacity="0.55"/>
+                            <stop offset="100%" stop-color="var(--color-liuri-overall)" stop-opacity="1"/>
+                        </linearGradient>
+                        <linearGradient id="liuriWealthGrad" x1="0" y1="1" x2="0" y2="0">
+                            <stop offset="0%" stop-color="var(--color-liuri-wealth)" stop-opacity="0.55"/>
+                            <stop offset="100%" stop-color="var(--color-liuri-wealth)" stop-opacity="1"/>
+                        </linearGradient>
+                    </defs>
+                `;
+                // 50 分基準參考線
+                const y50 = padT + plotH * (1 - 50 / 100);
+                svg += `<line x1="${padL}" y1="${y50}" x2="${w - padR}" y2="${y50}" stroke="#333" stroke-width="1" stroke-dasharray="2,3"/>`;
+                svg += `<line x1="${padL}" y1="${baseY}" x2="${w - padR}" y2="${baseY}" stroke="#444" stroke-width="1"/>`;
+
+                days.forEach((dday, i) => {
+                    const gx = padL + i * groupW;
+                    if (dday.isToday) svg += `<rect x="${gx}" y="${padT}" width="${groupW}" height="${plotH}" fill="rgba(0,210,255,0.07)"/>`;
+
+                    const hOverall = plotH * (dday.overall / 100);
+                    const hWealth = plotH * (dday.wealth / 100);
+                    const x1 = gx + gap;
+                    const x2 = x1 + barW + gap;
+
+                    // 深色凹槽軌道（比照原局五行 bar 的 inset track）
+                    svg += `<rect x="${x1}" y="${padT}" width="${barW}" height="${plotH}" rx="${barRadius}" fill="rgba(0,0,0,0.5)" stroke="#333" stroke-width="0.6"/>`;
+                    svg += `<rect x="${x2}" y="${padT}" width="${barW}" height="${plotH}" rx="${barRadius}" fill="rgba(0,0,0,0.5)" stroke="#333" stroke-width="0.6"/>`;
+
+                    svg += `<rect x="${x1}" y="${baseY - hOverall}" width="${barW}" height="${Math.max(hOverall, barW)}" rx="${barRadius}" fill="url(#liuriOverallGrad)"><title>${dday.dateShort} ${dday.gan}${dday.zhi} 整體 ${dday.overall}</title></rect>`;
+                    svg += `<rect x="${x2}" y="${baseY - hWealth}" width="${barW}" height="${Math.max(hWealth, barW)}" rx="${barRadius}" fill="url(#liuriWealthGrad)"><title>${dday.dateShort} ${dday.gan}${dday.zhi} 財運 ${dday.wealth}</title></rect>`;
+
+                    const cx = gx + groupW / 2;
+                    svg += `<text x="${cx}" y="${h - padB + 15}" text-anchor="middle" font-size="9" fill="${dday.isToday ? 'var(--accent)' : '#888'}" font-weight="${dday.isToday ? 'bold' : 'normal'}">${dday.dateShort}</text>`;
+                    svg += `<text x="${cx}" y="${h - padB + 30}" text-anchor="middle" font-size="11" font-weight="bold"><tspan fill="${dday.cGan}">${dday.gan}</tspan><tspan fill="${dday.cZhi}">${dday.zhi}</tspan></text>`;
+                });
+                svg += `</svg>`;
+
+                const today = days.find(d => d.isToday);
+                const todayRelation = today && (today.chongXingBadges || today.hejuBadges)
+                    ? `${today.chongXingBadges || ''} ${today.hejuBadges || ''}`.trim()
+                    : '';
+                const body = `
+                    <div style="font-size:12px; color:#888; margin-bottom:8px;">過去 3 日．今日起未來 7 日，共 10 天｜依日主與流日日柱十神量化，僅供參考（可滑鼠停留在長條上看數值）</div>
+                    <div class="liuri-legend">
+                        <span><span class="liuri-legend-dot" style="background:var(--color-liuri-overall);"></span>整體運勢</span>
+                        <span><span class="liuri-legend-dot" style="background:var(--color-liuri-wealth);"></span>財運</span>
+                    </div>
+                    <div class="liuri-chart-wrap">${svg}</div>
+                    ${today ? `
+                        <div class="liuri-today-callout">
+                            <div style="margin-bottom:4px;">📍 今日 ${today.dateShort}（<b><span style="color:${today.cGan}">${today.gan}</span><span style="color:${today.cZhi}">${today.zhi}</span></b>・${today.ganTenGod || '-'}）</div>
+                            <div style="margin-bottom:4px;">${todayRelation ? `與原局關係：${todayRelation}` : '與原局無明顯沖合刑，運勢平順'}</div>
+                            <div>建議：${getLiuriSuggestion(today.ganTenGod)}</div>
+                        </div>
+                    ` : ''}
+                `;
+                document.getElementById('liuriOutput').innerHTML = wrapAccordion('📆 流日速覽（財運與整體運勢）', body, true);
+            } catch (e) {
+                console.warn('流日面板計算失敗:', e);
+                document.getElementById('liuriOutput').innerHTML = '';
+            }
+        })();
+
+        const elementCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
+        const elementSpecificShiShen = { '木': [], '火': [], '土': [], '金': [], '水': [] }; 
+        
+        originalPillars.forEach(p => {
+            if(p.name !== '日柱') { elementSpecificShiShen[ganElementMap[p.gan]].push(p.ganShiShen); elementCount[ganElementMap[p.gan]] += 1.0; } 
+            else { elementCount[ganElementMap[p.gan]] += 1.0; }
+            p.hideShiShen.forEach((ss, index) => {
+                let hGanChar = p.hideGan[index], el = ganElementMap[hGanChar];
+                let weight = zhiHiddenWeights[p.zhi][hGanChar] || (1.0 / p.hideGan.length);
+                elementCount[el] += weight; elementSpecificShiShen[el].push(ss);
+            });
+        });
+
+        let totalElements = 0;
+        Object.values(elementCount).forEach(v => totalElements += v);
+        
+        let powerScore = 0;
+        if(totalElements > 0) {
+            powerScore = ((elementCount[dayElement] + elementCount[genEl]) / totalElements) * 100;
+        }
+        let isDeShi = powerScore >= 40; // 簡單定義：印比超過 40% 算得勢
+        let shiLabel = isDeShi ? "得勢" : "失勢";
+        let shiClass = isDeShi ? "status-on" : "status-off";
+
+        // ---- 子平格局定式與用神／忌神判定 ----
+        const geJuYongShen = determineGeJuAndYongShen(mz, dg, dayElement, baseGans, strengthLabel, elementCount, totalElements);
+        
+        let cmdHtml = `
+            <div class="dash-score-badge">體力</div>
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; margin-top: 15px; gap: 6px;">
+                <div class="dash-status-row" style="margin-bottom: 0;">
+                    <span class="dash-status-label" title="${deLingSourceNote}">日干月藏</span>
+                    <span class="dash-status-value ${isDeLing ? 'status-on' : 'status-off'}">${isDeLing ? '得令' : '失令'}</span>
+                </div>
+                <div style="font-size:10px; color:#777; text-align:right; margin-top:-2px; margin-bottom:2px;">${deLingSourceNote}</div>
+                <div class="dash-status-row" style="margin-bottom: 0;">
+                    <span class="dash-status-label">日干通根</span>
+                    <span class="dash-status-value ${rootClass}">${rootQuality}</span>
+                </div>
+                <div class="dash-status-row" style="margin-bottom: 0;">
+                    <span class="dash-status-label">天干比印</span>
+                    <span class="dash-status-value ${shiClass}">${shiLabel}</span>
+                </div>
+            </div>
+        `;
+
+        // [Dash 2: 顯星/定格 (Dynamic Penetration & Rooting)]
+        // 「定格」統一改用 determineGeJuAndYongShen() 的結果（含建祿/羊刃/從格特例判斷，避免與下方重複計算）
+        let traditionalPattern = geJuYongShen.isExtreme ? strengthLabel : geJuYongShen.geJuName;
+        let traditionalDesc = geJuYongShen.isExtreme
+            ? `不依正格論，原局月令屬${geJuYongShen.geJuBaseName}`
+            : geJuYongShen.geJuNote;
+
+        // 2. 判斷天干「實權主導」 (天干有強根者)
+        let rootedShiShen = [];
+        let strongestRootScore = 0;
+        let powerDesc = "全局無明顯強根";
+
+        [{gan: yg, idx: 0}, {gan: mg, idx: 1}, {gan: tg, idx: 3}].forEach(item => {
+            if (item.gan !== '-') {
+                let rootEval = getTraditionalRoots(item.gan, item.idx, allBaseZhis, pNames);
+                if (rootEval.roots.length > 0) {
+                    let ss = getSpecificShiShen(item.gan, dayGan);
+                    if (!rootedShiShen.includes(ss)) {
+                        rootedShiShen.push(ss);
+                    }
+                    if (rootEval.label.includes("強根")) strongestRootScore = 2;
+                    else if (rootEval.label.includes("有根") && strongestRootScore < 2) strongestRootScore = 1;
+                }
+            }
+        });
+
+        let realPowerHtml = "";
+        if (rootedShiShen.length > 0) {
+            realPowerHtml = `<div style="font-size: 14px; font-weight: bold; color: #2ed573; margin-bottom: 2px; line-height: 1.2;">${rootedShiShen.join('、')}</div>`;
+            if (strongestRootScore === 2) powerDesc = "通強根 (實權)";
+            else powerDesc = "通根得地 (具影響力)";
+        } else {
+            realPowerHtml = `<div style="font-size: 13px; font-weight: bold; color: #888; margin-bottom: 2px; line-height: 1.2;">無明顯當權者</div>`;
+            powerDesc = "天干虛浮無力";
+        }
+
+        let yongShenHtml = geJuYongShen.yongElements.map(el => `<b style="color:${elementColors[el]};">${el}</b>`).join('、');
+        let jiShenHtml = geJuYongShen.jiElements.map(el => `<b style="color:${elementColors[el]}; opacity:0.6;">${el}</b>`).join('、');
+
+        let penHtml = `
+            <div class="dash-score-badge">格局</div>
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; margin-top: 15px;">
+                <div style="text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; padding-top: 4px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="font-size: 11px; color: #888; margin-bottom: 2px;">定格</div>
+                    <div style="font-size: 15px; font-weight: bold; color: #00d2ff; letter-spacing: 1px; margin-bottom: 2px;">${traditionalPattern}</div>
+                    <div style="font-size: 10px; color: #aaa;">${traditionalDesc}</div>
+                </div>
+                <div style="text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; padding-top: 6px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                    <div style="font-size: 11px; color: #888; margin-bottom: 2px;">顯星</div>
+                    ${realPowerHtml}
+                    <div style="font-size: 10px; color: #aaa;">${powerDesc}</div>
+                </div>
+                <div style="text-align: center; padding-top: 6px; flex: 1; display: flex; flex-direction: column; justify-content: center;" title="${geJuYongShen.logicNote}">
+                    <div style="font-size: 11px; color: #888; margin-bottom: 2px;">用神／忌神${geJuYongShen.tiaohouActive ? '（調候優先）' : ''}</div>
+                    <div style="font-size: 14px; font-weight: bold; margin-bottom: 2px;">${yongShenHtml} <span style="color:#555;">／</span> ${jiShenHtml}</div>
+                    <div style="font-size: 10px; color: #aaa;">${geJuYongShen.tiaohouActive ? '寒暖失衡，調候優先' : '依身強身弱扶抑而定'}</div>
+                </div>
+            </div>
+        `;
+
+        // [Dash 3: 命局溫度 (Temperature)]
+        let tempScore = 0;
+        const monthBaseTemp = { '亥': -40, '子': -50, '丑': -30, '寅': -10, '卯': 0, '辰': 10, '巳': 40, '午': 50, '未': 30, '申': 10, '酉': 0, '戌': 10 };
+        tempScore += (monthBaseTemp[mz] || 0);
+        const allChars = [yg, yz, mg, mz, dg, dz, tg, tz];
+        allChars.forEach(c => {
+            if (['丙','丁','巳','午'].includes(c)) tempScore += 15;
+            if (['壬','癸','亥','子'].includes(c)) tempScore -= 15;
+            if (['戌','未'].includes(c)) tempScore += 5;
+            if (['辰','丑'].includes(c)) tempScore -= 5;
+        });
+
+        tempScore = Math.max(-100, Math.min(100, tempScore));
+        let tempPct = ((tempScore + 100) / 200) * 100; 
+        let tempLabel = "", tempColor = "";
+        if (tempScore > 40) { tempLabel = "過燥"; tempColor = "#ff5252"; }
+        else if (tempScore > 15) { tempLabel = "偏暖"; tempColor = "#ff9800"; }
+        else if (tempScore >= -15) { tempLabel = "中和"; tempColor = "#2ed573"; }
+        else if (tempScore >= -40) { tempLabel = "偏寒"; tempColor = "#00d2ff"; }
+        else { tempLabel = "過寒"; tempColor = "#3498db"; }
+
+        let motherEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
+        let keMeEl = Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement);
+        let meKeEl = wuxingRel[dayElement].ke;
+        let meShengEl = wuxingRel[dayElement].sheng;
+        let badElements = isStrong ? [dayElement, motherEl] : [keMeEl, meKeEl, meShengEl];
+
+        let rxText = "";
+        if (tempScore <= -15) { 
+            rxText = badElements.includes('火') ? "用木/燥土" : "建議用火";
+        } else if (tempScore >= 15) { 
+            rxText = badElements.includes('水') ? "用金/濕土" : "建議用水";
+        } else {
+            rxText = "溫度適中";
+        }
+
+        let tempHtml = `
+            <div class="dash-score-badge">調候</div>
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; margin-top: 15px; padding: 4px 0;">
+                <div style="font-size: 16px; font-weight: bold; color: ${tempColor}; letter-spacing: 1px;">${tempLabel}</div>
+                <div style="width: 85%; position:relative; height:6px; background: linear-gradient(to right, #3498db 0%, #2ed573 50%, #ff5252 100%); border-radius:3px; margin: 4px 0;">
+                    <div style="position:absolute; top:-3px; left:${tempPct}%; width:4px; height:12px; background:#fff; border-radius:2px; box-shadow:0 0 4px rgba(0,0,0,0.8); transform:translateX(-50%); transition: left 1s ease;"></div>
+                </div>
+                <div style="font-size:11px; color:#aaa; background: rgba(0,0,0,0.25); padding: 4px 10px; border-radius: 6px;">${rxText}</div>
+            </div>
+        `;
+
+
+        // [Dash 4: 五行比例 (Bar Chart - 優化版，滿版填滿不留白)]
+        let barHtml = `<div style="width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; padding: 5px 5px 10px 5px;">`;
+        ['木', '火', '土', '金', '水'].forEach(el => {
+            let pct = totalElements > 0 ? ((elementCount[el] / totalElements) * 100).toFixed(0) : 0;
+            let tg = getTenGodForElement(el, dayElement).substring(0, 1);
+            barHtml += `
+                <div style="display: flex; align-items: center; width: 100%;">
+                    <div style="width: 38px; font-size: 14px; font-weight: bold; color: ${elementColors[el]}; display:flex; justify-content:space-between; align-items: center;">
+                        <span>${el}</span><span style="font-size:10px; color:#666;">${tg}</span>
+                    </div>
+                    <div style="flex-grow: 1; background: rgba(0,0,0,0.5); height: 8px; border-radius: 4px; margin: 0 12px; overflow: hidden; border: 1px solid #333; box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);">
+                        <div style="height: 100%; background: linear-gradient(90deg, ${elementColors[el]}88, ${elementColors[el]}); width: ${pct}%; transition: width 0.8s; border-radius: 4px;"></div>
+                    </div>
+                    <div style="width: 28px; text-align: right; font-size: 12px; color: #ccc; font-weight: bold;">${pct}%</div>
+                </div>
+            `;
+        });
+        barHtml += `</div>`;
+
+        // [Dash 5: 五芒星 (Pentagram - 優化版，滿版置中+氛圍背景)]
+        const elementsArr = ['木', '火', '土', '金', '水'];
+        const dayIdx = elementsArr.indexOf(dayElement);
+        const orderedElements = [];
+        for (let i = 0; i < 5; i++) orderedElements.push(elementsArr[(dayIdx + i) % 5]);
+
+        const cx = 105, cy = 100, r = 68; // 畫布與半徑（放大版）
+        const angles = [-Math.PI/2, -Math.PI/2 + (2*Math.PI/5), -Math.PI/2 + (4*Math.PI/5), -Math.PI/2 + (6*Math.PI/5), -Math.PI/2 + (8*Math.PI/5)];
+        const svgNodes = {};
+        orderedElements.forEach((el, index) => { svgNodes[el] = { x: cx + r * Math.cos(angles[index]), y: cy + r * Math.sin(angles[index]), color: elementColors[el] }; });
+
+        // 外層加上 flex: 1 撐滿卡片，加上非常微弱的發光背景填補空白
+        let svgHtml = `<div style="width: 100%; flex: 1; display: flex; align-items: center; justify-content: center; position: relative; background: radial-gradient(circle at center, rgba(255,255,255,0.03) 0%, transparent 60%); border-radius: 8px;">`;
+        svgHtml += `<div style="position: absolute; top: -5px; right: -5px; background: rgba(0,210,255,0.1); color: var(--accent); padding: 3px 8px; border-radius: 6px; font-size: 12px; border: 1px solid rgba(0,210,255,0.3); z-index: 2; backdrop-filter: blur(2px);">${strengthLabel}<br><span style="font-size:10px;">${totalScore}分</span></div>`;
+        svgHtml += `<svg viewBox="-20 -20 250 230" width="100%" height="100%" style="max-height: 230px; max-width: 270px; drop-shadow: 0 0 8px rgba(0,0,0,0.5);">`;
+        
+        // Sheng Edges
+        [['木','火'], ['火','土'], ['土','金'], ['金','水'], ['水','木']].forEach(e => { 
+            svgHtml += `<line x1="${svgNodes[e[0]].x}" y1="${svgNodes[e[0]].y}" x2="${svgNodes[e[1]].x}" y2="${svgNodes[e[1]].y}" stroke="#666" stroke-width="1.5" />`; 
+        });
+        // Ke Edges
+        [['木','土'], ['土','水'], ['水','火'], ['火','金'], ['金','木']].forEach(e => { 
+            svgHtml += `<line x1="${svgNodes[e[0]].x}" y1="${svgNodes[e[0]].y}" x2="${svgNodes[e[1]].x}" y2="${svgNodes[e[1]].y}" stroke="#ff5252" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>`; 
+        });
+
+        // 縮寫轉換對照表
+        const ssShortName = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
+
+        Object.keys(svgNodes).forEach(el => {
+            let node = svgNodes[el], isDayMaster = (el === dayElement);
+            let tg = isDayMaster ? '主' : getTenGodForElement(el, dayElement).substring(0,1);
+            let textColor = (el === '金') ? '#000' : '#fff';
+            
+            // 繪製五行圓圈與基本文字（放大版）
+            svgHtml += `<circle cx="${node.x}" cy="${node.y}" r="18" fill="${node.color}" stroke="${isDayMaster ? '#fff' : 'none'}" stroke-width="2"/>
+                <text x="${node.x}" y="${node.y + 5}" text-anchor="middle" fill="${textColor}" font-size="14" font-weight="bold">${el}</text>
+                <text x="${node.x}" y="${node.y - 25}" text-anchor="middle" fill="#aaa" font-size="11">${tg}</text>`;
+                
+            // 處理並繪製旁邊的具體主/副星 (縮寫)
+            let specificSSArray = elementSpecificShiShen[el] || [];
+            if (specificSSArray.length > 0) {
+                // 將全名轉換為縮寫
+                let shortSSArray = specificSSArray.map(ss => ssShortName[ss] || ss);
+                
+                // 決定文字對齊與偏移位置
+                let offsetX = 26, anchor = "start";
+                if (node.x < cx) { offsetX = -26; anchor = "end"; } 
+                
+                // 如果有多個星，垂直排列
+                let startY = node.y - ((shortSSArray.length - 1) * 6.5) + 5; 
+                shortSSArray.forEach((ssText, idx) => { 
+                    svgHtml += `<text x="${node.x + offsetX}" y="${startY + (idx * 13)}" text-anchor="${anchor}" fill="#00d2ff" font-size="12" font-weight="bold">${ssText}</text>`; 
+                });
+            }
+        });
+        svgHtml += `</svg></div>`;
+
+        // --- 組裝成完整儀表板 ---
+        let dashboardHtml = `
+                <div class="dash-grid-top">
+                    <div class="dash-card" style="padding-top: 15px; align-items: stretch;">${cmdHtml}</div>
+                    <div class="dash-card" style="padding-top: 15px; align-items: stretch;">${penHtml}</div>
+                    <div class="dash-card" style="padding-top: 15px; align-items: stretch;">${tempHtml}</div>
+                </div>
+                <div class="dash-grid-bottom">
+                    <div class="dash-card" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
+                        <div class="dash-card-title">原局五行 (含藏干)</div>
+                        ${barHtml}
+                    </div>
+                    <div class="dash-card" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
+                        <div class="dash-card-title">十神</div>
+                        ${svgHtml}
+                    </div>
+                </div>
+                <div class="dash-footnote">📖 用神／忌神判斷依據：${geJuYongShen.logicNote}</div>
+        `;
+        document.getElementById('energyDashboardOutput').innerHTML = wrapAccordion('⚡ 核心能量儀表板 ⚡', dashboardHtml, true);
+
+        // ------------------------------------------------------------------------------------------
+        // --- 原局靜態與動態引動維持原狀 (V2.1邏輯無更動) ---
+        // ------------------------------------------------------------------------------------------
+
+        let tonggenAlerts = [];
+        originalPillars.forEach((p, pIndex) => {
+            if(p.gan !== '-') {
+                let evalObj = getTraditionalRoots(p.gan, pIndex, baseZhis, pNames);
+                let labelHtml = `<span style="display:inline-block; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px; `;
+                if (evalObj.label === '月令強根') labelHtml += `background:rgba(255,82,82,0.15); color:#ff5252; border: 1px solid #ff5252;">月令強根</span>`;
+                else if (evalObj.label === '自坐強根') labelHtml += `background:rgba(255,152,0,0.15); color:#ff9800; border: 1px solid #ff9800;">自坐強根</span>`;
+                else if (evalObj.label === '有根') labelHtml += `background:rgba(46,213,115,0.15); color:#2ed573; border: 1px solid #2ed573;">有&emsp;&emsp;根</span>`;
+                else if (evalObj.label === '弱根') labelHtml += `background:rgba(0,210,255,0.15); color:#00d2ff; border: 1px solid #00d2ff;">弱&emsp;&emsp;根</span>`;
+                else labelHtml += `background:rgba(170,170,170,0.1); color:#aaa; border: 1px solid #aaa;">虛浮無根</span>`;
+
+                let rootStr = "";
+                if(evalObj.roots.length > 0) {
+                    let rText = evalObj.roots.map(r => `${r.pillarName}支「${r.zhi}」 <span style="font-size:12px;color:#aaa;">(${r.type})</span>`).join('、');
+                    rootStr = `<span style="color:#aaa; font-size: 13px;">➔ ${p.name}干「${p.gan}」 通 ${rText}</span>`;
+                } else {
+                    rootStr = `<span style="color:#666; font-size: 13px;">➔ ${p.name}干「${p.gan}」 孤立無援</span>`;
+                }
+                
+                let color = elementColors[ganElementMap[p.gan]];
+                
+                tonggenAlerts.push(`
+                    <div style="margin-bottom: 8px; display: flex; align-items: flex-start; line-height: 1.4;">
+                        <div style="min-width: 65px; flex-shrink: 0;">${labelHtml}</div>
+                        <div style="flex-grow: 1;">
+                            <span style="color:${color}; font-weight:bold; font-size:14px; margin-right:4px;">${p.ganShiShen}</span>
+                            ${rootStr}
+                        </div>
+                    </div>
+                `);
+            }
+        });
+
+        document.getElementById('tonggenOutput').innerHTML = `
+            <div style="font-weight: bold; color: #e0e0e0; margin-bottom: 12px; border-left: 3px solid #2ed573; padding-left: 8px; font-size: 14px;">🌳 天干通根 <span style="font-size:12px; color:#aaa; font-weight:normal;">(十神底氣排名)</span></div>
+            <div style="font-size: 14px; line-height: 1.6;">${tonggenAlerts.join('')}</div>
+        `;
+
+        let touganList = [];
+        const tierColors = { 100: "#ff5252", 80:  "#ff9800", 70:  "#2ed573", 50:  "#00d2ff", 20:  "#a29bfe", 0:   "#888888" };
+
+        originalPillars.forEach((p, zIndex) => {
+            if (p.zhi === '-') return;
+            let hideGansObj = zhiHiddenWeights[p.zhi] || {};
+            let sortedGans = Object.keys(hideGansObj).sort((a, b) => hideGansObj[b] - hideGansObj[a]);
+
+            sortedGans.forEach((hg, qiIndex) => {
+                let qiName = qiIndex === 0 ? "本氣" : (qiIndex === 1 ? "中氣" : "餘氣");
+                let targetElement = ganElementMap[hg];
+                let maxScore = 0, bestTier = "隱而不顯", penetratedPillars = [];
+
+                baseGans.forEach((bg, gIndex) => {
+                    if (bg === '-') return;
+                    if (ganElementMap[bg] === targetElement) {
+                        penetratedPillars.push(`${pNames[gIndex]}干`);
+                        let score = 0, tier = "";
+                        
+                        if (zIndex === 1) { 
+                            if (qiIndex === 0) { score = 100; tier = "(月令本氣)"; } else { score = 80; tier = "(月令中餘氣)"; }
+                        } else { 
+                            if (qiIndex === 0) {
+                                if (zIndex === gIndex) { score = 70; tier = "(同柱本氣)"; } else { score = 50; tier = "(異柱本氣)"; }
+                            } else { score = 20; tier = "(中餘氣)"; }
+                        }
+                        if (score > maxScore) { maxScore = score; bestTier = tier; }
+                    }
+                });
+
+                touganList.push({
+                    zhiPillar: pNames[zIndex], zhi: p.zhi, hg: hg, shiShen: getSpecificShiShen(hg, dayGan),
+                    qiName: qiName, score: maxScore, tier: bestTier, penetratedPillars: penetratedPillars
+                });
+            });
+        });
+
+        touganList.sort((a, b) => b.score - a.score);
+
+        let touganAlerts = touganList.map(item => {
+            let color = elementColors[ganElementMap[item.hg]];
+            let badgeHtml = "", descHtml = "";
+            
+            if (item.score === 100) badgeHtml = `<span style="background:rgba(255,82,82,0.15); color:#ff5252; border: 1px solid #ff5252; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">SSS級</span>`;
+            else if (item.score === 80) badgeHtml = `<span style="background:rgba(255,152,0,0.15); color:#ff9800; border: 1px solid #ff9800; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">S&emsp;級</span>`;
+            else if (item.score === 70) badgeHtml = `<span style="background:rgba(46,213,115,0.15); color:#2ed573; border: 1px solid #2ed573; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">A&emsp;級</span>`;
+            else if (item.score === 50) badgeHtml = `<span style="background:rgba(0,210,255,0.15); color:#00d2ff; border: 1px solid #00d2ff; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">B&emsp;級</span>`;
+            else if (item.score === 20) badgeHtml = `<span style="background:rgba(162,155,254,0.15); color:#a29bfe; border: 1px solid #a29bfe; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">C&emsp;級</span>`;
+            else badgeHtml = `<span style="background:rgba(170,170,170,0.1); color:#aaa; border: 1px solid #aaa; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">隱&emsp;藏</span>`;
+
+            if (item.score > 0) { 
+                let oPillar = (item.score >= 20) ? `<b style="color:#fff; background:rgba(255,255,255,0.1); padding:2px 5px; border-radius:4px; box-shadow: 0 1px 2px rgba(0,0,0,0.5);">${item.zhiPillar}支</b>` : `${item.zhiPillar}支`;
+                let dPillar = (item.score >= 20) ? `<b style="color:#00d2ff; background:rgba(0,210,255,0.1); padding:2px 5px; border-radius:4px; border: 1px solid rgba(0,210,255,0.2); box-shadow: 0 1px 2px rgba(0,0,0,0.5);">${item.penetratedPillars.join('、')}</b>` : item.penetratedPillars.join('、');
+                descHtml = `<span style="color:#aaa; font-size: 13px;">➔ 從 ${oPillar} 透 ${dPillar} <span style="color:#888;">${item.tier}</span></span>`; 
+            } 
+            else { descHtml = `<span style="color:#666; font-size: 13px;">➔ 在 ${item.zhiPillar}支 未透干</span>`; }
+
+            return `
+                <div style="margin-bottom: 8px; display: flex; align-items: flex-start; line-height: 1.4;">
+                    <div style="min-width: 50px; flex-shrink: 0;">${badgeHtml}</div> 
+                    <div style="flex-grow: 1;">
+                        <span style="color:${color}; font-weight:bold; font-size:14px; margin-right:4px;">${item.shiShen}</span>
+                        ${descHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        document.getElementById('touganOutput').innerHTML = `
+            <div style="font-weight: bold; color: #e0e0e0; margin-bottom: 12px; border-left: 3px solid #00d2ff; padding-left: 8px; font-size: 14px;">🌱 藏干透干 <span style="font-size:12px; color:#aaa; font-weight:normal;">(潛能爆發排名)</span></div>
+            <div style="font-size: 14px; line-height: 1.6;">${touganAlerts.join('')}</div>
+        `;
+
+        const lySolar = Solar.fromYmd(currentYear - 1, 7, 1);
+        const lyBaZi = lySolar.getLunar().getEightChar();
+        const lyGan = lyBaZi.getYearGan(); const lyZhi = lyBaZi.getYearZhi();
+
+        const nySolar = Solar.fromYmd(currentYear + 1, 7, 1);
+        const nyBaZi = nySolar.getLunar().getEightChar();
+        const nyGan = nyBaZi.getYearGan(); const nyZhi = nyBaZi.getYearZhi();
+
+        function checkDynamicTonggenTougan(tGan, tZhi, label, baseGans, baseZhis, pNames, dayGan, minScore = 0) {
+            let alerts = [];
+            const getBadgeHtml = (score) => {
+                if (score === 100) return `<span style="background:rgba(255,82,82,0.15); color:#ff5252; border: 1px solid #ff5252; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">SSS級</span>`;
+                if (score === 80) return `<span style="background:rgba(255,152,0,0.15); color:#ff9800; border: 1px solid #ff9800; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">S&emsp;級</span>`;
+                if (score === 70) return `<span style="background:rgba(46,213,115,0.15); color:#2ed573; border: 1px solid #2ed573; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">A&emsp;級</span>`;
+                if (score === 50) return `<span style="background:rgba(0,210,255,0.15); color:#00d2ff; border: 1px solid #00d2ff; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">B&emsp;級</span>`;
+                return `<span style="background:rgba(162,155,254,0.15); color:#a29bfe; border: 1px solid #a29bfe; padding:1px 5px; border-radius:3px; font-size:11px; margin-right:5px;">C&emsp;級</span>`;
+            };
+
+            if (tGan !== '-') {
+                let tgElement = ganElementMap[tGan];
+                let tgShiShen = getSpecificShiShen(tGan, dayGan);
+                let color = elementColors[tgElement];
+
+                baseZhis.forEach((bz, i) => {
+                    if (bz === '-') return;
+                    let hideGansObj = zhiHiddenWeights[bz] || {};
+                    let sortedGans = Object.keys(hideGansObj).sort((a, b) => hideGansObj[b] - hideGansObj[a]);
+                    
+                    let foundIndex = sortedGans.findIndex(hg => ganElementMap[hg] === tgElement);
+                    if (foundIndex !== -1) {
+                        let qiName = foundIndex === 0 ? "本氣" : (foundIndex === 1 ? "中氣" : "餘氣");
+                        let tierColor = foundIndex === 0 ? "#ff5252" : (foundIndex === 1 ? "#ff9800" : "#00d2ff");
+                        let score = 20; 
+                        if (i === 1) { score = foundIndex === 0 ? 100 : 80; } else { score = foundIndex === 0 ? 70 : 20; }
+                        
+                        if (score < minScore) return; 
+
+                        alerts.push(`
+                            <div style="margin-bottom: 8px; display: flex; align-items: flex-start; line-height: 1.4;">
+                                <div style="min-width: 65px; flex-shrink: 0; color:#aaa; font-size:13px; display:flex; align-items:center; margin-top:1px;">⬆️ 引透：</div>
+                                <div style="min-width: 55px; flex-shrink: 0; margin-top: 1px;">${getBadgeHtml(score)}</div>
+                                <div style="flex-grow: 1;">
+                                    <span style="color:${color}; font-weight:bold; font-size:14px; margin-right:4px;">${tgShiShen}</span>
+                                    <span style="color:#aaa; font-size: 13px;">➔ ${label}「${tGan}」引動原局${pNames[i]}支「${bz}」<b style="color:${tierColor};">${qiName}</b></span>
+                                </div>
+                            </div>
+                        `);
+                    }
+                });
+            }
+
+            baseGans.forEach((bg, i) => {
+                if (bg === '-') return;
+                let bgElement = ganElementMap[bg];
+                let hideGansObj = zhiHiddenWeights[tZhi] || {};
+                let sortedGans = Object.keys(hideGansObj).sort((a, b) => hideGansObj[b] - hideGansObj[a]);
+                
+                let foundIndex = sortedGans.findIndex(hg => ganElementMap[hg] === bgElement);
+                if (foundIndex !== -1) {
+                    let qiName = foundIndex === 0 ? "本氣" : (foundIndex === 1 ? "中氣" : "餘氣");
+                    let bgShiShen = getSpecificShiShen(bg, dayGan);
+                    let color = elementColors[bgElement];
+                    let tierColor = foundIndex === 0 ? "#ff5252" : (foundIndex === 1 ? "#ff9800" : "#00d2ff");
+
+                    let score = foundIndex === 0 ? 70 : (foundIndex === 1 ? 50 : 20);
+                    if (score < minScore) return; 
+
+                    alerts.push(`
+                        <div style="margin-bottom: 8px; display: flex; align-items: flex-start; line-height: 1.4;">
+                            <div style="min-width: 65px; flex-shrink: 0; color:#aaa; font-size:13px; display:flex; align-items:center; margin-top:1px;">⬇️ 得根：</div>
+                            <div style="min-width: 55px; flex-shrink: 0; margin-top: 1px;">${getBadgeHtml(score)}</div>
+                            <div style="flex-grow: 1;">
+                                <span style="color:${color}; font-weight:bold; font-size:14px; margin-right:4px;">${bgShiShen}</span>
+                                <span style="color:#aaa; font-size: 13px;">➔ 原局${pNames[i]}干「${bg}」於${label}「${tZhi}」獲得 <b style="color:${tierColor};">${qiName}根</b></span>
+                            </div>
+                        </div>
+                    `);
+                }
+            });
+            return alerts;
+        }
+
+        let dynHtml = `
+            <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
+                <div style="font-size: 14px; line-height: 1.6;">
+        `;
+        
+        let dyAlerts = checkDynamicTonggenTougan(dyGan, dyZhi, '大運', baseGans, baseZhis, pNames, dayGan);
+        dynHtml += `<b style="color:#ccc; font-size:13px;">【大運引動：${dyGan}${dyZhi}】</b><br>`;
+        dynHtml += dyAlerts.length > 0 ? dyAlerts.join('') : '<div style="color:#888; font-size:13px; padding-left: 10px; margin-bottom:12px;">無明顯通透引動</div>';
+        
+        let lyAlerts = checkDynamicTonggenTougan(lyGan, lyZhi, '去年', baseGans, baseZhis, pNames, dayGan, 70);
+        dynHtml += `<div style="margin-top:10px;"><b style="color:#ccc; font-size:13px;">【去年回顧：${lyGan}${lyZhi} (${currentYear - 1})】</b> <span style="font-size:11px; color:#888;">(僅顯示 A級 以上強引動)</span></div>`;
+        dynHtml += lyAlerts.length > 0 ? lyAlerts.join('') : '<div style="color:#888; font-size:13px; padding-left: 10px; margin-bottom:12px;">去年無 A級 以上之強引動</div>';
+
+        let lnAlerts = checkDynamicTonggenTougan(lnGan, lnZhi, '本年', baseGans, baseZhis, pNames, dayGan);
+        dynHtml += `<div style="margin-top:10px;"><b style="color:#ccc; font-size:13px;">【本年引動：${lnGan}${lnZhi} (${currentYear})】</b></div>`;
+        dynHtml += lnAlerts.length > 0 ? lnAlerts.join('') : '<div style="color:#888; font-size:13px; padding-left: 10px; margin-bottom:12px;">無明顯通透引動</div>';
+
+        let nyAlerts = checkDynamicTonggenTougan(nyGan, nyZhi, '次年', baseGans, baseZhis, pNames, dayGan);
+        dynHtml += `<div style="margin-top:10px;"><b style="color:#ccc; font-size:13px;">【次年引動：${nyGan}${nyZhi} (${currentYear + 1})】</b></div>`;
+        dynHtml += nyAlerts.length > 0 ? nyAlerts.join('') : '<div style="color:#888; font-size:13px; padding-left: 10px;">無明顯通透引動</div>';
+
+        dynHtml += `</div></div>`;
+        document.getElementById('dynamicTonggenTouganOutput').innerHTML = wrapAccordion('🚀 歲運通透引動雷達', dynHtml, false);
+
+        const kuMap = { '辰':'水', '戌':'火', '丑':'金', '未':'木' };
+        const kuClash = { '辰':'戌', '戌':'辰', '丑':'未', '未':'丑' };
+        let natalKuAlerts = [], natalKuList = []; 
+        
+        originalPillars.forEach(p => {
+            if (kuMap[p.zhi]) {
+                let kuEl = kuMap[p.zhi];
+                let tg = getTenGodForElement(kuEl, dayElement).substring(0, 1) + '庫'; 
+                let isClashed = baseZhis.includes(kuClash[p.zhi]);
+                let penetratedItems = touganList.filter(t => t.zhiPillar === p.name && t.score > 0);
+                let isPenetrated = penetratedItems.length > 0;
+                let penetratedGans = penetratedItems.map(t => t.hg).join('、');
+
+                natalKuList.push({ zhi: p.zhi, pillar: p.name, tg: tg, isClashed: isClashed, isPenetrated: isPenetrated });
+                
+                if (isClashed) { natalKuAlerts.push(`<span style="color:#e0e0e0;">• ${p.name}柱「${p.zhi}」${tg} ➔ <span style="color:#2ed573;">🔓 沖開</span> <span style="color:#aaa;">(原局「${kuClash[p.zhi]}」沖開)</span></span>`); } 
+                else if (isPenetrated) { natalKuAlerts.push(`<span style="color:#e0e0e0;">• ${p.name}柱「${p.zhi}」${tg} ➔ <span style="color:#2ed573;">🔓 透干自開</span> <span style="color:#aaa;">(${penetratedGans}已透)</span></span>`); } 
+                else { natalKuAlerts.push(`<span style="color:#888;">• ${p.name}柱「${p.zhi}」${tg} ➔ 🔒 閉庫 <span style="color:#aaa;">(待「${kuClash[p.zhi]}」字引動)</span></span>`); }
+            }
+        });
+
+        const checkAdvancedTransitKu = (tZhi, label) => {
+            let alerts = [];
+            natalKuList.forEach(ku => {
+                let isTriggered = false, triggerReason = "";
+                if (tZhi === zhiChongMap[ku.zhi]) { isTriggered = true; triggerReason = `沖開 (${ku.zhi}${tZhi}沖)`; } 
+                else if (ku.zhi === '辰' && tZhi === '辰') { isTriggered = true; triggerReason = `刑開 (辰辰自刑)`; } 
+                else if (['丑','戌','未'].includes(ku.zhi) && ['丑','戌','未'].includes(tZhi) && ku.zhi !== tZhi) { isTriggered = true; triggerReason = `刑開 (${ku.zhi}${tZhi}刑)`; }
+                else if (tZhi === zhiHeMap[ku.zhi]) { isTriggered = true; triggerReason = `合開 (${ku.zhi}${tZhi}六合)`; } 
+                else {
+                    const sanheGroup = [['申','子','辰'], ['亥','卯','未'], ['寅','午','戌'], ['巳','酉','丑']];
+                    for(let he of sanheGroup) { if (he.includes(ku.zhi) && he.includes(tZhi) && ku.zhi !== tZhi) { isTriggered = true; triggerReason = `合開 (三/半合局)`; break; } }
+                }
+                if (isTriggered) { alerts.push(`<span style="color:#e0e0e0;">• ${label}「${tZhi}」➔ <span style="color:#2ed573;">🔓 ${triggerReason}</span> 原局 ${ku.pillar}「${ku.zhi}」${ku.tg}</span>`); }
+            });
+            return alerts;
+        };
+
+        let dyKuAlerts = checkAdvancedTransitKu(dyZhi, '大運');
+        let lnKuAlerts = checkAdvancedTransitKu(lnZhi, '本年');
+        let nextLnKuAlerts = checkAdvancedTransitKu(nyZhi, '次年');
+
+        document.getElementById('sikuOutput').innerHTML = wrapAccordion('📦 四庫雷達（辰戌丑未動態偵測）', `
+            <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
+                <div style="font-size: 13px; line-height: 1.8;">
+                    <b style="color:#ccc;">【原局內建狀態】</b><br>
+                    ${natalKuAlerts.length > 0 ? natalKuAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">原局無辰戌丑未四墓庫</span>'}<br><br>
+                    <b style="color:#ccc;">【開庫引動偵測】</b><br>
+                    ${dyKuAlerts.length > 0 ? dyKuAlerts.join('<br>') : `<span style="color:#888; padding-left: 10px;">大運無引動</span>`}<br>
+                    ${lnKuAlerts.length > 0 ? lnKuAlerts.join('<br>') : `<span style="color:#888; padding-left: 10px;">本年無引動</span>`}<br>
+                    ${nextLnKuAlerts.length > 0 ? nextLnKuAlerts.join('<br>') : `<span style="color:#888; padding-left: 10px;">次年無引動</span>`}
+                </div>
+            </div>
+        `, false);
+
+        let hebanAlerts = [];
+        for(let i=0; i<3; i++) {
+            for(let j=i+1; j<4; j++) {
+                if(ganHeMap[originalPillars[i].gan] === originalPillars[j].gan) {
+                    let dist = (j - i === 1) ? '相鄰' : (j - i === 2 ? '隔柱' : '遙隔');
+                    if (dist !== '遙隔') hebanAlerts.push(`<span style="color:#00d2ff;">• 原局天干：${originalPillars[i].name}「${originalPillars[i].gan}」與 ${originalPillars[j].name}「${originalPillars[j].gan}」合絆 (${dist})</span>`);
+                }
+                if(zhiHeMap[originalPillars[i].zhi] === originalPillars[j].zhi) {
+                    let dist = (j - i === 1) ? '相鄰' : (j - i === 2 ? '隔柱' : '遙隔');
+                    if (dist !== '遙隔') hebanAlerts.push(`<span style="color:#00d2ff;">• 原局地支：${originalPillars[i].name}「${originalPillars[i].zhi}」與 ${originalPillars[j].name}「${originalPillars[j].zhi}」合絆 (${dist})</span>`);
+                }
+            }
+        }
+        hebanAlerts.push(...getOriginalHeju(baseZhis));
+
+        let yunHebanAlerts = []; 
+        originalPillars.forEach(p => {
+            if (dyGan !== '-' && ganHeMap[dyGan] === p.gan) yunHebanAlerts.push(`<span style="color:#f39c12;">• 大運天干「${dyGan}」合絆 ${p.name}「${p.gan}」 (${p.ganShiShen})</span>`);
+            if (dyZhi !== '-' && zhiHeMap[dyZhi] === p.zhi) yunHebanAlerts.push(`<span style="color:#f39c12;">• 大運地支「${dyZhi}」合絆 ${p.name}「${p.zhi}」</span>`);
+            if (lnGan !== '-' && ganHeMap[lnGan] === p.gan) yunHebanAlerts.push(`<span style="color:#2ed573;">• 本年天干「${lnGan}」合絆 ${p.name}「${p.gan}」 (${p.ganShiShen})</span>`);
+            if (lnZhi !== '-' && zhiHeMap[lnZhi] === p.zhi) yunHebanAlerts.push(`<span style="color:#2ed573;">• 本年地支「${lnZhi}」合絆 ${p.name}「${p.zhi}」</span>`);
+        });
+        
+        if (dyZhi !== '-') yunHebanAlerts.push(...getExternalHeju(dyZhi, baseZhis, '大運地支'));
+        if (lnZhi !== '-') yunHebanAlerts.push(...getExternalHeju(lnZhi, baseZhis, '本年地支'));
+
+        document.getElementById('hebanOutput').innerHTML = wrapAccordion('🔗 會合局偵測', `
+            <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
+                <div style="font-size: 13px; line-height: 1.8;">
+                    <b style="color:#ccc;">【原局內建】</b><br>
+                    ${hebanAlerts.length > 0 ? hebanAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">無合絆現象</span>'}<br><br>
+                    <b style="color:#ccc;">【本年引動 ( ${currentYear}年)】</b><br>
+                    ${yunHebanAlerts.length > 0 ? yunHebanAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">本年無合絆現象</span>'}
+                </div>
+            </div>
+        `, false);
+        
+        let originalChongXingAlerts = getOriginalChongXingHai(originalPillars);
+        let yunChongXingAlerts = []; 
+        if (dyZhi !== '-') yunChongXingAlerts.push(...getExternalChongXingHai(dyZhi, originalPillars, '大運地支'));
+        if (lnZhi !== '-') yunChongXingAlerts.push(...getExternalChongXingHai(lnZhi, originalPillars, '本年地支'));
+
+        document.getElementById('chongxingOutput').innerHTML = wrapAccordion('⚔️ 刑沖害偵測', `
+            <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
+                <div style="font-size: 13px; line-height: 1.8;">
+                    <b style="color:#ccc;">【原局內建】</b><br>
+                    ${originalChongXingAlerts.length > 0 ? originalChongXingAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">原局無明顯刑沖害</span>'}<br><br>
+                    <b style="color:#ccc;">【本年引動 ( ${currentYear}年)】</b><br>
+                    ${yunChongXingAlerts.length > 0 ? yunChongXingAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">本年無重大刑沖害</span>'}
+                </div>
+            </div>
+        `, false);
+
+        const checkLiunianChongXingHai = (tGan, tZhi, baseGans, baseZhis, pNamesList) => {
+            let alerts = [];
+            let allZhis = [...baseZhis, tZhi];
+            
+            if (allZhis.includes('寅') && allZhis.includes('巳') && allZhis.includes('申')) {
+                if (tZhi === '寅' || tZhi === '巳' || tZhi === '申') {
+                    let needed = ['寅', '巳', '申'].filter(z => z !== tZhi);
+                    if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#ff5252; background:rgba(255,82,82,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">無恩三刑</span>`);
+                }
+            }
+            if (allZhis.includes('丑') && allZhis.includes('戌') && allZhis.includes('未')) {
+                 if (tZhi === '丑' || tZhi === '戌' || tZhi === '未') {
+                    let needed = ['丑', '戌', '未'].filter(z => z !== tZhi);
+                    if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) alerts.push(`<span style="color:#ff5252; background:rgba(255,82,82,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">恃勢三刑</span>`);
+                }
+            }
+            for(let i=0; i<4; i++) { if(ganChongMap[tGan] === baseGans[i]) alerts.push(`<span style="color:#ff5252; border:1px solid #ff5252; padding:1px 3px; border-radius:3px; font-size:11px;">沖${pNamesList[i]}干</span>`); }
+
+            for(let i=0; i<4; i++) {
+                let z2 = baseZhis[i], pName = pNamesList[i];
+                if(zhiChongMap[tZhi] === z2) alerts.push(`<span style="color:#ff5252; background:rgba(255,82,82,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">沖${pName}支</span>`);
+                if(zhiHaiMap[tZhi] === z2) alerts.push(`<span style="color:#ff9800; background:rgba(255,152,0,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">害${pName}支</span>`);
+                if((tZhi === '子' && z2 === '卯') || (tZhi === '卯' && z2 === '子')) alerts.push(`<span style="color:#ff9800; background:rgba(255,152,0,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">刑${pName}支</span>`);
+                if(tZhi === z2 && ['辰','午','酉','亥'].includes(tZhi)) alerts.push(`<span style="color:#ff9800; background:rgba(255,152,0,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">自刑${pName}</span>`);
+                
+                let isSanXingTriggered = false;
+                if (['寅','巳','申'].includes(tZhi)) {
+                    let needed = ['寅', '巳', '申'].filter(z => z !== tZhi);
+                    if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) isSanXingTriggered = true;
+                }
+                if (!isSanXingTriggered && ((tZhi === '寅' && z2 === '巳') || (tZhi === '巳' && z2 === '寅') || (tZhi === '巳' && z2 === '申') || (tZhi === '申' && z2 === '巳'))) alerts.push(`<span style="color:#ff9800; background:rgba(255,152,0,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">刑${pName}支</span>`);
+                
+                let isShiShiTriggered = false;
+                if (['丑','戌','未'].includes(tZhi)) {
+                     let needed = ['丑', '戌', '未'].filter(z => z !== tZhi);
+                     if (baseZhis.includes(needed[0]) && baseZhis.includes(needed[1])) isShiShiTriggered = true;
+                }
+                if (!isShiShiTriggered && ((tZhi === '丑' && z2 === '戌') || (tZhi === '戌' && z2 === '丑') || (tZhi === '戌' && z2 === '未') || (tZhi === '未' && z2 === '戌'))) alerts.push(`<span style="color:#ff9800; background:rgba(255,152,0,0.15); padding:2px 4px; border-radius:3px; font-size:12px;">刑${pName}支</span>`);
+            }
+            return [...new Set(alerts)].join(' ');
+        };
+
+        let dlHtml = `<div class="chart-container" style="padding-bottom: 20px;">`;
+        dlHtml += `<div class="chart-title">大運</div><div class="dayun-grid">`;
+        daYunData.forEach(dy => {
+            if (dy.index > 0 && dy.index <= 10) {
+                const cGan = elementColors[ganElementMap[dy.gan]], cZhi = elementColors[zhiElementMap[dy.zhi]];
+                dlHtml += `
+                    <div class="dayun-item">
+                        <div style="font-size: 11px; color: #aaa;">${dy.startYear}年</div>
+                        <div style="font-size: 11px; color: #aaa;">${dy.startAge}歲</div>
+                        <div style="font-size: 18px; font-weight: bold; margin-top: 5px;"><span style="color:${cGan}">${dy.gan}</span><span style="color:${cZhi}">${dy.zhi}</span></div>
+                        <div style="min-height: 20px; margin-top: 6px; display:flex; flex-direction:column; gap:3px;">
+                            ${checkDayunChongXing(dy.gan, dy.zhi, baseGans, baseZhis, pNames)}
+                            ${checkDayunHeju(dy.zhi, baseZhis)}
+                        </div>
+                    </div>`;
+            }
+        });
+        dlHtml += `</div>`;
+
+        const endYear = currentYear + 50; 
+        // 「起運」年：第一個大運開始的西元年；若無大運資料（理論上不會發生）則退回出生年
+        const qiyunStartYear = daYunData.length > 0 ? daYunData[0].startYear : startYearOfLife;
+        dlHtml += `<div class="chart-title" style="margin-top: 30px;">流年運勢 (${daYunData.length > 0 ? '起運 ' + daYunData[0].startAge + '歲' : '0歲'} 起推演)</div>`;
+        dlHtml += `
+            <div class="table-container" id="liunianContainer">
+                <table class="liunian-table">
+                    <thead><tr><th>西元</th><th>歲數</th><th>流年干支</th><th>天干神</th><th>地支神</th><th>刑沖害</th><th>合會局</th></tr></thead>
+                    <tbody>
+        `;
+        
+        for (let i = qiyunStartYear; i <= endYear; i++) {
+            const tempSolar = Solar.fromYmd(i, 7, 1);
+            const tempBaZi = tempSolar.getLunar().getEightChar();
+            const tempGanZhi = tempBaZi.getYear(); 
+            const tempGan = tempGanZhi.charAt(0), tempZhi = tempGanZhi.charAt(1);
+            const elGan = ganElementMap[tempGan], elZhi = zhiElementMap[tempZhi];
+            const cGan = elementColors[elGan], cZhi = elementColors[elZhi];
+            const tgGan = getTenGodForElement(elGan, dayElement).split(' ')[0], tgZhi = getTenGodForElement(elZhi, dayElement).split(' ')[0];
+            const age = i - startYearOfLife;
+            const highlightStyle = (i === currentYear) ? 'background-color: rgba(0, 210, 255, 0.15); border-left: 3px solid var(--accent);' : '';
+            const currMarker = (i === currentYear) ? ' <br><span style="font-size:10px; background:var(--accent); color:#000; padding:1px 4px; border-radius:3px;">今年</span>' : '';
+
+            dlHtml += `
+                <tr style="${highlightStyle}" id="year-${i}">
+                    <td>${i}${currMarker}</td><td>${age}</td>
+                    <td style="font-weight: bold; font-size: 16px;"><span style="color:${cGan}">${tempGan}</span><span style="color:${cZhi}">${tempZhi}</span></td>
+                    <td style="color:${cGan}">${tgGan}</td><td style="color:${cZhi}">${tgZhi}</td>
+                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${checkLiunianChongXingHai(tempGan, tempZhi, baseGans, baseZhis, pNames)}</div></td>
+                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${checkLiunianHeju(tempGan, tempZhi, baseGans, baseZhis, pNames)}</div></td>
+                </tr>
+            `;
+        }
+        dlHtml += `</tbody></table></div></div>`;
+        document.getElementById('dayunLiunianOutput').innerHTML = wrapAccordion('🌊 大運與流年時間軸', dlHtml, false);
+
+        const monthlyHtml = generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender);
+        document.getElementById('monthlyTacticsOutput').innerHTML = wrapAccordion('📅 近月動態流月掃描（過去 6 個月驗證＋未來 1 年預測）', monthlyHtml, false);
+
+        window.currentBaziDataForAI = {
+            gender: genderStr,
+            pillars: `${yg}${yz}年 ${mg}${mz}月 ${dg}${dz}日 ${tg}${tz}時`,
+            dayMaster: `${dg} (${dayElement})`,
+            strength: strengthLabel,
+            totalScore: totalScore,
+            elements: {
+                '木': (elementCount['木'] / totalElements * 100).toFixed(1),
+                '火': (elementCount['火'] / totalElements * 100).toFixed(1),
+                '土': (elementCount['土'] / totalElements * 100).toFixed(1),
+                '金': (elementCount['金'] / totalElements * 100).toFixed(1),
+                '水': (elementCount['水'] / totalElements * 100).toFixed(1)
+            },
+            currentDaYun: `${dyGan}${dyZhi}`,
+            currentYear: `${lnGan}${lnZhi} (${currentYear}年)`,
+            geJu: geJuYongShen.geJuName,
+            geJuNote: geJuYongShen.geJuNote,
+            yongShen: geJuYongShen.yongElements.join('、'),
+            jiShen: geJuYongShen.jiElements.join('、'),
+            yongShenLogic: geJuYongShen.logicNote,
+            tiaohouActive: geJuYongShen.tiaohouActive
+        };
+
+        document.getElementById('resultBox').style.display = 'block';
+        
+        setTimeout(() => {
+            const container = document.getElementById('liunianContainer');
+            const currentYearRow = document.getElementById(`year-${currentYear}`);
+            if(container && currentYearRow) { container.scrollTop = currentYearRow.offsetTop - (container.clientHeight / 2) + (currentYearRow.clientHeight / 2); }
+        }, 150);
+    }
+
+    function cleanHtmlToPureText(arrOrStr) {
+        if (!arrOrStr) return '無明顯反應';
+        let str = Array.isArray(arrOrStr) ? arrOrStr.join('\n') : arrOrStr;
+        return str.replace(/<[^>]*>/g, '').replace(/&emsp;/g, ' ').replace(/&nbsp;/g, ' ').trim() || '無明顯反應';
+    }
+
+    const calculateBazi = function() {
+        calculateBaziCore(); 
+        
+        const baziData = window.currentBaziDataForAI;
+        if (baziData) {
+            baziData.pureTonggen = cleanHtmlToPureText(document.getElementById('tonggenOutput').innerHTML);
+            baziData.pureTougan = cleanHtmlToPureText(document.getElementById('touganOutput').innerHTML);
+            baziData.pureDynamic = cleanHtmlToPureText(document.getElementById('dynamicTonggenTouganOutput').innerHTML);
+            baziData.pureSiku = cleanHtmlToPureText(document.getElementById('sikuOutput').innerHTML);
+            baziData.pureHeban = cleanHtmlToPureText(document.getElementById('hebanOutput').innerHTML);
+            baziData.pureChongxing = cleanHtmlToPureText(document.getElementById('chongxingOutput').innerHTML);
+            baziData.pure12Month = cleanHtmlToPureText(document.getElementById('monthlyTacticsOutput').innerHTML);
+            baziData.pureLiuri = cleanHtmlToPureText(document.getElementById('liuriOutput').innerHTML);
+        }
+
+        setTimeout(() => {
+            document.getElementById('aiBtnContainer').style.display = 'flex';
+        }, 100);
+    };
+
+    function copyPromptForAI() {
+        if (!window.currentBaziDataForAI || !window.currentBaziDataForAI.pureTonggen) {
+            alert('請先點擊「執行運算」產生完整的精算數據！');
+            return;
+        }
+
+        const data = window.currentBaziDataForAI;
+        
+        const prompt = `你是一位精通子平八字命理的專業命理師，深諳《滴天髓》《子平真詮》《三命通會》等命理經典的論命邏輯與術語，行文兼具命理專業的精準度與白話文的可讀性，語氣客觀、溫暖、一針見血，不打模糊仗、不說模稜兩可的安全話術。
+
+【重要前提：排盤數據以下方系統精算結果為唯一依據，不得重新推算】
+以下所有八字排盤、十神歸屬、通根透干強弱、格局強弱量化總分、刑沖會合、開庫引動、流月戰術等數據，皆由使用者自建的量化八字系統精算產出，排盤與運算已經完成。你不需要、也「不應該」重新排八字、質疑或修改任何一項數據（包括日主強弱判定、歲運干支、刑沖會合結果等）——這些以系統給出的結果為準。你的任務只有一個：**基於這份已完成的精算報告，站在專業命理師的角度進行解讀與白話演繹**，不要另起爐灶用你自己的方式重新推算或覆蓋這份排盤。
+
+【命理師的論命規範，請務必遵守】
+- 用神／忌神／格局已由系統依「調候為先、扶抑次之」原則精算完成（見下方【1】），直接引用系統給出的結論即可，不需要你自己重新判斷或推翻，但你要用一到兩句話向讀者解釋「為什麼是這個結果」，把系統給的判斷依據轉成白話。
+- 論性格、事業、財運、感情時，具體點出「十神生剋制化」的因果鏈（例如「七殺無食傷制化，故決斷力強但易衝動犯險」），而非只複述十神字面意義。
+- 論刑沖會合時，說明「動的是哪個宮位」（年柱＝根基／祖蔭，月柱＝事業／父母，日支＝配偶／自身，時柱＝子女／晚運），並解釋動了之後對應到現實中的什麼狀況。
+- 可使用命理專業術語（如：得令、得地、得勢、通根、透干、清透、雜氣、財官印食傷比劫、墓庫、調候、格局、用神、忌神、喜神），但每次專有名詞出現後，請用一句白話立即補充說明，讓非命理背景的讀者也能看懂，不要整段堆術語。
+- 該直言的風險、盲點、警訊要直接點出來，不需要為了安慰人而模糊焦點。
+
+【1. 命盤基礎與能量佔比】
+- 性別：${data.gender}
+- 八字原局：${data.pillars}
+- 日主元神：${data.dayMaster}
+- 格局強弱：${data.strength} (量化總分：${data.totalScore} 分)
+- 五行比例：木 ${data.elements['木']}%、火 ${data.elements['火']}%、土 ${data.elements['土']}%、金 ${data.elements['金']}%、水 ${data.elements['水']}%
+- 子平格局定式：${data.geJu}（${data.geJuNote}）
+- 用神：${data.yongShen}　忌神：${data.jiShen}${data.tiaohouActive ? '　※本命調候失衡，用神以調候優先判定' : ''}
+- 用神忌神判斷依據：${data.yongShenLogic}
+- 當前大運：${data.currentDaYun}
+- 今年流年：${data.currentYear}
+
+【2. 原局底氣與結構深度拆解報告】
+■ 天干通根解析（各十神在現實中的真實底氣強度）：
+${data.pureTonggen}
+
+■ 藏干透干解析（潛能爆發排名與隱藏特質）：
+${data.pureTougan}
+
+■ 原局內建會合絆局與刑沖克害狀態：
+${data.pureHeban}
+${data.pureChongxing}
+
+【3. 歲運交感與動態變數引動雷達】
+■ 大運/流年天干「引透」與地支「得根」動態監測：
+${data.pureDynamic}
+
+■ 命局四庫（辰戌丑未）動態開庫引動偵測：
+${data.pureSiku}
+
+■ 過去 6 個月與未來 1 年流月戰術掃描 (感情/事業/財庫/健康/家庭)：
+${data.pure12Month}
+
+■ 流日速覽（過去 3 日＋今日起未來 7 日，共 10 天，含日柱十神、與原局沖合關係、每日量化整體運勢與財運強弱）：
+${data.pureLiuri}
+
+【你的分析任務】
+請絕對不要重複列印、覆述或解釋上述數據的定義本身。請直接發揮專業命理師的功力，將「通根、透干、沖刑、合絆、開庫、流月、流日」這些量化化學反應，轉化為對命主現實生活的演繹，輸出約 1200-1800 字的深度解析：
+
+0. 用神／忌神／格局定調（先講結論再展開）：直接引用系統給出的格局與用神忌神結論（見【1】），用一到兩句話把判斷依據轉成白話講清楚，作為後面所有分析的立論基礎，不需要重新推算。
+1. 核心性格與天賦盲點（直觀）：結合日主底氣與通根透干排名，直接點出他最顯性與最隱性的雙重性格特質與致命盲點，並連結到用神忌神的十神屬性去解釋「為什麼」。
+2. 原生家庭與底層安全感（溯源）：剖析年月柱（父母宮位）的十神交互作用與刑沖合害，精準解構原生家庭給予的是「實質庇蔭」還是「隱性消耗（如情感勒索、資源吸附）」。觀察財星與印星的狀態，點出家庭背景如何形塑他潛意識中的金錢觀與安全感模型，並給予如何從家族羈絆中實現「精神與現實雙重獨立」的戰術建議。
+3. 事業與資源配置（細部）：根據原局結構與透干十神，給出精準的職涯環境建議，並指出他在金錢理財策略、重大決策上應該防範哪種十神帶來的風險陷阱（例如比劫奪財、官殺壓制），對應到忌神時要明講。
+4. 近一年與近期的變動（核心破題，必須極度直觀）：請高度聚焦在「去年回顧」、「本年動態」、「動態開庫」與「近18個月流月戰術」。直接、具體地推斷出近一年內（或今年/接下來幾個月）最可能發生的現實大事（包含利用過去6個月的流月特徵進行驗證，以及預測如：職涯劇烈轉換、大筆資金重分配、人際感情危機），並給予具體的行動戰術建議，建議要能對應到用神忌神的取捨（該衝刺用神旺運、還是該防範忌神引動）。
+5. 近 10 日流日精推（過去驗證＋未來行動，需具體到「日」）：利用【流日速覽】裡「過去 3 日」的日柱十神與沖合資料，回頭驗證這幾天命主可能實際感受到的具體徵兆（例如某天沖動配偶宮、某天財星透干進財），藉此證明系統判斷的準確度；接著針對「未來 7 日」逐日或分段給出具體到日期的行動建議（哪幾天適合簽約談判、哪幾天該保守避險、哪幾天財運或整體運勢特別突出或特別低落），建議需可執行，不要籠統帶過。
+6. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
+
+【最後提醒】全文分析請完全建立在上方系統給出的排盤與量化數據之上，不要自行更動用神候選以外的任何排盤結果；你的角色是「解讀者」，不是「排盤者」。`;
+
+        try {
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = prompt;
+            tempTextArea.style.position = 'absolute';
+            tempTextArea.style.left = '-9999px';
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+
+            const btn = document.getElementById('copyPromptBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ 複製成功';
+            btn.style.background = '#2ed573';
+            btn.style.color = '#000';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.background = '#333';
+                btn.style.color = 'var(--accent)';
+            }, 3000);
+        } catch (err) {
+            console.error('複製失敗:', err);
+            alert('複製失敗，請檢查瀏覽器權限或換個瀏覽器試試。');
+        }
+    }
+
+</script>
+
+</body>
+</html>
