@@ -217,8 +217,17 @@
         table.lm-table tr.lm-month-row:first-child td { border-top: none; padding-top: 0; }
         table.lm-table td.lm-badge-cell { white-space: nowrap; vertical-align: top; padding: 2px 10px 8px 0; width: 1%; }
         table.lm-table td.lm-desc-cell { color: #ddd; font-size: 13px; vertical-align: top; padding: 2px 0 8px 0; }
-        @media (max-width: 420px) {
-            table.lm-table td.lm-badge-cell { white-space: normal; }
+        /* 窄螢幕：放棄表格欄位對齊，改成上下堆疊的區塊，避免中文字被擠到逐字換行 */
+        @media (max-width: 560px) {
+            table.lm-table, table.lm-table tbody { display: block; width: 100%; }
+            table.lm-table tr.lm-month-row, table.lm-table tr.lm-event-row { display: block; }
+            table.lm-table tr.lm-event-row { margin-bottom: 8px; }
+            table.lm-table tr.lm-month-row td,
+            table.lm-table td.lm-badge-cell,
+            table.lm-table td.lm-desc-cell {
+                display: block; width: 100%; white-space: normal; padding: 2px 0;
+            }
+            table.lm-table td.lm-badge-cell { padding-bottom: 3px; }
         }
     </style>
 </head>
