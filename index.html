@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bazi-quant</title>
+    <title>八字五行(量化版)</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.min.js"></script>
     <style>
         :root {
@@ -86,21 +86,6 @@
         .bazi-table .bt-hidden-item { display: flex; justify-content: center; gap: 4px; margin-bottom: 2px; }
 
         /* --- 核心能量儀表板專用樣式 --- */
-        .dashboard-container {
-            background: linear-gradient(145deg, #181818, #222);
-            border: 1px solid #444;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        }
-        .dashboard-header {
-            text-align: center; font-size: 16px; font-weight: bold; color: #fff; margin-bottom: 15px;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .dashboard-header::before, .dashboard-header::after {
-            content: ''; height: 1px; flex-grow: 1; background: linear-gradient(90deg, transparent, var(--accent), transparent);
-        }
         .dash-grid-top {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 10px;
         }
@@ -124,9 +109,6 @@
         .dash-score-badge {
             position: absolute; top: 8px; left: 8px; background: rgba(255,255,255,0.1); 
             font-size: 10px; padding: 2px 6px; border-radius: 4px; color: #ddd;
-        }
-        @media (max-width: 500px) {
-            .dash-grid-top, .dash-grid-bottom { grid-template-columns: 1fr; }
         }
         
         .dayun-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; text-align: center; }
@@ -197,6 +179,7 @@
         details.acc-section .acc-body { padding: 0 14px 16px 14px; border-top: 1px solid #333; padding-top: 14px; }
         @media (max-width: 500px) {
             details.acc-section summary.acc-summary { font-size: 14px; padding: 12px 14px; }
+            .dash-grid-top, .dash-grid-bottom { grid-template-columns: 1fr; }
         }
 
         /* ===== 流日面板：單一長條圖，一行顯示10天趨勢 ===== */
@@ -264,7 +247,7 @@
         <div id="savedChartsList" class="saved-charts-list"></div>
     </div>
 
-    <div class="mode-toggle" id="modeToggle">
+    <div class="mode-toggle">
         <label class="mode-toggle-btn active" data-mode="date">
             <input type="radio" name="inputMode" value="date" checked onchange="toggleInputMode()">
             <span>依出生日期</span>
@@ -276,7 +259,7 @@
     </div>
 
     <!-- 出生日期輸入介面 -->
-    <div class="form-group" id="dateInputGroup" style="display: flex !important; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+    <div class="form-group" id="dateInputGroup" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
         <div style="position: relative;">
             <input type="datetime-local" id="birthDateTime" style="padding: 12px; font-size: 15px; width: 100%;">
         </div>
@@ -341,8 +324,8 @@
 
     <div class="form-group" style="margin-bottom: 0;">
         <select id="gender" style="grid-column: span 2;">
-            <option value="1">男生</option>
-            <option value="0">女生</option>
+            <option value="1">男性</option>
+            <option value="0">女性</option>
         </select>
     </div>
     <div class="form-group" style="grid-template-columns: 2fr 1fr; margin-top: 15px; display: grid; gap: 10px;">
@@ -1129,13 +1112,48 @@
     }
 
     /**
+     * 獨立的「從格」判斷——完全不使用老師系統的量化總分，改用傳統子平「通根有無」＋
+     * 「滿盤一面倒（比劫印 or 財官食傷其中一方掛零）」的離散式判斷，與量化分數系統脫鉤。
+     * 回傳 '從強' / '從弱' / null（null 代表不成立從格，仍依正格常規論）。
+     */
+    function checkCongGeIndependently(dGan, dayElement, baseGans, baseZhis, pNames, genEl) {
+        const dayIndex = pNames.indexOf('日');
+        const dayRoots = getTraditionalRoots(dGan, dayIndex, baseZhis, pNames);
+        const hasRoot = dayRoots.roots.length > 0;
+
+        const catOf = (el) => {
+            if (el === dayElement) return '比劫';
+            if (el === genEl) return '印';
+            if (wuxingRel[dayElement].sheng === el) return '食傷';
+            if (wuxingRel[dayElement].ke === el) return '財';
+            return '官殺';
+        };
+        let helpCount = 0, drainCount = 0; // 統計日干以外的 3 天干＋4 地支本氣，落在「印比」或「財官食傷」哪一邊
+        baseGans.forEach((g, idx) => {
+            if (idx === dayIndex || g === '-') return;
+            const cat = catOf(ganElementMap[g]);
+            if (cat === '比劫' || cat === '印') helpCount++; else drainCount++;
+        });
+        baseZhis.forEach((z) => {
+            if (z === '-') return;
+            const cat = catOf(zhiElementMap[z]);
+            if (cat === '比劫' || cat === '印') helpCount++; else drainCount++;
+        });
+
+        if (!hasRoot && helpCount === 0) return '從弱';
+        if (hasRoot && drainCount === 0) return '從強';
+        return null;
+    }
+
+    /**
      * 子平格局定式＋用神／忌神判定（簡化版，僅供參考，非嚴格對應單一流派）。
      * 格局：以月令（月支）藏干為主氣，優先採「已透干」者定格；比肩／劫財月令另定建祿／羊刃（月劫）；
-     *       極強極弱（從強格／從弱格）時覆蓋為變格，不依正格常規論。
+     *       從強格／從弱格的判定改用傳統子平「通根＋滿盤一面倒」的獨立邏輯（見 checkCongGeIndependently），
+     *       與下方「用神／忌神」的量化分數（老師系統）判斷脫鉤，兩者刻意採不同方法。
      * 用神／忌神：先判斷是否需要調候（月支寒暖＋原局水火比例），調候優先於扶抑；
-     *            否則依身強／身弱／從強／從弱四種狀態各自對應（從格的用神方向與正格身強身弱恰好相反）。
+     *            從格時用神方向依上方獨立判斷的從強／從弱而定；非從格時才採用老師系統的量化身強／身弱。
      */
-    function determineGeJuAndYongShen(mz, dGan, dayElement, baseGans, strengthLabel, elementCount, totalElements) {
+    function determineGeJuAndYongShen(mz, dGan, dayElement, baseGans, baseZhis, pNames, strengthLabel, elementCount, totalElements) {
         // ---- 1. 格局：月令司令神（本氣優先，若有其他藏干已透干則以透干者優先） ----
         const hideGansObj = zhiHiddenWeights[mz] || {};
         const sortedCandidates = Object.keys(hideGansObj).sort((a, b) => hideGansObj[b] - hideGansObj[a]);
@@ -1158,10 +1176,15 @@
             geJuBaseName = geJuNameMap[geJuTenGod] || '雜氣格';
         }
 
+        // 獨立判斷從格（不依賴老師系統的量化總分）
+        const genEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
+        const congGeResult = checkCongGeIndependently(dGan, dayElement, baseGans, baseZhis, pNames, genEl);
+
         let geJuName = geJuBaseName;
-        let isExtreme = (strengthLabel === '從強格' || strengthLabel === '從弱格');
+        let isExtreme = !!congGeResult;
         if (isExtreme) {
-            geJuName = `${strengthLabel}（不依正格論，原局月令本屬${geJuBaseName}）`;
+            const extremeLabel = congGeResult === '從強' ? '從強格（專旺）' : '從弱格';
+            geJuName = `${extremeLabel}（不依正格論，原局月令本屬${geJuBaseName}；依傳統子平通根＋滿盤判定，非老師量化分數）`;
         }
         const geJuNote = `月支「${mz}」藏干以「${geJuGan}」定格${isTou ? '，且已透干（格局清晰）' : '，未透干，僅以藏干本氣論格'}`;
 
@@ -1176,7 +1199,6 @@
         }
 
         // ---- 3. 扶抑用神／忌神（十神類別 → 換算對應五行） ----
-        const genEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
         const catToEl = {
             '比劫': dayElement,
             '印': genEl,
@@ -1187,18 +1209,19 @@
         const toElements = (cats) => [...new Set(cats.map(c => catToEl[c]))];
 
         let yongCats, jiCats, logicNote;
-        if (strengthLabel === '從強格') {
+        if (congGeResult === '從強') {
             yongCats = ['比劫', '印']; jiCats = ['財', '官殺', '食傷'];
-            logicNote = '從強格：日主氣勢已成一方獨大，用神反取比劫、印星以順其勢；財官食傷逆勢而為，稱忌神。';
-        } else if (strengthLabel === '身強') {
+            logicNote = '從強格：日主氣勢已成一方獨大，用神反取比劫、印星以順其勢；財官食傷逆勢而為，稱忌神。（此判斷依傳統子平通根＋滿盤，非老師量化分數）';
+        } else if (congGeResult === '從弱') {
             yongCats = ['財', '官殺', '食傷']; jiCats = ['比劫', '印'];
-            logicNote = '身強：日主偏旺，用神取財官食傷剋洩耗身；印比為忌神，恐助身過旺。';
-        } else if (strengthLabel === '身弱') {
+            logicNote = '從弱格：日主氣勢已從他方，用神反取財官食傷順其強勢；比劫印星欲扶身反而逆勢，稱忌神。（此判斷依傳統子平通根＋滿盤，非老師量化分數）';
+        } else if (strengthLabel === '身強' || strengthLabel === '從強格') {
+            yongCats = ['財', '官殺', '食傷']; jiCats = ['比劫', '印'];
+            logicNote = '身強：日主偏旺（依老師量化分數系統判定），用神取財官食傷剋洩耗身；印比為忌神，恐助身過旺。';
+        } else {
+            // 涵蓋 strengthLabel === '身弱' 或 '從弱格'：只要獨立判斷未成立從格，一律以正格「身弱」扶抑邏輯處理
             yongCats = ['比劫', '印']; jiCats = ['財', '官殺', '食傷'];
-            logicNote = '身弱：日主偏弱，用神取比劫印星生扶日主；財官食傷為忌神，恐耗身過度。';
-        } else { // 從弱格
-            yongCats = ['財', '官殺', '食傷']; jiCats = ['比劫', '印'];
-            logicNote = '從弱格：日主氣勢已從他方，用神反取財官食傷順其強勢；比劫印星欲扶身反而逆勢，稱忌神。';
+            logicNote = '身弱：日主偏弱（依老師量化分數系統判定），用神取比劫印星生扶日主；財官食傷為忌神，恐耗身過度。';
         }
 
         let yongElements = toElements(yongCats), jiElements = toElements(jiCats);
@@ -1211,7 +1234,7 @@
         }
 
         return {
-            geJuName, geJuBaseName, geJuGan, geJuTenGod, geJuNote, isExtreme,
+            geJuName, geJuBaseName, geJuGan, geJuTenGod, geJuNote, isExtreme, congGeResult,
             yongElements, jiElements, yongCats, jiCats, logicNote, tiaohouActive
         };
     }
@@ -1719,7 +1742,7 @@
         let shiClass = isDeShi ? "status-on" : "status-off";
 
         // ---- 子平格局定式與用神／忌神判定 ----
-        const geJuYongShen = determineGeJuAndYongShen(mz, dg, dayElement, baseGans, strengthLabel, elementCount, totalElements);
+        const geJuYongShen = determineGeJuAndYongShen(mz, dg, dayElement, baseGans, baseZhis, pNames, strengthLabel, elementCount, totalElements);
         
         let cmdHtml = `
             <div class="dash-score-badge">體力</div>
@@ -1742,7 +1765,10 @@
 
         // [Dash 2: 顯星/定格 (Dynamic Penetration & Rooting)]
         // 「定格」統一改用 determineGeJuAndYongShen() 的結果（含建祿/羊刃/從格特例判斷，避免與下方重複計算）
-        let traditionalPattern = geJuYongShen.isExtreme ? strengthLabel : geJuYongShen.geJuName;
+        // 從強/從弱的短標籤取自「獨立子平判斷」(congGeResult)，不使用老師量化分數的 strengthLabel 字串，兩套系統徹底脫鉤
+        let traditionalPattern = geJuYongShen.isExtreme
+            ? (geJuYongShen.congGeResult === '從強' ? '從強格' : '從弱格')
+            : geJuYongShen.geJuName;
         let traditionalDesc = geJuYongShen.isExtreme
             ? `不依正格論，原局月令屬${geJuYongShen.geJuBaseName}`
             : geJuYongShen.geJuNote;
@@ -1783,7 +1809,7 @@
             <div class="dash-score-badge">格局</div>
             <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; margin-top: 15px;">
                 <div style="text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; padding-top: 4px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                    <div style="font-size: 11px; color: #888; margin-bottom: 2px;">定格</div>
+                    <div style="font-size: 11px; color: #888; margin-bottom: 2px;">定格（傳統子平）</div>
                     <div style="font-size: 15px; font-weight: bold; color: #00d2ff; letter-spacing: 1px; margin-bottom: 2px;">${traditionalPattern}</div>
                     <div style="font-size: 10px; color: #aaa;">${traditionalDesc}</div>
                 </div>
@@ -1793,7 +1819,7 @@
                     <div style="font-size: 10px; color: #aaa;">${powerDesc}</div>
                 </div>
                 <div style="text-align: center; padding-top: 6px; flex: 1; display: flex; flex-direction: column; justify-content: center;" title="${geJuYongShen.logicNote}">
-                    <div style="font-size: 11px; color: #888; margin-bottom: 2px;">用神／忌神${geJuYongShen.tiaohouActive ? '（調候優先）' : ''}</div>
+                    <div style="font-size: 11px; color: #888; margin-bottom: 2px;">用神／忌神（傳統子平${geJuYongShen.tiaohouActive ? '・調候優先' : ''}）</div>
                     <div style="font-size: 14px; font-weight: bold; margin-bottom: 2px;">${yongShenHtml} <span style="color:#555;">／</span> ${jiShenHtml}</div>
                     <div style="font-size: 10px; color: #aaa;">${geJuYongShen.tiaohouActive ? '寒暖失衡，調候優先' : '依身強身弱扶抑而定'}</div>
                 </div>
@@ -2447,6 +2473,7 @@
 
 【命理師的論命規範，請務必遵守】
 - 用神／忌神／格局已由系統依「調候為先、扶抑次之」原則精算完成（見下方【1】），直接引用系統給出的結論即可，不需要你自己重新判斷或推翻，但你要用一到兩句話向讀者解釋「為什麼是這個結果」，把系統給的判斷依據轉成白話。
+- 【1】中「身強身弱（老師量化分數系統）」與「傳統子平格局定式」是兩套獨立系統、各自獨立判斷，請勿混為一談、勿互相解釋成因、也不要說其中一個是另一個的依據——兩者可能結論一致，也可能不一致，若不一致屬正常現象，如有需要可以簡單向讀者說明這是兩套不同方法的交叉參考，不用強行調和。
 - 論性格、事業、財運、感情時，具體點出「十神生剋制化」的因果鏈（例如「七殺無食傷制化，故決斷力強但易衝動犯險」），而非只複述十神字面意義。
 - 論刑沖會合時，說明「動的是哪個宮位」（年柱＝根基／祖蔭，月柱＝事業／父母，日支＝配偶／自身，時柱＝子女／晚運），並解釋動了之後對應到現實中的什麼狀況。
 - 可使用命理專業術語（如：得令、得地、得勢、通根、透干、清透、雜氣、財官印食傷比劫、墓庫、調候、格局、用神、忌神、喜神），但每次專有名詞出現後，請用一句白話立即補充說明，讓非命理背景的讀者也能看懂，不要整段堆術語。
@@ -2456,10 +2483,10 @@
 - 性別：${data.gender}
 - 八字原局：${data.pillars}
 - 日主元神：${data.dayMaster}
-- 格局強弱：${data.strength} (量化總分：${data.totalScore} 分)
+- 身強身弱（老師量化分數系統，非傳統子平格局）：${data.strength} (量化總分：${data.totalScore} 分)
 - 五行比例：木 ${data.elements['木']}%、火 ${data.elements['火']}%、土 ${data.elements['土']}%、金 ${data.elements['金']}%、水 ${data.elements['水']}%
-- 子平格局定式：${data.geJu}（${data.geJuNote}）
-- 用神：${data.yongShen}　忌神：${data.jiShen}${data.tiaohouActive ? '　※本命調候失衡，用神以調候優先判定' : ''}
+- 傳統子平格局定式（獨立判斷，與上一行的量化分數系統無關，請勿混用或互相解釋）：${data.geJu}（${data.geJuNote}）
+- 用神（傳統子平）：${data.yongShen}　忌神（傳統子平）：${data.jiShen}${data.tiaohouActive ? '　※本命調候失衡，用神以調候優先判定' : ''}
 - 用神忌神判斷依據：${data.yongShenLogic}
 - 當前大運：${data.currentDaYun}
 - 今年流年：${data.currentYear}
