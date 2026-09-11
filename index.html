@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>八字五行(量化版)</title>
+    <title>Bazi-quant</title>
     <script src="https://cdn.jsdelivr.net/npm/lunar-javascript@1.7.7/lunar.min.js"></script>
     <style>
         :root {
@@ -75,9 +75,6 @@
             border-left: 4px solid var(--accent); border-radius: 4px; display: none;
         }
 
-        .input-mode-toggle { text-align: center; margin-bottom: 20px; font-size: 15px; }
-        .input-mode-toggle label { cursor: pointer; margin: 0 10px; color: #aaa; transition: 0.2s; }
-        .input-mode-toggle label:hover, .input-mode-toggle input:checked + span { color: var(--accent); font-weight: bold; }
         
         .bazi-table-wrapper { background: #1a1a1a; border-radius: 6px; padding: 15px 5px; margin-bottom: 20px; overflow-x: auto; }
         .bazi-table { width: 100%; border-collapse: collapse; text-align: center; white-space: nowrap; }
@@ -208,6 +205,33 @@
         .liuri-chart-wrap { width: 100%; overflow: visible; }
         .liuri-today-callout { font-size: 12px; color: #ccc; margin-top: 10px; padding: 8px 10px; background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.25); border-radius: 6px; }
 
+        /* ===== 我的命盤（localStorage 儲存/切換） ===== */
+        .saved-charts-panel { margin-bottom: 18px; }
+        .saved-charts-list { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .saved-charts-label { font-size: 12px; color: #888; margin-right: 2px; }
+        .saved-charts-empty { font-size: 12px; color: #666; }
+        .saved-chart-chip {
+            display: flex; align-items: center; gap: 6px; background: #1e1e1e; border: 1px solid #444;
+            border-radius: 16px; padding: 6px 6px 6px 12px; font-size: 13px;
+        }
+        .saved-chart-name { cursor: pointer; color: var(--accent); font-weight: bold; -webkit-tap-highlight-color: transparent; }
+        .saved-chart-name:hover { text-decoration: underline; }
+        .saved-chart-del {
+            cursor: pointer; color: #888; font-size: 12px; width: 20px; height: 20px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; -webkit-tap-highlight-color: transparent;
+        }
+        .saved-chart-del:hover { color: #fff; background: rgba(255,82,82,0.5); }
+
+        /* ===== 輸入模式切換：並排分段式按鈕，取代原生 radio 對齊不齊的問題 ===== */
+        .mode-toggle { display: flex; background: #1a1a1a; border: 1px solid #444; border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 18px; }
+        .mode-toggle-btn {
+            flex: 1; display: flex; align-items: center; justify-content: center; text-align: center;
+            padding: 10px 4px; border-radius: 6px; cursor: pointer; font-size: 14px; color: #999;
+            transition: background 0.15s, color 0.15s; user-select: none; -webkit-tap-highlight-color: transparent;
+        }
+        .mode-toggle-btn input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+        .mode-toggle-btn.active { background: var(--accent); color: #0a0a0a; font-weight: bold; }
+
         /* ===== 近月動態流月掃描：真表格對齊（badge 欄自動依內容最寬對齊，不再跑版） ===== */
         table.lm-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
         table.lm-table tr.lm-month-row td {
@@ -235,55 +259,48 @@
 
 <div class="container">
     <h2>八字五行(量化版)</h2>
-    <div class="input-mode-toggle">
-        <label><input type="radio" name="inputMode" value="date" checked onchange="toggleInputMode()"> <span>依出生日期</span></label>
-        <label><input type="radio" name="inputMode" value="bazi" onchange="toggleInputMode()"> <span>手動輸入八字</span></label>
+
+    <div class="saved-charts-panel">
+        <div id="savedChartsList" class="saved-charts-list"></div>
+    </div>
+
+    <div class="mode-toggle" id="modeToggle">
+        <label class="mode-toggle-btn active" data-mode="date">
+            <input type="radio" name="inputMode" value="date" checked onchange="toggleInputMode()">
+            <span>依出生日期</span>
+        </label>
+        <label class="mode-toggle-btn" data-mode="bazi">
+            <input type="radio" name="inputMode" value="bazi" onchange="toggleInputMode()">
+            <span>手動輸入八字</span>
+        </label>
     </div>
 
     <!-- 出生日期輸入介面 -->
-    <div class="form-group" id="dateInputGroup" style="display: flex !important; flex-direction: column; gap: 15px; margin-bottom: 20px;">
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-            <div style="position: relative;">
-                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">年</span>
-                <input type="number" id="year" style="padding-left: 36px; padding-right: 8px;">
-            </div>
-            <div style="position: relative;">
-                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">月</span>
-                <input type="number" id="month" style="padding-left: 36px; padding-right: 8px;">
-            </div>
-            <div style="position: relative;">
-                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">日</span>
-                <input type="number" id="day" style="padding-left: 36px; padding-right: 8px;">
-            </div>
+    <div class="form-group" id="dateInputGroup" style="display: flex !important; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+        <div style="position: relative;">
+            <input type="datetime-local" id="birthDateTime" style="padding: 12px; font-size: 15px; width: 100%;">
         </div>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            <div style="position: relative;">
-                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">時</span>
-                <input type="number" id="hour" style="padding-left: 36px; padding-right: 8px;">
-            </div>
-            <div style="position: relative;">
-                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 14px;">分</span>
-                <input type="number" id="minute" style="padding-left: 36px; padding-right: 8px;">
-            </div>
-        </div>
-        <div style="background-color: #2a2a2a; padding: 15px; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px;">
-            <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 15px;">
-                <input type="checkbox" id="useSplitZi" style="width: 18px; height: 18px; margin-right: 8px;">
-                <span style="flex:1;">區分早晚子時 <span style="font-size:12px; color:#aaa;">(23:00~00:00 日柱算當日)</span></span>
-            </label>
-            <div style="height: 1px; background: #3c3c3c;"></div>
-            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
-                <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 15px; min-width: 120px;">
-                    <input type="checkbox" id="useTrueSolar" style="width: 18px; height: 18px; margin-right: 8px;" onchange="toggleTrueSolar()">
-                    啟用真太陽時
+        <details class="acc-section" style="margin-bottom: 0;">
+            <summary class="acc-summary" style="font-size: 13px; padding: 10px 12px;">⚙️ 進階設定（早晚子時／真太陽時）<span class="acc-chevron">▾</span></summary>
+            <div class="acc-body" style="display: flex; flex-direction: column; gap: 12px; padding-top: 10px;">
+                <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 14px;">
+                    <input type="checkbox" id="useSplitZi" style="width: 18px; height: 18px; margin-right: 8px;">
+                    <span style="flex:1;">區分早晚子時 <span style="font-size:12px; color:#aaa;">(23:00~00:00 日柱算當日)</span></span>
                 </label>
-                <div id="solarTimeSettings" style="display: none; flex: 1; align-items: center; gap: 8px; min-width: 150px;">
-                    <span style="color: #aaa; font-size: 13px; white-space: nowrap;">經度:</span>
-                    <input type="number" id="longitude" value="121.5" step="0.1" style="padding: 8px; font-size: 14px; flex: 1; min-width: 60px;">
-                    <span style="font-size: 12px; color: #888; white-space: nowrap;">(台灣 121.5)</span>
+                <div style="height: 1px; background: #3c3c3c;"></div>
+                <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 14px; min-width: 120px;">
+                        <input type="checkbox" id="useTrueSolar" style="width: 18px; height: 18px; margin-right: 8px;" onchange="toggleTrueSolar()">
+                        啟用真太陽時
+                    </label>
+                    <div id="solarTimeSettings" style="display: none; flex: 1; align-items: center; gap: 8px; min-width: 150px;">
+                        <span style="color: #aaa; font-size: 13px; white-space: nowrap;">經度:</span>
+                        <input type="number" id="longitude" value="121.5" step="0.1" style="padding: 8px; font-size: 14px; flex: 1; min-width: 60px;">
+                        <span style="font-size: 12px; color: #888; white-space: nowrap;">(台灣 121.5)</span>
+                    </div>
                 </div>
             </div>
-        </div>
+        </details>
     </div>
 
     <!-- 手動八字輸入介面 -->
@@ -324,12 +341,13 @@
 
     <div class="form-group" style="margin-bottom: 0;">
         <select id="gender" style="grid-column: span 2;">
-            <option value="1">男性</option>
-            <option value="0">女性</option>
+            <option value="1">男生</option>
+            <option value="0">女生</option>
         </select>
     </div>
-    <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px;">
+    <div class="form-group" style="grid-template-columns: 2fr 1fr; margin-top: 15px; display: grid; gap: 10px;">
         <button onclick="calculateBazi()">執行運算</button>
+        <button onclick="saveCurrentChartPrompt()" style="background: #333; color: var(--accent); border: 1px solid var(--accent);">💾 儲存</button>
     </div>
 
     <div class="result-box" id="resultBox">
@@ -398,11 +416,8 @@
         });
 
         const now = new Date();
-        document.getElementById('year').value = now.getFullYear();
-        document.getElementById('month').value = now.getMonth() + 1;
-        document.getElementById('day').value = now.getDate();
-        document.getElementById('hour').value = now.getHours();
-        document.getElementById('minute').value = now.getMinutes();
+        const pad2 = (n) => String(n).padStart(2, '0');
+        document.getElementById('birthDateTime').value = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}T${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
         document.getElementById('baziYear').value = now.getFullYear();
 
         try {
@@ -423,6 +438,7 @@
             document.getElementById('dg').value = '丁'; document.getElementById('dz').value = '丑';
             document.getElementById('tg').value = '乙'; document.getElementById('tz').value = '巳';
         }
+        renderSavedChartsList();
     };
 
     function toggleTrueSolar() {
@@ -439,6 +455,102 @@
             document.getElementById('dateInputGroup').style.display = 'none';
             document.getElementById('baziInputGroup').style.display = 'flex';
         }
+        document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mode === mode);
+        });
+    }
+
+    // ===== 我的命盤：存在瀏覽器 localStorage，只有這台裝置看得到，不會上傳 =====
+    const SAVED_CHARTS_KEY = 'bazi_saved_charts_v1';
+
+    function getSavedCharts() {
+        try { return JSON.parse(localStorage.getItem(SAVED_CHARTS_KEY) || '[]'); }
+        catch (e) { return []; }
+    }
+
+    function setSavedCharts(list) {
+        try { localStorage.setItem(SAVED_CHARTS_KEY, JSON.stringify(list)); }
+        catch (e) { alert('儲存失敗，可能是瀏覽器隱私模式或儲存空間已滿。'); }
+    }
+
+    function serializeCurrentInputs() {
+        const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
+        return {
+            mode: document.querySelector('input[name="inputMode"]:checked').value,
+            birthDateTime: getVal('birthDateTime'),
+            useSplitZi: document.getElementById('useSplitZi').checked,
+            useTrueSolar: document.getElementById('useTrueSolar').checked,
+            longitude: getVal('longitude'),
+            yg: getVal('yg'), yz: getVal('yz'), mg: getVal('mg'), mz: getVal('mz'),
+            dg: getVal('dg'), dz: getVal('dz'), tg: getVal('tg'), tz: getVal('tz'),
+            baziYear: getVal('baziYear'), baziStartAge: getVal('baziStartAge'),
+            gender: getVal('gender')
+        };
+    }
+
+    function applySavedInputs(inputs) {
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== '') el.value = val; };
+        document.querySelector(`input[name="inputMode"][value="${inputs.mode}"]`).checked = true;
+        toggleInputMode();
+        if (inputs.birthDateTime) {
+            setVal('birthDateTime', inputs.birthDateTime);
+        } else if (inputs.year) {
+            // 相容舊版（分開的年/月/日/時/分）存檔格式
+            const pad2 = (n) => String(n).padStart(2, '0');
+            setVal('birthDateTime', `${inputs.year}-${pad2(inputs.month)}-${pad2(inputs.day)}T${pad2(inputs.hour)}:${pad2(inputs.minute || 0)}`);
+        }
+        document.getElementById('useSplitZi').checked = !!inputs.useSplitZi;
+        document.getElementById('useTrueSolar').checked = !!inputs.useTrueSolar;
+        toggleTrueSolar();
+        setVal('longitude', inputs.longitude);
+        setVal('yg', inputs.yg); setVal('yz', inputs.yz); setVal('mg', inputs.mg); setVal('mz', inputs.mz);
+        setVal('dg', inputs.dg); setVal('dz', inputs.dz); setVal('tg', inputs.tg); setVal('tz', inputs.tz);
+        setVal('baziYear', inputs.baziYear); setVal('baziStartAge', inputs.baziStartAge);
+        setVal('gender', inputs.gender);
+    }
+
+    function saveCurrentChartPrompt() {
+        const name = prompt('幫這份命盤取個名字（例如：我自己、爸爸、客戶王小姐）');
+        if (!name) return;
+        const list = getSavedCharts();
+        list.push({ name: name.trim(), savedAt: Date.now(), inputs: serializeCurrentInputs() });
+        setSavedCharts(list);
+        renderSavedChartsList();
+    }
+
+    function loadSavedChart(idx) {
+        const list = getSavedCharts();
+        const item = list[idx];
+        if (!item) return;
+        applySavedInputs(item.inputs);
+        calculateBazi();
+        const rb = document.getElementById('resultBox');
+        if (rb) rb.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function deleteSavedChart(idx) {
+        const list = getSavedCharts();
+        if (!list[idx]) return;
+        if (!confirm(`確定要刪除「${list[idx].name}」這份命盤嗎？`)) return;
+        list.splice(idx, 1);
+        setSavedCharts(list);
+        renderSavedChartsList();
+    }
+
+    function renderSavedChartsList() {
+        const list = getSavedCharts();
+        const container = document.getElementById('savedChartsList');
+        if (!container) return;
+        let html = `<span class="saved-charts-label">💾 我的命盤</span>`;
+        html += list.length === 0
+            ? `<span class="saved-charts-empty">（尚無存檔）</span>`
+            : list.map((item, idx) => `
+                <div class="saved-chart-chip">
+                    <span class="saved-chart-name" onclick="loadSavedChart(${idx})">👤 ${item.name}</span>
+                    <span class="saved-chart-del" onclick="deleteSavedChart(${idx})">✕</span>
+                </div>
+            `).join('');
+        container.innerHTML = html;
     }
 
     const ganElementMap = { '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水' };
@@ -1237,11 +1349,11 @@
         let birthSolarForJieQi = null; // 僅在「依出生日期」模式下有值，供精確得令（人元司令分野）計算使用
 
         if (mode === 'date') {
-            let y = parseInt(document.getElementById('year').value);
-            let m = parseInt(document.getElementById('month').value);
-            let d = parseInt(document.getElementById('day').value);
-            let h = parseInt(document.getElementById('hour').value);
-            let min = parseInt(document.getElementById('minute').value) || 0;
+            let dtVal = document.getElementById('birthDateTime').value; // 格式："YYYY-MM-DDTHH:mm"
+            if (!dtVal) { alert('請選擇出生日期與時間'); return; }
+            let [datePart, timePart] = dtVal.split('T');
+            let [y, m, d] = datePart.split('-').map(Number);
+            let [h, min] = (timePart || '00:00').split(':').map(Number);
 
             let useTrueSolar = document.getElementById('useTrueSolar').checked;
             let useSplitZi = document.getElementById('useSplitZi').checked;
