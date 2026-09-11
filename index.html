@@ -72,7 +72,7 @@
         
         .result-box {
             margin-top: 25px; padding: 20px; background-color: #232323;
-            border-left: 4px solid var(--accent); border-radius: 4px; display: none;
+            border-radius: 4px; display: none;
         }
 
         
@@ -105,10 +105,6 @@
         .dash-footnote {
             font-size: 11px; color: #777; line-height: 1.7; margin-top: 4px;
             padding: 8px 10px; border-top: 1px dashed #333;
-        }
-        .dash-score-badge {
-            position: absolute; top: 8px; left: 8px; background: rgba(255,255,255,0.1); 
-            font-size: 10px; padding: 2px 6px; border-radius: 4px; color: #ddd;
         }
         
         .dayun-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; text-align: center; }
@@ -186,7 +182,25 @@
         .liuri-legend { display: flex; gap: 16px; font-size: 11px; color: #ccc; margin-bottom: 8px; }
         .liuri-legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
         .liuri-chart-wrap { width: 100%; overflow: visible; }
-        .liuri-today-callout { font-size: 12px; color: #ccc; margin-top: 10px; padding: 8px 10px; background: rgba(0,210,255,0.06); border: 1px solid rgba(0,210,255,0.25); border-radius: 6px; }
+        /* ===== 流日建議：可橫向滑動的 10 天卡片 ===== */
+        .liuri-advice-hint { font-size: 11px; color: #666; text-align: center; margin-top: 14px; }
+        .liuri-advice-scroll {
+            display: flex; gap: 10px; overflow-x: auto; padding: 8px 2px 6px 2px;
+            -webkit-overflow-scrolling: touch; scroll-snap-type: x proximity;
+        }
+        .liuri-advice-card {
+            flex: 0 0 auto; width: 220px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px;
+            padding: 12px 14px; scroll-snap-align: start;
+        }
+        .liuri-advice-card.is-today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: rgba(0,210,255,0.06); }
+        .liuri-advice-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; gap: 6px; }
+        .liuri-advice-date { font-size: 11px; color: #888; white-space: nowrap; }
+        .liuri-advice-ganzhi { font-size: 15px; font-weight: bold; white-space: nowrap; }
+        .liuri-advice-relation { font-size: 12px; color: #ccc; margin-bottom: 8px; line-height: 1.6; min-height: 20px; }
+        .liuri-advice-text { font-size: 12px; color: #ddd; line-height: 1.6; }
+        @media (max-width: 500px) {
+            .liuri-advice-card { width: 78vw; }
+        }
 
         /* ===== 我的命盤（localStorage 儲存/切換） ===== */
         .saved-charts-panel { margin-bottom: 18px; }
@@ -1691,10 +1705,22 @@
                 });
                 svg += `</svg>`;
 
-                const today = days.find(d => d.isToday);
-                const todayRelation = today && (today.chongXingBadges || today.hejuBadges)
-                    ? `${today.chongXingBadges || ''} ${today.hejuBadges || ''}`.trim()
-                    : '';
+                const adviceCardsHtml = days.map(dday => {
+                    const relation = (dday.chongXingBadges || dday.hejuBadges)
+                        ? `${dday.chongXingBadges || ''} ${dday.hejuBadges || ''}`.trim()
+                        : '<span style="color:#666;">與原局無明顯沖合刑，運勢平順</span>';
+                    return `
+                        <div class="liuri-advice-card${dday.isToday ? ' is-today' : ''}" ${dday.isToday ? 'id="liuriAdviceToday"' : ''}>
+                            <div class="liuri-advice-head">
+                                <span class="liuri-advice-date">${dday.dateShort}（${dday.weekLabel}）${dday.isToday ? ' ・今日' : ''}</span>
+                                <span class="liuri-advice-ganzhi"><span style="color:${dday.cGan}">${dday.gan}</span><span style="color:${dday.cZhi}">${dday.zhi}</span></span>
+                            </div>
+                            <div class="liuri-advice-relation">${relation}</div>
+                            <div class="liuri-advice-text">${getLiuriSuggestion(dday.ganTenGod)}</div>
+                        </div>
+                    `;
+                }).join('');
+
                 const body = `
                     <div style="font-size:12px; color:#888; margin-bottom:8px;">過去 3 日．今日起未來 7 日，共 10 天｜依日主與流日日柱十神量化，僅供參考（可滑鼠停留在長條上看數值）</div>
                     <div class="liuri-legend">
@@ -1702,15 +1728,18 @@
                         <span><span class="liuri-legend-dot" style="background:var(--color-liuri-wealth);"></span>財運</span>
                     </div>
                     <div class="liuri-chart-wrap">${svg}</div>
-                    ${today ? `
-                        <div class="liuri-today-callout">
-                            <div style="margin-bottom:4px;">📍 今日 ${today.dateShort}（<b><span style="color:${today.cGan}">${today.gan}</span><span style="color:${today.cZhi}">${today.zhi}</span></b>・${today.ganTenGod || '-'}）</div>
-                            <div style="margin-bottom:4px;">${todayRelation ? `與原局關係：${todayRelation}` : '與原局無明顯沖合刑，運勢平順'}</div>
-                            <div>建議：${getLiuriSuggestion(today.ganTenGod)}</div>
-                        </div>
-                    ` : ''}
+                    <div class="liuri-advice-hint">👉 左右滑動查看近 10 天的沖合與建議，方便提前準備</div>
+                    <div class="liuri-advice-scroll" id="liuriAdviceScroll">${adviceCardsHtml}</div>
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('📆 流日速覽（財運與整體運勢）', body, true);
+                // 預設捲動到「今日」那張卡片，不用先滑過過去三天
+                setTimeout(() => {
+                    const todayCard = document.getElementById('liuriAdviceToday');
+                    const scrollWrap = document.getElementById('liuriAdviceScroll');
+                    if (todayCard && scrollWrap) {
+                        scrollWrap.scrollLeft = todayCard.offsetLeft - 12;
+                    }
+                }, 50);
             } catch (e) {
                 console.warn('流日面板計算失敗:', e);
                 document.getElementById('liuriOutput').innerHTML = '';
@@ -1745,8 +1774,8 @@
         const geJuYongShen = determineGeJuAndYongShen(mz, dg, dayElement, baseGans, baseZhis, pNames, strengthLabel, elementCount, totalElements);
         
         let cmdHtml = `
-            <div class="dash-score-badge">體力</div>
-            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; margin-top: 15px; gap: 6px;">
+            <div class="dash-card-title">💪 體力</div>
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; gap: 6px;">
                 <div class="dash-status-row" style="margin-bottom: 0;">
                     <span class="dash-status-label" title="${deLingSourceNote}">日干月藏</span>
                     <span class="dash-status-value ${isDeLing ? 'status-on' : 'status-off'}">${isDeLing ? '得令' : '失令'}</span>
@@ -1806,8 +1835,8 @@
         let jiShenHtml = geJuYongShen.jiElements.map(el => `<b style="color:${elementColors[el]}; opacity:0.6;">${el}</b>`).join('、');
 
         let penHtml = `
-            <div class="dash-score-badge">格局</div>
-            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; margin-top: 15px;">
+            <div class="dash-card-title">🎴 格局</div>
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between;">
                 <div style="text-align: center; border-bottom: 1px dashed rgba(255,255,255,0.15); padding-bottom: 6px; padding-top: 4px; flex: 1; display: flex; flex-direction: column; justify-content: center;">
                     <div style="font-size: 11px; color: #888; margin-bottom: 2px;">定格（傳統子平）</div>
                     <div style="font-size: 15px; font-weight: bold; color: #00d2ff; letter-spacing: 1px; margin-bottom: 2px;">${traditionalPattern}</div>
@@ -1863,8 +1892,8 @@
         }
 
         let tempHtml = `
-            <div class="dash-score-badge">調候</div>
-            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; margin-top: 15px; padding: 4px 0;">
+            <div class="dash-card-title">🌡️ 調候</div>
+            <div style="width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-evenly; align-items: center; padding: 4px 0;">
                 <div style="font-size: 16px; font-weight: bold; color: ${tempColor}; letter-spacing: 1px;">${tempLabel}</div>
                 <div style="width: 85%; position:relative; height:6px; background: linear-gradient(to right, #3498db 0%, #2ed573 50%, #ff5252 100%); border-radius:3px; margin: 4px 0;">
                     <div style="position:absolute; top:-3px; left:${tempPct}%; width:4px; height:12px; background:#fff; border-radius:2px; box-shadow:0 0 4px rgba(0,0,0,0.8); transform:translateX(-50%); transition: left 1s ease;"></div>
@@ -1959,11 +1988,11 @@
                 </div>
                 <div class="dash-grid-bottom">
                     <div class="dash-card" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
-                        <div class="dash-card-title">原局五行 (含藏干)</div>
+                        <div class="dash-card-title">🌳 原局五行 (含藏干)</div>
                         ${barHtml}
                     </div>
                     <div class="dash-card" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
-                        <div class="dash-card-title">十神</div>
+                        <div class="dash-card-title">⭐ 十神</div>
                         ${svgHtml}
                     </div>
                 </div>
