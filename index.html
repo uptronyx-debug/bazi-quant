@@ -420,6 +420,10 @@
             <button id="copyPromptBtn" style="flex:1;" onclick="copyPromptForAI()">📋 一鍵複製提示詞，貼給 AI 解盤</button>
         </div>
     </div>
+
+    <div style="text-align:center; margin-top:20px; opacity:0.6;">
+        <img src="https://visitor-badge.laobi.icu/badge?page_id=uptronyx-debug.bazi-app" alt="訪客累計人次" style="height:20px;">
+    </div>
     
 </div>
 
@@ -2074,7 +2078,7 @@
                 </div>
                 <div class="dash-footnote">📖 用神／忌神判斷依據：${geJuYongShen.logicNote}</div>
         `;
-        document.getElementById('energyDashboardOutput').innerHTML = wrapAccordion('⚡ 核心能量儀表板 ⚡', dashboardHtml, true);
+        document.getElementById('energyDashboardOutput').innerHTML = wrapAccordion('<span style="flex:1; text-align:center;">⚡ 核心能量儀表板 ⚡</span>', dashboardHtml, true);
 
         // ------------------------------------------------------------------------------------------
         // --- 原局靜態與動態引動維持原狀 (V2.1邏輯無更動) ---
