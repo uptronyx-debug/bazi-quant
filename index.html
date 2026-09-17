@@ -214,6 +214,18 @@
         .liuri-advice-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 6px; min-height: 20px; }
         .liuri-advice-text { font-size: 12px; color: #ddd; line-height: 1.5; }
 
+        .liuri-advice-wrap { position: relative; }
+        .liuri-nav-btn {
+            position: absolute; top: 50%; transform: translateY(-50%);
+            width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.55);
+            border: 1px solid #444; color: var(--accent); font-size: 16px; line-height: 1;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            z-index: 3; transition: background 0.15s, border-color 0.15s; -webkit-tap-highlight-color: transparent;
+        }
+        .liuri-nav-btn:hover { background: rgba(0,210,255,0.15); border-color: var(--accent); }
+        .liuri-nav-prev { left: 4px; }
+        .liuri-nav-next { right: 4px; }
+
         /* ===== 沖合會統一標籤樣式（純色小 pill，僅用顏色區分類別） ===== */
         .tag { display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; white-space: nowrap; }
         .tag-chong  { color: var(--color-chong);  background: rgba(255,82,82,0.15); }
@@ -1781,18 +1793,29 @@
                         <span><span class="liuri-legend-dot" style="background:var(--color-liuri-wealth);"></span>財運</span>
                     </div>
                     <div class="liuri-chart-wrap">${svg}</div>
-                    <div class="liuri-advice-hint">👉 左右滑動查看近 10 天的沖合與建議，方便提前準備</div>
-                    <div class="liuri-advice-scroll" id="liuriAdviceScroll">${adviceCardsHtml}</div>
+                    <div class="liuri-advice-hint">👉 左右滑動或點兩側箭頭查看近 10 天的沖合與建議，方便提前準備</div>
+                    <div class="liuri-advice-wrap">
+                        <div class="liuri-nav-btn liuri-nav-prev" id="liuriPrevBtn">‹</div>
+                        <div class="liuri-advice-scroll" id="liuriAdviceScroll">${adviceCardsHtml}</div>
+                        <div class="liuri-nav-btn liuri-nav-next" id="liuriNextBtn">›</div>
+                    </div>
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('📆 流日速覽（財運與整體運勢）', body, true);
-                // 預設捲動到「今日」那張卡片，不用先滑過過去三天
-                setTimeout(() => {
-                    const todayCard = document.getElementById('liuriAdviceToday');
-                    const scrollWrap = document.getElementById('liuriAdviceScroll');
-                    if (todayCard && scrollWrap) {
-                        scrollWrap.scrollLeft = todayCard.offsetLeft;
-                    }
-                }, 50);
+
+                // 用「索引 × 卡片寬度」精準定位，避開 scroll-snap 在 offsetLeft 讀取時機不穩導致停錯一天的問題
+                const scrollWrap = document.getElementById('liuriAdviceScroll');
+                const todayIdx = days.findIndex(d => d.isToday);
+                const scrollToIndex = (idx) => {
+                    idx = Math.max(0, Math.min(days.length - 1, idx));
+                    if (scrollWrap) scrollWrap.scrollLeft = idx * scrollWrap.clientWidth;
+                };
+                // 等瀏覽器完成這一輪的版面配置（手風琴展開、卡片實際寬度確定）後再定位，比固定 50ms 更可靠
+                requestAnimationFrame(() => requestAnimationFrame(() => scrollToIndex(todayIdx)));
+
+                const prevBtn = document.getElementById('liuriPrevBtn');
+                const nextBtn = document.getElementById('liuriNextBtn');
+                if (prevBtn) prevBtn.onclick = () => { scrollWrap.scrollLeft -= scrollWrap.clientWidth; };
+                if (nextBtn) nextBtn.onclick = () => { scrollWrap.scrollLeft += scrollWrap.clientWidth; };
             } catch (e) {
                 console.warn('流日面板計算失敗:', e);
                 document.getElementById('liuriOutput').innerHTML = '';
