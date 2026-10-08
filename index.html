@@ -268,9 +268,11 @@
         table.lm-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
         table.lm-table tr.lm-month-row td { padding: 10px 0 6px 0; }
         table.lm-table tr.lm-month-row:first-child td { padding-top: 0; }
-        .lm-month-chip {
-            color: var(--accent); font-weight: bold; font-size: 11px; letter-spacing: 0.3px;
-        }
+        .lm-month-chip { font-size: 11px; letter-spacing: 0.3px; }
+        .lm-time { color: var(--accent); font-weight: bold; }
+        .lm-time.is-past { color: #2b6a85; }
+        .lm-gz { font-weight: bold; font-size: 13px; margin-left: 4px; }
+        .lm-past-note { display: none; } /* 畫面上不顯示，僅供複製提示詞時 AI 辨識已過時段 */
         table.lm-table td.lm-badge-cell { white-space: nowrap; vertical-align: top; padding: 2px 10px 8px 0; width: 1%; }
         table.lm-table td.lm-desc-cell { color: #ddd; font-size: 13px; vertical-align: top; padding: 2px 0 8px 0; }
         /* 窄螢幕：放棄表格欄位對齊，改成上下堆疊的區塊，避免中文字被擠到逐字換行 */
@@ -284,6 +286,59 @@
                 display: block; width: 100%; white-space: normal; padding: 2px 0;
             }
             table.lm-table td.lm-badge-cell { padding-bottom: 3px; }
+        }
+        /* ===== 六親人際 ===== */
+        .tag-star { color: #2ed573; background: rgba(46,213,115,0.15); }
+        .rel-tabs { display: flex; background: #1a1a1a; border: 1px solid #444; border-radius: 8px; padding: 3px; gap: 3px; margin-bottom: 14px; }
+        .rel-tab-btn { flex: 1; text-align: center; padding: 8px 4px; border-radius: 6px; cursor: pointer; font-size: 13px; color: #999; user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.15s, color 0.15s; }
+        .rel-tab-btn.active { background: var(--accent); color: #0a0a0a; font-weight: bold; }
+        .rel-section-title { font-size: 14px; font-weight: bold; color: #fff; margin-bottom: 8px; }
+        .rel-summary { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: #999; margin-bottom: 10px; }
+        .rel-summary b { color: #e0e0e0; }
+        .rel-empty { margin-bottom: 10px; }
+        .rel-star-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+        .rel-star-card { background: #1a1a1a; border: 1px solid #333; border-radius: 8px; padding: 10px; }
+        .rel-star-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; gap: 4px; }
+        .rel-star-gan { font-size: 20px; font-weight: bold; }
+        .rel-star-gan small { font-size: 11px; color: #999; font-weight: normal; margin-left: 3px; }
+        .rel-star-pos { font-size: 10px; color: #888; text-align: right; }
+        .rel-star-row { display: flex; justify-content: space-between; font-size: 11px; color: #888; padding: 2px 0; }
+        .rel-star-row b { color: #ddd; font-weight: normal; }
+        .rel-star-row b.ok { color: #2ed573; }
+        .rel-star-row b.ng { color: #ff5252; }
+        .rel-ev-block { margin-top: 12px; }
+        .rel-ev-title { font-size: 12px; color: #aaa; font-weight: bold; margin-bottom: 4px; }
+        .rel-ev-row { display: grid; grid-template-columns: minmax(0, 1.4fr) 40px minmax(0, 2fr); gap: 8px; align-items: center; padding: 6px 6px; border-bottom: 1px solid #262626; font-size: 12px; }
+        .rel-ev-row.is-current { background: rgba(0,210,255,0.08); border-radius: 4px; }
+        .rel-ev-time { color: var(--accent); font-size: 11px; }
+        .rel-ev-gz { font-weight: bold; font-size: 14px; text-align: center; }
+        .rel-ev-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+        .rel-ev-empty { font-size: 12px; color: #666; padding: 4px 6px; }
+        .rel-now { font-size: 10px; background: var(--accent); color: #000; padding: 0 4px; border-radius: 3px; margin-left: 2px; }
+        .rel-thin-why { font-size: 10px; color: #888; margin-top: 3px; }
+        .rc-wrap { background: #1a1a1a; border-radius: 6px; padding: 8px 4px; margin-bottom: 12px; overflow-x: auto; }
+        .rc-table { width: 100%; border-collapse: collapse; text-align: center; white-space: nowrap; }
+        .rc-table td { padding: 3px 2px; vertical-align: middle; font-size: 11px; }
+        .rc-head { color: #888; font-weight: bold; }
+        .rc-palace { font-size: 9px; color: var(--accent); font-weight: normal; }
+        .rc-gz { font-size: 17px; font-weight: bold; }
+        .rc-tg { color: #999; }
+        .rc-ring { display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid #2ed573; border-radius: 50%; min-width: 1.5em; height: 1.5em; line-height: 1; box-sizing: border-box; }
+        .rc-hidden .rc-ring { min-width: 1.6em; height: 1.6em; border-width: 1px; }
+        .rel-persona { font-size: 12px; color: #999; margin: -4px 0 12px 0; }
+        .rel-persona b { color: #ddd; }
+        .rel-ev-row.is-past .rel-ev-time { color: #2b6a85; }
+        .rc-hidden { vertical-align: top !important; }
+        /* 藏干：干字固定在欄位正中（與上方天干地支對齊），十神縮寫貼在右側 */
+        .rc-hidden div { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 3px; font-weight: bold; }
+        .rc-hidden div > :first-child { grid-column: 2; }
+        .rc-hidden div > :last-child { grid-column: 3; justify-self: start; }
+        .rel-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 2px solid; margin-right: 4px; vertical-align: -1px; }
+        .rel-coming { font-size: 12px; color: #666; text-align: center; padding: 14px 0 4px 0; }
+        @media (max-width: 500px) {
+            .rel-star-grid { grid-template-columns: 1fr 1fr; }
+            .rel-ev-row { grid-template-columns: 1fr 36px; }
+            .rel-ev-tags { grid-column: 1 / -1; }
         }
     </style>
 </head>
@@ -393,6 +448,9 @@
 
         <!-- 3. 流日速覽 (新增，預設展開) -->
         <div id="liuriOutput"></div>
+
+        <!-- 3.5 六親人際 (分頁：家人／同儕／婚姻) -->
+        <div id="relativesOutput"></div>
 
         <!-- 4. 原局結構拆解 (天地通透) -->
         <details class="acc-section">
@@ -1174,6 +1232,617 @@
     }
 
     // 全域版精確十神（含陰陽），供格局／用神判定使用（與 calculateBaziCore 內的 getSpecificShiShen 邏輯相同）
+    // ===================================================================
+    // 六親動態偵測器 (Relative_Dynamics_Scanner) — 子女星專屬偵測模組 (Child_Star_Scanner)
+    // 角色映射：男命子女星＝官殺、女命子女星＝食傷（不分兒女、不論胎數）；子女宮＝時柱地支
+    // 只做條件觸發與數據記錄，不做解讀；解讀交給 AI 提詞
+    // ===================================================================
+    const XING_PAIRS = ['子卯', '寅巳', '巳申', '申寅', '丑戌', '戌未', '未丑'];
+    function getXingType(a, b) {
+        if (!a || !b || a === '-' || b === '-') return null;
+        if (a === b && ['辰', '午', '酉', '亥'].includes(a)) return '自刑';
+        if (XING_PAIRS.includes(a + b) || XING_PAIRS.includes(b + a)) return '刑';
+        return null;
+    }
+
+    function scanChildStars(ctx) {
+        const { dg, dayElement, gender, baseGans, baseZhis, pNames, daYunData, currentYear } = ctx;
+        const childEl = gender === 1
+            ? Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement)   // 男命：官殺（剋我者）
+            : wuxingRel[dayElement].sheng;                                       // 女命：食傷（我生者）
+        const childCatName = gender === 1 ? '官殺' : '食傷';
+        const palaceZhi = baseZhis[3];
+
+        // ---- 二、子女星定位與擷取（最大容量 3，依優先順序） ----
+        const stars = [];
+        const push = (s) => { if (stars.length < 3) stars.push(s); };
+        // Priority 1：天干（日干為日主本身，略過）
+        baseGans.forEach((g, i) => {
+            if (i === 2 || g === '-' || ganElementMap[g] !== childEl) return;
+            push({ gan: g, pillarIdx: i, layer: '天干' });
+        });
+        // Priority 2：地支主氣
+        baseZhis.forEach((z, i) => {
+            if (z === '-') return;
+            const w = zhiHiddenWeights[z] || {};
+            const sorted = Object.keys(w).sort((a, b) => w[b] - w[a]);
+            if (sorted[0] && ganElementMap[sorted[0]] === childEl) push({ gan: sorted[0], pillarIdx: i, layer: '地支主氣' });
+        });
+        // Priority 3：地支中氣／餘氣
+        baseZhis.forEach((z, i) => {
+            if (z === '-') return;
+            const w = zhiHiddenWeights[z] || {};
+            const sorted = Object.keys(w).sort((a, b) => w[b] - w[a]);
+            sorted.slice(1).forEach((hg, k) => {
+                if (ganElementMap[hg] === childEl) push({ gan: hg, pillarIdx: i, layer: k === 0 ? '地支中氣' : '地支餘氣' });
+            });
+        });
+
+        // ---- 三、狀態屬性判定 ----
+        const dayHourChong = baseZhis[2] !== '-' && zhiChongMap[baseZhis[2]] === baseZhis[3];
+        stars.forEach(s => {
+            s.tenGod = getPreciseTenGod(s.gan, dg);
+            s.pillarName = pNames[s.pillarIdx];
+            s.sittingBranch = baseZhis[s.pillarIdx];
+            if (s.layer === '天干') {
+                const r = getTraditionalRoots(s.gan, s.pillarIdx, baseZhis, pNames);
+                s.hasTonggen = r.roots.length > 0;
+                s.tonggenLabel = r.label;
+                s.hasTougan = true; // 本身就在天干
+                s.touganLabel = '本身透干';
+            } else {
+                s.hasTonggen = true; // 本身就藏於地支
+                s.tonggenLabel = s.layer;
+                const exact = baseGans.some((g, i) => i !== 2 && g === s.gan);
+                const sameEl = baseGans.some((g, i) => i !== 2 && g !== '-' && ganElementMap[g] === childEl);
+                s.hasTougan = exact || sameEl;
+                s.touganLabel = exact ? `「${s.gan}」透出` : (sameEl ? '同類透出' : '未透干');
+            }
+            // 子女緣分輕薄：①無通根或無透干（天干星本身已透看通根；地支星本身有根看透干）②日支與時支相沖
+
+        });
+
+        // ---- 四、動態歲運偵測 ----
+        const sittingSet = [...new Set(stars.map(s => s.sittingBranch).filter(z => z && z !== '-'))];
+        const targets = [{ zhi: palaceZhi, label: '子女宮' }];
+        sittingSet.forEach(z => { if (z !== palaceZhi) targets.push({ zhi: z, label: `子女星(${z})` }); });
+
+        // 依地支順序排出固定寫法（例：午子 → 子午）
+        const ZHI_ORDER = '子丑寅卯辰巳午未申酉戌亥';
+        const pairName = (a, b) => ZHI_ORDER.indexOf(a) <= ZHI_ORDER.indexOf(b) ? a + b : b + a;
+        const SAN_XING = [['寅', '巳', '申'], ['丑', '戌', '未']];
+        const checkClash = (inZhi) => {
+            const hits = [];
+            targets.forEach(t => {
+                if (!t.zhi || t.zhi === '-') return;
+                const isChong = zhiChongMap[inZhi] === t.zhi;
+                if (isChong) hits.push({ type: '沖', name: `${pairName(inZhi, t.zhi)}沖`, target: t.label });
+                // 三刑：歲運地支＋目標地支＋原局另一支 湊齊
+                const trio = SAN_XING.find(tr => tr.includes(inZhi) && tr.includes(t.zhi) && inZhi !== t.zhi);
+                if (trio) {
+                    const third = trio.find(z => z !== inZhi && z !== t.zhi);
+                    if (baseZhis.includes(third)) { hits.push({ type: '刑', name: `${trio.join('')}三刑`, target: t.label }); return; }
+                }
+                const x = getXingType(inZhi, t.zhi);
+                if (x === '自刑') hits.push({ type: '刑', name: `${inZhi}${t.zhi}自刑`, target: t.label });
+                else if (x && !isChong) hits.push({ type: '刑', name: `${pairName(inZhi, t.zhi)}刑`, target: t.label }); // 寅申、丑未已計沖，不重複標刑
+            });
+            return hits;
+        };
+        // 依徐玉蘭老師「易懷孕時機」：① 子女星（男官殺／女食傷）透干 ② 地支主氣為子女星
+        const checkStarArrival = (inGan, inZhi, ganLabel) => {
+            const hits = [];
+            if (inGan && ganElementMap[inGan] === childEl) hits.push('原星透干');
+            const w = zhiHiddenWeights[inZhi] || {};
+            const main = Object.keys(w).sort((a, b) => w[b] - w[a])[0];
+            if (main && ganElementMap[main] === childEl) hits.push('地支主氣');
+            return hits;
+        };
+
+        // 合：依所學體系暫只採「三合成子女星局」（歲運地支＋原局另兩支湊齊，且局的五行＝子女星）
+        const SAN_HE = [['申','子','辰','水'], ['亥','卯','未','木'], ['寅','午','戌','火'], ['巳','酉','丑','金']];
+        const checkHe = (inGan, inZhi) => {
+            const hits = [];
+            SAN_HE.forEach(([a, b, c, el]) => {
+                if (el !== childEl || ![a, b, c].includes(inZhi)) return;
+                if ([a, b, c].filter(z => z !== inZhi).every(z => baseZhis.includes(z)))
+                    hits.push({ kind: '三合', name: `${a}${b}${c}三合${el}局` });
+            });
+            return hits;
+        };
+
+        const events = { dayun: [], liunian: [], liuyue: [] };
+        (daYunData || []).forEach((dy, idx) => {
+            const endYear = daYunData[idx + 1] ? daYunData[idx + 1].startYear - 1 : dy.startYear + 9;
+            const clash = checkClash(dy.zhi);
+            const arrive = checkStarArrival(dy.gan, dy.zhi, '天干帶子女星');
+            const he = checkHe(dy.gan, dy.zhi);
+            if (clash.length || arrive.length || he.length) events.dayun.push({
+                time: `${dy.startYear}–${endYear}（${dy.startAge}歲起）`, ganZhi: dy.ganZhi,
+                isCurrent: currentYear >= dy.startYear && currentYear <= endYear, isPast: endYear < currentYear, clash, arrive, he
+            });
+        });
+        for (let y = currentYear - 3; y <= currentYear + 3; y++) {
+            const gz = Solar.fromYmd(y, 7, 1).getLunar().getEightChar().getYear();
+            const g = gz.charAt(0), z = gz.charAt(1);
+            const clash = checkClash(z);
+            const arrive = checkStarArrival(g, z, '流年天干透子女星');
+            const he = checkHe(g, z);
+            if (clash.length || arrive.length || he.length) events.liunian.push({ time: `${y}`, ganZhi: gz, isCurrent: y === currentYear, isPast: y < currentYear, clash, arrive, he });
+        }
+        const now = new Date();
+        for (let i = -6; i <= 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 15);
+            const solar = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 15);
+            const bz = solar.getLunar().getEightChar();
+            const g = bz.getMonthGan(), z = bz.getMonthZhi();
+            const clash = checkClash(z);
+            const arrive = checkStarArrival(g, z, '流月天干透子女星');
+            const he = checkHe(g, z);
+            if (!clash.length && !arrive.length && !he.length) continue;
+            const r = getJieQiRange(solar);
+            events.liuyue.push({
+                time: r ? `${r.startLabel} ~ ${r.endLabel}` : `${d.getFullYear()}/${d.getMonth() + 1}`,
+                ganZhi: g + z, isCurrent: i === 0, isPast: i < 0, clash, arrive, he
+            });
+        }
+
+        // 子女個性判讀柱：子女星所在的柱（天干＋地支），去重後合併
+        // 只用干支本身（五行陰陽），不帶命主十神：十神是「相對日主」的關係，不代表子女本身的個性
+        const YANG_ZHI = '子寅辰午申戌';
+        const personalityPillars = [...new Set(stars.map(s => s.pillarIdx))].sort().map(i => ({
+            pillarName: pNames[i], gan: baseGans[i], zhi: baseZhis[i],
+            ganDesc: `${stemPolarity[baseGans[i]] === 1 ? '陽' : '陰'}${ganElementMap[baseGans[i]]}`,
+            zhiDesc: `${YANG_ZHI.includes(baseZhis[i]) ? '陽' : '陰'}${zhiElementMap[baseZhis[i]]}`
+        }));
+
+        // 整盤判定子女緣（不逐星判斷）
+        // 子女緣強：①子女星干支相見（有通根／透干：天干星有根，或地支星有透）或 ②子女星坐子女宮（時支主氣為子女星），且日時支不相沖
+        // 其餘皆為子女緣分輕薄（含原局不見子女星）
+        const ganZhiMeet = stars.some(st => st.hasTonggen && st.hasTougan);
+        const palaceMain = (() => { const w = zhiHiddenWeights[palaceZhi] || {}; const m = Object.keys(w).sort((a, b) => w[b] - w[a])[0]; return m && ganElementMap[m] === childEl ? m : null; })();
+        const strongReasons = [];
+        if (ganZhiMeet) strongReasons.push('子女星干支相見（通根透干）');
+        if (palaceMain) strongReasons.push(`子女星坐子女宮（時支${palaceZhi}主氣${palaceMain}）`);
+        const thinReasons = [];
+        if (!stars.length) thinReasons.push('原局不見子女星');
+        else if (!strongReasons.length) thinReasons.push('子女星未通根透干，也未坐子女宮');
+        if (dayHourChong) thinReasons.push('日時支相沖');
+        const affinity = (strongReasons.length && !dayHourChong) ? 'strong' : 'thin';
+
+        return { childEl, childCatName, palaceZhi, stars, events, dayHourChong, dg, baseGans, baseZhis, personalityPillars,
+            affinity, strongReasons, thinReasons };
+    }
+
+    /**
+     * 六親迷你命盤：沿用上方排盤格式（時/日/月/年），十神改標為該分頁對應的「星」。
+     * roleFn(gan) → 回傳角色名（例如「子女星」）或 null（非該星，改以淡色顯示原十神縮寫）
+     */
+    function renderRoleChart(baseGans, baseZhis, dg, isRoleFn, palaceIdx, palaceLabel, extraZhiRingIdx = []) {
+        const ssShort = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
+        const names = ['年柱', '月柱', '日柱', '時柱'];
+        const order = [3, 2, 1, 0];
+        const hiddenOf = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
+        const tg = (g, isDm) => isDm ? '日主' : (ssShort[getPreciseTenGod(g, dg)] || '');
+        // 屬於該星的字加圈；地支只要藏有該星也圈起來
+        const ring = (ch, color, on) => `<span class="${on ? 'rc-ring' : ''}" style="color:${color}">${ch}</span>`;
+        let h = `<div class="rc-wrap"><table class="rc-table"><tr>`;
+        order.forEach(i => h += `<td class="rc-head">${names[i]}${i === palaceIdx ? `<div class="rc-palace">${palaceLabel}</div>` : ''}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => h += `<td class="rc-tg">${tg(baseGans[i], i === 2)}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => h += `<td class="rc-gz">${ring(baseGans[i], elementColors[ganElementMap[baseGans[i]]] || '#888', i !== 2 && isRoleFn(baseGans[i]))}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => h += `<td class="rc-gz">${ring(baseZhis[i], elementColors[zhiElementMap[baseZhis[i]]] || '#888', hiddenOf(baseZhis[i]).some(isRoleFn) || extraZhiRingIdx.includes(i))}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => {
+            h += `<td class="rc-hidden">` + hiddenOf(baseZhis[i]).map(g =>
+                `<div>${ring(g, elementColors[ganElementMap[g]], isRoleFn(g))}<span style="color:${elementColors[ganElementMap[g]]}">${tg(g, false)}</span></div>`
+            ).join('') + `</td>`;
+        });
+        h += `</tr></table></div>`;
+        return h;
+    }
+
+    function renderChildScanHtml(scan) {
+        const ssShort = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
+        const elC = elementColors[scan.childEl];
+        let html = `
+            <div class="rel-summary">
+                <span>子女宮 <b>時支「${scan.palaceZhi}」</b></span>
+                <span>子女星 <b style="color:${elC}">${scan.childCatName}（${scan.childEl}）</b></span>
+                <span>${scan.affinity === 'strong'
+                    ? `<span class="tag tag-star">子女緣強</span> <span class="rel-thin-why">${scan.strongReasons.join('・')}</span>`
+                    : `<span class="tag tag-chong">子女緣分輕薄</span> <span class="rel-thin-why">${scan.thinReasons.join('・')}</span>`}</span>
+            </div>
+        `;
+        html += renderRoleChart(scan.baseGans, scan.baseZhis, scan.dg,
+            (g) => ganElementMap[g] === scan.childEl, 3, '子女宮');
+        if (scan.personalityPillars.length) {
+            html += `<div class="rel-persona">🧬 子女個性判讀柱：` + scan.personalityPillars.map(pp =>
+                `<b>${pp.pillarName}柱 <span style="color:${elementColors[ganElementMap[pp.gan]]}">${pp.gan}</span><span style="color:${elementColors[zhiElementMap[pp.zhi]]}">${pp.zhi}</span></b>`
+            ).join('、') + `</div>`;
+        }
+        if (scan.stars.length === 0) {
+            html += `<div class="rel-empty"><span class="tag tag-neutral">原局不見子女星</span></div>`;
+        } else {
+            html += `<div class="rel-star-grid">` + scan.stars.map(s => `
+                <div class="rel-star-card">
+                    <div class="rel-star-head">
+                        <span class="rel-star-gan" style="color:${elementColors[ganElementMap[s.gan]]}">${s.gan}<small>${ssShort[s.tenGod] || s.tenGod}</small></span>
+                        <span class="rel-star-pos">${s.pillarName}・${s.layer}</span>
+                    </div>
+                    <div class="rel-star-row"><span>坐柱</span><b>${s.pillarName}柱 ${scan.baseGans[s.pillarIdx]}${s.sittingBranch}</b></div>
+                    <div class="rel-star-row"><span>通根</span><b class="${s.hasTonggen ? 'ok' : 'ng'}">${s.tonggenLabel}</b></div>
+                    <div class="rel-star-row"><span>透干</span><b class="${s.hasTougan ? 'ok' : 'ng'}">${s.touganLabel}</b></div>
+                </div>
+            `).join('') + `</div>`;
+        }
+
+        html += renderRelEventBlocks(scan.events);
+        return html;
+    }
+
+    function renderRelEventBlocks(events) {
+        const evRow = (e) => {
+            const tags = e.clash.map(c => `<span class="tag ${c.type === '沖' ? 'tag-chong' : 'tag-xing'}">${c.name}・${c.target}</span>`)
+                .concat(e.arrive.map(a => `<span class="tag tag-star">${a}</span>`))
+                .concat((e.he || []).map(h => `<span class="tag tag-sanhe">${h.name}</span>`)).join(' ');
+            return `
+                <div class="rel-ev-row${e.isCurrent ? ' is-current' : ''}${e.isPast ? ' is-past' : ''}">
+                    <div class="rel-ev-time">${e.time}${e.isCurrent ? ' <span class="rel-now">現在</span>' : ''}</div>
+                    <div class="rel-ev-gz">${e.ganZhi.split('').map(c => `<span style="color:${elementColors[ganElementMap[c] || zhiElementMap[c]]}">${c}</span>`).join('')}</div>
+                    <div class="rel-ev-tags">${tags}</div>
+                </div>`;
+        };
+        const evBlock = (title, list, emptyMsg) => `
+            <div class="rel-ev-block">
+                <div class="rel-ev-title">${title}</div>
+                ${list.length ? list.map(evRow).join('') : `<div class="rel-ev-empty">${emptyMsg}</div>`}
+            </div>`;
+        return evBlock('🌊 大運', events.dayun, '各步大運無觸發')
+            + evBlock('📆 流年（前後 3 年）', events.liunian, '此區間無觸發')
+            + evBlock('🗓️ 流月（前 6 月＋後 12 月）', events.liuyue, '此區間無觸發');
+    }
+
+    function buildChildScanPromptText(scan) {
+        let t = `子女宮：時支「${scan.palaceZhi}」；子女星＝${scan.childCatName}（${scan.childEl}），不分兒女、不論胎數。\n`;
+        t += `日支與時支相沖：${scan.dayHourChong ? '是' : '否'}\n`;
+        t += scan.affinity === 'strong'
+            ? `整體子女緣：[子女緣強]（${scan.strongReasons.join('、')}）\n`
+            : `整體子女緣：[子女緣分輕薄]（${scan.thinReasons.join('、')}）\n`;
+        if (scan.stars.length === 0) t += '原局子女星：無\n';
+        scan.stars.forEach((s, i) => {
+            t += `子女星${i + 1}：${s.gan}（${s.tenGod}）位於${s.pillarName}柱${s.layer}；通根：${s.tonggenLabel}；透干：${s.touganLabel}`;
+            t += '\n';
+        });
+        if (scan.personalityPillars.length) {
+            t += `子女個性判讀柱（以該柱天干＋地支合併判斷${scan.personalityPillars.length > 1 ? '，多柱請綜合判讀' : ''}）[推斷子女個性]：` +
+                scan.personalityPillars.map(pp => `${pp.pillarName}柱「${pp.gan}${pp.zhi}」（${pp.gan}${pp.ganDesc}、${pp.zhi}${pp.zhiDesc}）`).join('、') +
+                '。請只依干支本身的五行陰陽與干支組合推斷子女性格，勿以命主十神（正財、七殺等）推斷子女個性。\n';
+        }
+        const fmt = (e) => {
+            const parts = [];
+            if (e.clash.length) parts.push(`子女宮/星被沖刑（${e.clash.map(c => c.name + '・' + c.target).join('、')}）[推斷突發事件或變動]`);
+            if (e.arrive.length) parts.push(`歲運現子女星（${e.arrive.join('、')}）[推斷得子時機]`);
+            (e.he || []).forEach(h => parts.push(`${h.name}（子女星局）[推斷得子時機・力量強]`));
+            return `- ${e.time} ${e.ganZhi}${e.isCurrent ? '（現在）' : (e.isPast ? '（已過，供驗證）' : '')}：${parts.join('；')}`;
+        };
+        t += '大運觸發：\n' + (scan.events.dayun.length ? scan.events.dayun.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流年觸發：\n' + (scan.events.liunian.length ? scan.events.liunian.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流月觸發：\n' + (scan.events.liuyue.length ? scan.events.liuyue.map(fmt).join('\n') : '- 無');
+        return t;
+    }
+
+    // ===================================================================
+    // 兄弟星偵測 (Sibling_Star_Scanner)：比劫星＝與日主同五行；只掃比劫星坐支被歲運沖刑
+    // ===================================================================
+    function scanSiblingStars(ctx) {
+        const { dg, dayElement, baseGans, baseZhis, pNames, daYunData, currentYear } = ctx;
+        const el = dayElement;
+        const hiddenOf = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
+
+        // 擷取順序同子女星：天干 → 地支主氣 → 地支中/餘氣，最多 3 顆
+        const stars = [];
+        const push = (st) => { if (stars.length < 3) stars.push(st); };
+        baseGans.forEach((g, i) => { if (i !== 2 && g !== '-' && ganElementMap[g] === el) push({ gan: g, pillarIdx: i, layer: '天干' }); });
+        baseZhis.forEach((z, i) => { const h = hiddenOf(z); if (h[0] && ganElementMap[h[0]] === el) push({ gan: h[0], pillarIdx: i, layer: '地支主氣' }); });
+        baseZhis.forEach((z, i) => hiddenOf(z).slice(1).forEach((hg, k) => { if (ganElementMap[hg] === el) push({ gan: hg, pillarIdx: i, layer: k === 0 ? '地支中氣' : '地支餘氣' }); }));
+
+        stars.forEach(st => {
+            st.tenGod = getPreciseTenGod(st.gan, dg);
+            st.pillarName = pNames[st.pillarIdx];
+            st.sittingBranch = baseZhis[st.pillarIdx];
+            if (st.layer === '天干') {
+                const r = getTraditionalRoots(st.gan, st.pillarIdx, baseZhis, pNames);
+                st.hasTonggen = r.roots.length > 0; st.tonggenLabel = r.label;
+                st.hasTougan = true; st.touganLabel = '本身透干';
+            } else {
+                st.hasTonggen = true; st.tonggenLabel = st.layer;
+                const exact = baseGans.some((g, i) => i !== 2 && g === st.gan);
+                const sameEl = baseGans.some((g, i) => i !== 2 && g !== '-' && ganElementMap[g] === el);
+                st.hasTougan = exact || sameEl;
+                st.touganLabel = exact ? `「${st.gan}」透出` : (sameEl ? '同類透出' : '未透干');
+            }
+        });
+
+        // 目標：比劫星坐支（去重）
+        const targets = [];
+        stars.forEach(st => { if (st.sittingBranch && st.sittingBranch !== '-' && !targets.some(t => t.idx === st.pillarIdx)) targets.push({ idx: st.pillarIdx, zhi: st.sittingBranch, label: `比劫(${st.sittingBranch})` }); });
+
+        const ZHI_ORDER = '子丑寅卯辰巳午未申酉戌亥';
+        const pairName = (a, b) => ZHI_ORDER.indexOf(a) <= ZHI_ORDER.indexOf(b) ? a + b : b + a;
+        const SAN_XING = [['寅', '巳', '申'], ['丑', '戌', '未']];
+        const checkClash = (inZhi) => {
+            const hits = [];
+            targets.forEach(t => {
+                const isChong = zhiChongMap[inZhi] === t.zhi;
+                if (isChong) hits.push({ type: '沖', name: `${pairName(inZhi, t.zhi)}沖`, target: t.label });
+                const trio = SAN_XING.find(tr => tr.includes(inZhi) && tr.includes(t.zhi) && inZhi !== t.zhi);
+                if (trio) {
+                    const third = trio.find(z => z !== inZhi && z !== t.zhi);
+                    if (baseZhis.includes(third)) { hits.push({ type: '刑', name: `${trio.join('')}三刑`, target: t.label }); return; }
+                }
+                const x = getXingType(inZhi, t.zhi);
+                if (x === '自刑') hits.push({ type: '刑', name: `${inZhi}${t.zhi}自刑`, target: t.label });
+                else if (x && !isChong) hits.push({ type: '刑', name: `${pairName(inZhi, t.zhi)}刑`, target: t.label });
+            });
+            return hits;
+        };
+
+        const events = { dayun: [], liunian: [], liuyue: [] };
+        (daYunData || []).forEach((dy, idx) => {
+            const endYear = daYunData[idx + 1] ? daYunData[idx + 1].startYear - 1 : dy.startYear + 9;
+            const clash = checkClash(dy.zhi);
+            if (clash.length) events.dayun.push({ time: `${dy.startYear}–${endYear}（${dy.startAge}歲起）`, ganZhi: dy.ganZhi,
+                isCurrent: currentYear >= dy.startYear && currentYear <= endYear, isPast: endYear < currentYear, clash, arrive: [] });
+        });
+        for (let y = currentYear - 3; y <= currentYear + 3; y++) {
+            const gz = Solar.fromYmd(y, 7, 1).getLunar().getEightChar().getYear();
+            const clash = checkClash(gz.charAt(1));
+            if (clash.length) events.liunian.push({ time: `${y}`, ganZhi: gz, isCurrent: y === currentYear, isPast: y < currentYear, clash, arrive: [] });
+        }
+        const now = new Date();
+        for (let i = -6; i <= 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 15);
+            const solar = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 15);
+            const bz = solar.getLunar().getEightChar();
+            const clash = checkClash(bz.getMonthZhi());
+            if (!clash.length) continue;
+            const r = getJieQiRange(solar);
+            events.liuyue.push({ time: r ? `${r.startLabel} ~ ${r.endLabel}` : `${d.getFullYear()}/${d.getMonth() + 1}`,
+                ganZhi: bz.getMonthGan() + bz.getMonthZhi(), isCurrent: i === 0, isPast: i < 0, clash, arrive: [] });
+        }
+        return { el, stars, targets, events, dg, baseGans, baseZhis };
+    }
+
+    function renderSiblingScanHtml(scan) {
+        const ssShort = { '比肩':'比', '劫財':'劫' };
+        let html = `
+            <div class="rel-summary">
+                <span>兄弟星 <b style="color:${elementColors[scan.el]}">比劫（${scan.el}）</b></span>
+                <span>比劫坐支 <b>${scan.targets.length ? scan.targets.map(t => `${t.zhi}`).join('、') : '無'}</b></span>
+            </div>
+        `;
+        html += renderRoleChart(scan.baseGans, scan.baseZhis, scan.dg,
+            (g) => ganElementMap[g] === scan.el, -1, '', scan.targets.map(t => t.idx));
+        if (scan.stars.length === 0) {
+            html += `<div class="rel-empty"><span class="tag tag-neutral">原局不見比劫星</span></div>`;
+        } else {
+            html += `<div class="rel-star-grid">` + scan.stars.map(st => `
+                <div class="rel-star-card">
+                    <div class="rel-star-head">
+                        <span class="rel-star-gan" style="color:${elementColors[ganElementMap[st.gan]]}">${st.gan}<small>${ssShort[st.tenGod] || st.tenGod}</small></span>
+                        <span class="rel-star-pos">${st.pillarName}・${st.layer}</span>
+                    </div>
+                    <div class="rel-star-row"><span>坐柱</span><b>${st.pillarName}柱 ${scan.baseGans[st.pillarIdx]}${st.sittingBranch}</b></div>
+                    <div class="rel-star-row"><span>通根</span><b class="${st.hasTonggen ? 'ok' : 'ng'}">${st.tonggenLabel}</b></div>
+                    <div class="rel-star-row"><span>透干</span><b class="${st.hasTougan ? 'ok' : 'ng'}">${st.touganLabel}</b></div>
+                </div>
+            `).join('') + `</div>`;
+        }
+        html += renderRelEventBlocks(scan.events);
+        return html;
+    }
+
+    function buildSiblingScanPromptText(scan) {
+        let t = `兄弟星＝比劫（${scan.el}，與日主同五行）。\n`;
+        if (scan.stars.length === 0) t += '原局比劫星：無\n';
+        scan.stars.forEach((st, i) => {
+            t += `比劫星${i + 1}：${st.gan}（${st.tenGod}）位於${st.pillarName}柱${st.layer}，坐支「${st.sittingBranch}」；通根：${st.tonggenLabel}；透干：${st.touganLabel}\n`;
+        });
+        const fmt = (e) => `- ${e.time} ${e.ganZhi}${e.isCurrent ? '（現在）' : (e.isPast ? '（已過，供驗證）' : '')}：比劫坐支被沖刑（${e.clash.map(c => c.name + '・' + c.target).join('、')}）[推斷兄弟手足變動]`;
+        t += '大運觸發：\n' + (scan.events.dayun.length ? scan.events.dayun.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流年觸發：\n' + (scan.events.liunian.length ? scan.events.liunian.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流月觸發：\n' + (scan.events.liuyue.length ? scan.events.liuyue.map(fmt).join('\n') : '- 無');
+        return t;
+    }
+
+    // ===================================================================
+    // 父母星偵測 (Parent_Star_Scanner)：母＝印星（生我者）、父＝財星（我剋者），不分正偏
+    // 每位家人最多 2 顆：天干 1 顆（月→年→時）＋地支 1 顆（主氣優先；無主氣則取藏干比重最高者）
+    // 掃描：父母星所在柱的地支，被大運／流年／流月沖刑（依徐玉蘭老師「家人星該柱地支」）
+    // ===================================================================
+    const YIMA_ZHI = '寅申巳亥', SIKU_ZHI = '辰戌丑未';
+    function scanParentStars(ctx) {
+        const { dg, dayElement, baseGans, baseZhis, pNames, daYunData, currentYear } = ctx;
+        const motherEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
+        const fatherEl = wuxingRel[dayElement].ke;
+        const PILLAR_ORDER = [1, 0, 2, 3]; // 父母以月、年柱優先
+        const hiddenSorted = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
+
+        // 擷取規則（依徐玉蘭老師藏干表的主氣／中氣／餘氣排列）：
+        // 天干有就取 1 顆；地支主氣有就取 1 顆；兩者都沒有，才往地支中氣→餘氣找 1 顆（同層取比重最高者）
+        const pickStars = (el, who) => {
+            const picked = [];
+            const gi = PILLAR_ORDER.find(i => i !== 2 && baseGans[i] !== '-' && ganElementMap[baseGans[i]] === el);
+            if (gi !== undefined) picked.push({ who, gan: baseGans[gi], pillarIdx: gi, layer: '天干' });
+            const zi = PILLAR_ORDER.find(i => baseZhis[i] !== '-' && ganElementMap[hiddenSorted(baseZhis[i])[0]] === el);
+            if (zi !== undefined) picked.push({ who, gan: hiddenSorted(baseZhis[zi])[0], pillarIdx: zi, layer: '地支主氣' });
+            if (!picked.length) {
+                for (const [pos, layerName] of [[1, '地支中氣'], [2, '地支餘氣']]) {
+                    let best = null;
+                    PILLAR_ORDER.forEach(i => {
+                        const z = baseZhis[i], hg = hiddenSorted(z)[pos];
+                        if (hg && ganElementMap[hg] === el && (!best || zhiHiddenWeights[z][hg] > best.w)) best = { i, hg, w: zhiHiddenWeights[z][hg] };
+                    });
+                    if (best) { picked.push({ who, gan: best.hg, pillarIdx: best.i, layer: layerName }); break; }
+                }
+            }
+            picked.forEach(st => {
+                st.tenGod = getPreciseTenGod(st.gan, dg);
+                st.pillarName = pNames[st.pillarIdx];
+                st.sittingBranch = baseZhis[st.pillarIdx];
+                if (st.layer === '天干') {
+                    const r = getTraditionalRoots(st.gan, st.pillarIdx, baseZhis, pNames);
+                    st.hasTonggen = r.roots.length > 0; st.hasTougan = true;
+                } else {
+                    st.hasTonggen = true;
+                    st.hasTougan = baseGans.some((g, i) => i !== 2 && g !== '-' && ganElementMap[g] === el);
+                }
+            });
+            return picked;
+        };
+
+        const mother = pickStars(motherEl, '母');
+        const father = pickStars(fatherEl, '父');
+
+        // 目標：父母星所在柱的地支（同一支同時是父母星時合併標示）
+        const targets = [];
+        [...mother, ...father].forEach(st => {
+            const ex = targets.find(t => t.idx === st.pillarIdx);
+            if (ex) { if (!ex.who.includes(st.who)) ex.who.push(st.who); }
+            else targets.push({ idx: st.pillarIdx, zhi: st.sittingBranch, who: [st.who] });
+        });
+        targets.forEach(t => t.label = `${t.who.join('、')}(${t.zhi})`);
+
+        const ZHI_ORDER = '子丑寅卯辰巳午未申酉戌亥';
+        const pairName = (a, b) => ZHI_ORDER.indexOf(a) <= ZHI_ORDER.indexOf(b) ? a + b : b + a;
+        const SAN_XING = [['寅', '巳', '申'], ['丑', '戌', '未']];
+        // 刑的性質：驛馬（寅申巳亥）＝出入安全；四庫（辰戌丑未）＝健康檢查；其餘（子卯、午午、酉酉）＝一般刑
+        const xingKind = (chars) => [...chars].every(c => YIMA_ZHI.includes(c)) ? '驛馬' : ([...chars].every(c => SIKU_ZHI.includes(c)) ? '四庫' : '');
+        const checkClash = (inZhi) => {
+            const hits = [];
+            targets.forEach(t => {
+                const isChong = zhiChongMap[inZhi] === t.zhi;
+                if (isChong) hits.push({ type: '沖', kind: '沖', name: `${pairName(inZhi, t.zhi)}沖`, target: t.label });
+                const trio = SAN_XING.find(tr => tr.includes(inZhi) && tr.includes(t.zhi) && inZhi !== t.zhi);
+                if (trio) {
+                    const third = trio.find(z => z !== inZhi && z !== t.zhi);
+                    if (baseZhis.includes(third)) { hits.push({ type: '刑', kind: xingKind(trio.join('')), name: `${trio.join('')}三刑`, target: t.label }); return; }
+                }
+                const x = getXingType(inZhi, t.zhi);
+                if (x === '自刑') hits.push({ type: '刑', kind: xingKind(inZhi), name: `${inZhi}${t.zhi}自刑`, target: t.label });
+                else if (x && !isChong) hits.push({ type: '刑', kind: xingKind(inZhi + t.zhi), name: `${pairName(inZhi, t.zhi)}刑`, target: t.label });
+            });
+            return hits;
+        };
+
+        const events = { dayun: [], liunian: [], liuyue: [] };
+        (daYunData || []).forEach((dy, idx) => {
+            const endYear = daYunData[idx + 1] ? daYunData[idx + 1].startYear - 1 : dy.startYear + 9;
+            const clash = checkClash(dy.zhi);
+            if (clash.length) events.dayun.push({ time: `${dy.startYear}–${endYear}（${dy.startAge}歲起）`, ganZhi: dy.ganZhi,
+                isCurrent: currentYear >= dy.startYear && currentYear <= endYear, isPast: endYear < currentYear, clash, arrive: [] });
+        });
+        for (let y = currentYear - 3; y <= currentYear + 3; y++) {
+            const gz = Solar.fromYmd(y, 7, 1).getLunar().getEightChar().getYear();
+            const clash = checkClash(gz.charAt(1));
+            if (clash.length) events.liunian.push({ time: `${y}`, ganZhi: gz, isCurrent: y === currentYear, isPast: y < currentYear, clash, arrive: [] });
+        }
+        const now = new Date();
+        for (let i = -6; i <= 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 15);
+            const solar = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 15);
+            const bz = solar.getLunar().getEightChar();
+            const clash = checkClash(bz.getMonthZhi());
+            if (!clash.length) continue;
+            const r = getJieQiRange(solar);
+            events.liuyue.push({ time: r ? `${r.startLabel} ~ ${r.endLabel}` : `${d.getFullYear()}/${d.getMonth() + 1}`,
+                ganZhi: bz.getMonthGan() + bz.getMonthZhi(), isCurrent: i === 0, isPast: i < 0, clash, arrive: [] });
+        }
+        return { motherEl, fatherEl, mother, father, targets, events, dg, baseGans, baseZhis };
+    }
+
+    const PARENT_RING = { '母': '#ff6b9d', '父': '#ffb347' };
+
+    // 指定位置加圈的迷你命盤（每顆星可用不同顏色）
+    function renderMarkedChart(baseGans, baseZhis, dg, marks) {
+        const ssShort = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
+        const names = ['年柱', '月柱', '日柱', '時柱'];
+        const order = [3, 2, 1, 0];
+        const hiddenOf = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
+        const tg = (g, isDm) => isDm ? '日主' : (ssShort[getPreciseTenGod(g, dg)] || '');
+        const ringColor = (type, idx, g) => { const m = marks.find(mk => mk.type === type && mk.idx === idx && (!g || mk.gan === g)); return m ? m.color : null; };
+        const ch = (c, color, rc) => `<span class="${rc ? 'rc-ring' : ''}" style="color:${color};${rc ? `border-color:${rc};` : ''}">${c}</span>`;
+        let h = `<div class="rc-wrap"><table class="rc-table"><tr>`;
+        order.forEach(i => h += `<td class="rc-head">${names[i]}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => h += `<td class="rc-tg">${tg(baseGans[i], i === 2)}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => h += `<td class="rc-gz">${ch(baseGans[i], elementColors[ganElementMap[baseGans[i]]] || '#888', ringColor('gan', i))}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => h += `<td class="rc-gz">${ch(baseZhis[i], elementColors[zhiElementMap[baseZhis[i]]] || '#888', ringColor('zhi', i))}</td>`);
+        h += `</tr><tr>`;
+        order.forEach(i => {
+            h += `<td class="rc-hidden">` + hiddenOf(baseZhis[i]).map(g =>
+                `<div>${ch(g, elementColors[ganElementMap[g]], ringColor('zhi', i, g))}<span style="color:${elementColors[ganElementMap[g]]}">${tg(g, false)}</span></div>`
+            ).join('') + `</td>`;
+        });
+        h += `</tr></table></div>`;
+        return h;
+    }
+
+    function renderParentScanHtml(scan) {
+        const ssShort = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
+        const all = [...scan.mother, ...scan.father];
+        const marks = all.map(st => ({ type: st.layer === '天干' ? 'gan' : 'zhi', idx: st.pillarIdx, gan: st.layer === '天干' ? null : st.gan, color: PARENT_RING[st.who] }));
+        let html = `
+            <div class="rel-summary">
+                <span><i class="rel-dot" style="border-color:${PARENT_RING['母']}"></i>母星 <b style="color:${elementColors[scan.motherEl]}">印（${scan.motherEl}）</b></span>
+                <span><i class="rel-dot" style="border-color:${PARENT_RING['父']}"></i>父星 <b style="color:${elementColors[scan.fatherEl]}">財（${scan.fatherEl}）</b></span>
+            </div>
+        `;
+
+        html += renderMarkedChart(scan.baseGans, scan.baseZhis, scan.dg, marks);
+        const card = (st) => `
+            <div class="rel-star-card" style="border-color:${PARENT_RING[st.who]}55">
+                <div class="rel-star-head">
+                    <span class="rel-star-gan" style="color:${elementColors[ganElementMap[st.gan]]}">${st.gan}<small>${ssShort[st.tenGod] || st.tenGod}</small></span>
+                    <span class="rel-star-pos"><b style="color:${PARENT_RING[st.who]}">${st.who}星</b><br>${st.pillarName}・${st.layer}</span>
+                </div>
+                <div class="rel-star-row"><span>坐柱</span><b>${st.pillarName}柱 ${scan.baseGans[st.pillarIdx]}${st.sittingBranch}</b></div>
+            </div>`;
+        const missing = [];
+        if (!scan.mother.length) missing.push('原局不見印星（母星）');
+        if (!scan.father.length) missing.push('原局不見財星（父星）');
+        if (missing.length) html += `<div class="rel-empty">${missing.map(m => `<span class="tag tag-neutral">${m}</span>`).join(' ')}</div>`;
+        if (all.length) html += `<div class="rel-star-grid">${all.map(card).join('')}</div>`;
+        html += renderRelEventBlocks(scan.events);
+        return html;
+    }
+
+    function buildParentScanPromptText(scan) {
+        let t = `母星＝印星（${scan.motherEl}），父星＝財星（${scan.fatherEl}），不分正偏。天干有取 1 顆、地支主氣有取 1 顆；兩者皆無才取地支中氣或餘氣 1 顆。\n`;
+        const line = (arr, who) => arr.length
+            ? arr.map(st => `${who}星：${st.gan}（${st.tenGod}）位於${st.pillarName}柱${st.layer}，該柱地支「${st.sittingBranch}」`).join('\n') + '\n'
+            : `${who}星：原局無\n`;
+        t += line(scan.mother, '母') + line(scan.father, '父');
+
+        const tagOf = (c) => c.kind === '四庫' ? '[推斷家人健康檢查]' : '[推斷家人出入安全]';
+        const fmt = (e) => `- ${e.time} ${e.ganZhi}${e.isCurrent ? '（現在）' : (e.isPast ? '（已過，供驗證）' : '')}：` +
+            e.clash.map(c => `${c.name}・${c.target}${c.kind === '驛馬' ? '（驛馬刑）' : c.kind === '四庫' ? '（四庫刑）' : ''} ${tagOf(c)}`).join('；');
+        t += '大運觸發：\n' + (scan.events.dayun.length ? scan.events.dayun.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流年觸發：\n' + (scan.events.liunian.length ? scan.events.liunian.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流月觸發：\n' + (scan.events.liuyue.length ? scan.events.liuyue.map(fmt).join('\n') : '- 無');
+        return t;
+    }
+
+    function switchRelTab(name) {
+        document.querySelectorAll('.rel-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+        document.querySelectorAll('.rel-tab-panel').forEach(p => p.style.display = (p.dataset.tab === name ? 'block' : 'none'));
+    }
+
     function getPreciseTenGod(targetGan, dGan) {
         if (!targetGan || targetGan === '-') return '';
         const tEl = ganElementMap[targetGan], dEl = ganElementMap[dGan];
@@ -1347,9 +2016,13 @@
             let mZhi = bazi.getMonthZhi();
 
             const jieRange = getJieQiRange(solar);
-            let monthStr = jieRange
-                ? `${jieRange.startLabel} ~ ${jieRange.endLabel} (${mGan}${mZhi})`
-                : `${y}年${m}月 (${mGan}${mZhi})`; // 節氣資料抓取失敗時的備援顯示
+            const timeText = jieRange
+                ? `${jieRange.startLabel} ~ ${jieRange.endLabel}`
+                : `${y}年${m}月`; // 節氣資料抓取失敗時的備援顯示
+            // 時間格式比照六親分頁：過去＝深藍、現在＝亮藍＋「現在」標記；干支依五行上色
+            const gzHtml = `<span style="color:${elementColors[ganElementMap[mGan]]}">${mGan}</span><span style="color:${elementColors[zhiElementMap[mZhi]]}">${mZhi}</span>`;
+            let monthStr = `<span class="lm-time${i < 0 ? ' is-past' : ''}">${timeText}</span> <span class="lm-gz">${gzHtml}</span>`
+                + (i === 0 ? ' <span class="rel-now">現在</span>' : (i < 0 ? '<span class="lm-past-note">（已過）</span>' : ''));
 
             let mGanEl = ganElementMap[mGan];
             let tgGan = getTenGodForElement(mGanEl, dayElement);
@@ -1825,6 +2498,35 @@
                 document.getElementById('liuriOutput').innerHTML = '';
             }
         })();
+
+        // ===== 六親人際：子女星專屬偵測 =====
+        let childScanPromptText = '', siblingScanPromptText = '', parentScanPromptText = '';
+        try {
+            const childScan = scanChildStars({ dg, dayElement, gender, baseGans, baseZhis, pNames, daYunData, currentYear });
+            childScanPromptText = buildChildScanPromptText(childScan);
+            const siblingScan = scanSiblingStars({ dg, dayElement, baseGans, baseZhis, pNames, daYunData, currentYear });
+            siblingScanPromptText = buildSiblingScanPromptText(siblingScan);
+            const parentScan = scanParentStars({ dg, dayElement, baseGans, baseZhis, pNames, daYunData, currentYear });
+            parentScanPromptText = buildParentScanPromptText(parentScan);
+            const relBody = `
+                <div class="rel-tabs">
+                    <div class="rel-tab-btn" data-tab="parents" onclick="switchRelTab('parents')">父母</div>
+                    <div class="rel-tab-btn" data-tab="siblings" onclick="switchRelTab('siblings')">兄弟</div>
+                    <div class="rel-tab-btn active" data-tab="children" onclick="switchRelTab('children')">子女</div>
+                    <div class="rel-tab-btn" data-tab="peer" onclick="switchRelTab('peer')">同儕</div>
+                    <div class="rel-tab-btn" data-tab="marriage" onclick="switchRelTab('marriage')">婚姻</div>
+                </div>
+                <div class="rel-tab-panel" data-tab="parents" style="display:none;">${renderParentScanHtml(parentScan)}</div>
+                <div class="rel-tab-panel" data-tab="siblings" style="display:none;">${renderSiblingScanHtml(siblingScan)}</div>
+                <div class="rel-tab-panel" data-tab="children" style="display:block;">${renderChildScanHtml(childScan)}</div>
+                <div class="rel-tab-panel" data-tab="peer" style="display:none;"><div class="rel-coming">同事・朋友 規劃中</div></div>
+                <div class="rel-tab-panel" data-tab="marriage" style="display:none;"><div class="rel-coming">婚姻 規劃中</div></div>
+            `;
+            document.getElementById('relativesOutput').innerHTML = wrapAccordion('👥 我的人際圈', relBody, false);
+        } catch (e) {
+            console.warn('六親偵測失敗:', e);
+            document.getElementById('relativesOutput').innerHTML = '';
+        }
 
         const elementCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
         const elementSpecificShiShen = { '木': [], '火': [], '土': [], '金': [], '水': [] }; 
@@ -2559,7 +3261,10 @@
             yongShen: geJuYongShen.yongElements.join('、'),
             jiShen: geJuYongShen.jiElements.join('、'),
             yongShenLogic: geJuYongShen.logicNote,
-            tiaohouActive: geJuYongShen.tiaohouActive
+            tiaohouActive: geJuYongShen.tiaohouActive,
+            childScan: childScanPromptText,
+            siblingScan: siblingScanPromptText,
+            parentScan: parentScanPromptText
         };
 
         document.getElementById('resultBox').style.display = 'block';
@@ -2654,6 +3359,15 @@ ${data.pure12Month}
 ■ 流日速覽（過去 3 日＋今日起未來 7 日，共 10 天，含日柱十神、與原局沖合關係、每日量化整體運勢與財運強弱）：
 ${data.pureLiuri}
 
+【4. 六親人際：子女星偵測（系統只做條件觸發，未解讀）】
+${data.childScan || '（無資料）'}
+
+【5. 六親人際：兄弟星（比劫）偵測（系統只做條件觸發，未解讀）】
+${data.siblingScan || '（無資料）'}
+
+【6. 六親人際：父母星偵測（系統只做條件觸發，未解讀）】
+${data.parentScan || '（無資料）'}
+
 【你的分析任務】
 請絕對不要重複列印、覆述或解釋上述數據的定義本身。請直接發揮專業命理師的功力，將「通根、透干、沖刑、合絆、開庫、流月、流日」這些量化化學反應，轉化為對命主現實生活的演繹，輸出約 1200-1800 字的深度解析：
 
@@ -2663,7 +3377,10 @@ ${data.pureLiuri}
 3. 事業與資源配置（細部）：根據原局結構與透干十神，給出精準的職涯環境建議，並指出他在金錢理財策略、重大決策上應該防範哪種十神帶來的風險陷阱（例如比劫奪財、官殺壓制），對應到忌神時要明講。
 4. 近一年與近期的變動（核心破題，必須極度直觀）：請高度聚焦在「去年回顧」、「本年動態」、「動態開庫」與「近18個月流月戰術」。直接、具體地推斷出近一年內（或今年/接下來幾個月）最可能發生的現實大事（包含利用過去6個月的流月特徵進行驗證，以及預測如：職涯劇烈轉換、大筆資金重分配、人際感情危機），並給予具體的行動戰術建議，建議要能對應到用神忌神的取捨（該衝刺用神旺運、還是該防範忌神引動）。
 5. 近 10 日流日精推（過去驗證＋未來行動，需具體到「日」）：利用【流日速覽】裡「過去 3 日」的日柱十神與沖合資料，回頭驗證這幾天命主可能實際感受到的具體徵兆（例如某天沖動配偶宮、某天財星透干進財），藉此證明系統判斷的準確度；接著針對「未來 7 日」逐日或分段給出具體到日期的行動建議（哪幾天適合簽約談判、哪幾天該保守避險、哪幾天財運或整體運勢特別突出或特別低落），建議需可執行，不要籠統帶過。
-6. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
+6. 子女緣分（依【4】標籤解讀）：[子女緣強] 說明子女緣深厚的表現；[子女緣分輕薄] 說明緣分深淺與可能原因（可包含晚得子女、子女較早獨立、聚少離多，或命主本身不想生育、無子女等可能，請以多種可能並列呈現，勿單一斷定）；[推斷子女個性] 依「子女個性判讀柱」干支本身的五行陰陽推斷子女性格特質（勿用命主十神）；[推斷突發事件或變動] 對照時間點說明子女相關的變動（含過去時間點的驗證）；[推斷得子時機] 指出較可能的時間窗口。系統不分兒女、不論胎數，請勿推斷性別或胎數。
+7. 兄弟手足（依【5】標籤解讀）：說明比劫星（兄弟姊妹、同輩手足）在原局的強弱與狀態（通根、透干、坐支）；對每個 [推斷兄弟手足變動] 時間點，說明比劫坐支被沖或刑可能對應的手足變動（例如分離、搬遷、關係起伏、手足有狀況），已過的時間點請用來驗證，未來的時間點請給提醒。比劫是喜神或忌神，請引用【1】的用神忌神結論判斷手足是助力還是競爭消耗。
+8. 父母（依【6】標籤解讀）：說明母星（印）、父星（財）在原局的位置與狀態；父母緣分深淺請依原局自行判讀（父母有各自命盤，且向上關係命主可自行經營，勿下負面斷語）；對每個觸發時間點，依「家人星該柱地支被大運／流年沖刑」的規則提醒：相沖或驛馬刑（寅申巳亥）[推斷家人出入安全] → 跌倒、車關、突發疾病、意外受傷，提醒出入安全；四庫刑（辰戌丑未）[推斷家人健康檢查] → 結石、腫瘤、息肉、慢性病、憂鬱等累積型問題，提醒做健康檢查。已過的時間點用來驗證，未來的給提醒；語氣以「提醒留意」為主，勿下斷言。
+9. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
 
 【最後提醒】全文分析請完全建立在上方系統給出的排盤與量化數據之上，不要自行更動用神候選以外的任何排盤結果；你的角色是「解讀者」，不是「排盤者」。`;
 
