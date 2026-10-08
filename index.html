@@ -335,6 +335,46 @@
         .rc-hidden div { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; column-gap: 3px; font-weight: bold; }
         .rc-hidden div > :first-child { grid-column: 2; }
         .rc-hidden div > :last-child { grid-column: 3; justify-self: start; }
+        /* ===== 朋友契合度 ===== */
+        .fr-input { display: grid; grid-template-columns: 1fr 1.2fr auto; gap: 8px; margin-bottom: 14px; }
+        .fr-input input, .fr-input button { padding: 9px 10px; font-size: 14px; }
+        .fr-input button { grid-column: auto; width: auto; padding: 9px 16px; }
+        .fr-result { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 12px; }
+        .fr-result-head { font-weight: bold; color: #fff; margin-bottom: 8px; font-size: 14px; }
+        .fr-pillars { font-weight: normal; font-size: 11px; color: #888; margin-left: 8px; }
+        .fr-viz { display: grid; grid-template-columns: 180px 1fr; gap: 14px; align-items: center; }
+        .fr-gauge { width: 100%; max-width: 180px; display: block; margin: 0 auto; }
+        .fr-gauge-arc { transition: stroke-dashoffset 1.1s ease-out; }
+        .fr-gauge-num { font-size: 34px; font-weight: bold; }
+        .fr-gauge-label { font-size: 13px; font-weight: bold; }
+        .fr-breakdown { text-align: center; font-size: 11px; color: #888; margin-top: 2px; }
+        .fr-bars-title { font-size: 11px; color: #888; margin-bottom: 6px; }
+        .fr-bar-row { display: grid; grid-template-columns: 22px 1fr 64px; gap: 8px; align-items: center; margin-bottom: 7px; }
+        .fr-bar-el { font-weight: bold; font-size: 13px; text-align: center; border-radius: 4px; }
+        .fr-bar-el.is-fav { box-shadow: inset 0 0 0 1px #2ed573; }
+        .fr-bar-track { position: relative; height: 12px; background: #262626; border-radius: 6px; overflow: hidden; }
+        .fr-bar-base, .fr-bar-delta { position: absolute; top: 0; bottom: 0; transition: width 1s ease-out; }
+        .fr-bar-base { left: 0; border-radius: 6px 0 0 6px; opacity: 0.85; }
+        .fr-delta-good { background: #2ed573; box-shadow: 0 0 6px rgba(46,213,115,0.6); }
+        .fr-delta-up { background: #777; }
+        .fr-delta-down { background: repeating-linear-gradient(45deg, rgba(255,255,255,0.15) 0 3px, transparent 3px 6px); }
+        .fr-bar-line { position: absolute; top: -2px; bottom: -2px; border-left: 1px dashed #aaa; z-index: 2; }
+        .fr-bar-val { font-size: 10px; color: #888; text-align: right; white-space: nowrap; }
+        .fr-bar-val b { color: #ddd; }
+        .fr-rank { display: flex; flex-direction: column; gap: 4px; }
+        .fr-rank-row { display: grid; grid-template-columns: 20px minmax(0, 1fr) 1.2fr 30px 22px; gap: 8px; align-items: center; padding: 7px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .fr-rank-row:hover { background: rgba(255,255,255,0.04); }
+        .fr-rank-row.is-sel { background: rgba(0,210,255,0.08); box-shadow: inset 0 0 0 1px rgba(0,210,255,0.35); }
+        .fr-rank-no { color: #888; font-size: 11px; text-align: center; }
+        .fr-rank-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .fr-rank-track { height: 6px; background: #262626; border-radius: 3px; overflow: hidden; }
+        .fr-rank-track span { display: block; height: 100%; border-radius: 3px; }
+        .fr-rank-score { font-weight: bold; text-align: right; }
+        @media (max-width: 500px) {
+            .fr-viz { grid-template-columns: 1fr; }
+            .fr-input { grid-template-columns: 1fr 1fr; }
+            .fr-input button { grid-column: 1 / -1; width: 100%; }
+        }
         .rel-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 2px solid; margin-right: 4px; vertical-align: -1px; }
         .rel-coming { font-size: 12px; color: #666; text-align: center; padding: 14px 0 4px 0; }
         @media (max-width: 500px) {
@@ -451,9 +491,6 @@
         <!-- 3. 流日速覽 (新增，預設展開) -->
         <div id="liuriOutput"></div>
 
-        <!-- 3.5 六親人際 (分頁：家人／同儕／婚姻) -->
-        <div id="relativesOutput"></div>
-
         <!-- 4. 原局結構拆解 (天地通透) -->
         <details class="acc-section">
             <summary class="acc-summary">☯️ 天地通透（藏干通根與透干）<span class="acc-chevron">▾</span></summary>
@@ -474,6 +511,9 @@
         
         <!-- 6. 落地戰術指南 -->
         <div id="monthlyTacticsOutput"></div>
+
+        <!-- 我的人際圈（父母／兄弟／子女／朋友／婚姻）：放在命主資訊之後 -->
+        <div id="relativesOutput"></div>
         
         <!-- 7. AI 深度總結（永遠常駐顯示，不放進手風琴） -->
         <div class="ai-btn-group" id="aiBtnContainer" style="display:none;">
@@ -567,6 +607,192 @@
     }
 
     // ===== 我的命盤：存在瀏覽器 localStorage，只有這台裝置看得到，不會上傳 =====
+    // ===================================================================
+    // 朋友契合度（單向：朋友對命主的幫助）— 不列入 AI 提詞
+    // 命主身弱／從弱：喜 印、比劫（各 1.0）
+    // 命主身強／從強：喜 官殺、財（各 1.0），食傷 0.3，印比 0
+    // 總分 = 主分數 80% ＋ 補缺分 20%（命主喜用低於 20% 平衡線的缺口，合盤平均後補回比例）
+    // ===================================================================
+    const FRIENDS_KEY = 'bazi_friends_v1';
+    const FIVE_ELS = ['木', '火', '土', '金', '水'];
+    const BALANCE_LINE = 20;
+    let __selectedFriendIdx = null;
+
+    function getFriends() { try { return JSON.parse(localStorage.getItem(FRIENDS_KEY) || '[]'); } catch (e) { return []; } }
+    function setFriends(list) { try { localStorage.setItem(FRIENDS_KEY, JSON.stringify(list)); } catch (e) { alert('儲存失敗，可能是瀏覽器隱私模式或空間已滿。'); } }
+
+    // 朋友只有年月日（無時辰）：排年、月、日三柱，以中午 12:00 排盤避開子時換日
+    function calcFriendPct(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        const bz = Solar.fromYmdHms(y, m, d, 12, 0, 0).getLunar().getEightChar();
+        const gans = [bz.getYearGan(), bz.getMonthGan(), bz.getDayGan()];
+        const zhis = [bz.getYearZhi(), bz.getMonthZhi(), bz.getDayZhi()];
+        const cnt = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
+        gans.forEach(g => cnt[ganElementMap[g]] += 1.0);
+        zhis.forEach(z => { const w = zhiHiddenWeights[z] || {}; Object.keys(w).forEach(g => cnt[ganElementMap[g]] += w[g]); });
+        const total = Object.values(cnt).reduce((a, b) => a + b, 0);
+        const pct = {}; FIVE_ELS.forEach(el => pct[el] = total ? cnt[el] / total * 100 : 0);
+        return { pct, pillars: gans.map((g, i) => g + zhis[i]) };
+    }
+
+    function friendWeights(ctx) {
+        const de = ctx.dayElement;
+        const yin = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === de);
+        const shiShang = wuxingRel[de].sheng, cai = wuxingRel[de].ke;
+        const guanSha = Object.keys(wuxingRel).find(k => wuxingRel[k].ke === de);
+        const isWeak = ctx.strengthLabel === '身弱' || ctx.strengthLabel === '從弱格';
+        const w = {}; FIVE_ELS.forEach(el => w[el] = 0);
+        if (isWeak) { w[yin] = 1; w[de] = 1; }
+        else { w[guanSha] = 1; w[cai] = 1; w[shiShang] = 0.3; }
+        return { w, isWeak, names: { [yin]: '印', [de]: '比劫', [shiShang]: '食傷', [cai]: '財', [guanSha]: '官殺' } };
+    }
+
+    function computeFriendScore(ctx, frPct) {
+        const { w } = friendWeights(ctx);
+        const main = FIVE_ELS.reduce((sum, el) => sum + frPct[el] * w[el], 0);
+        const combined = {}; FIVE_ELS.forEach(el => combined[el] = (ctx.mePct[el] + frPct[el]) / 2);
+        let gap = 0, filled = 0;
+        FIVE_ELS.forEach(el => {
+            if (w[el] === 1 && ctx.mePct[el] < BALANCE_LINE) {
+                gap += BALANCE_LINE - ctx.mePct[el];
+                filled += Math.max(0, Math.min(combined[el], BALANCE_LINE) - ctx.mePct[el]);
+            }
+        });
+        const fill = gap > 0 ? filled / gap * 100 : null;
+        const total = Math.round(fill === null ? main : main * 0.8 + fill * 0.2);
+        return { main: Math.round(main), fill: fill === null ? null : Math.round(fill), total: Math.max(0, Math.min(100, total)), combined };
+    }
+
+    function friendGrade(score) {
+        if (score >= 80) return { label: '神隊友', color: '#2ed573' };
+        if (score >= 60) return { label: '合拍', color: '#00d2ff' };
+        if (score >= 40) return { label: '普通', color: '#ff9800' };
+        return { label: '各有所長', color: '#999' };
+    }
+
+    function renderFriendGauge(score) {
+        const g = friendGrade(score);
+        const R = 70, C = Math.PI * R;
+        const off = C * (1 - score / 100);
+        return `
+            <svg viewBox="0 0 180 110" class="fr-gauge">
+                <path d="M20 95 A70 70 0 0 1 160 95" fill="none" stroke="#2a2a2a" stroke-width="14" stroke-linecap="round"/>
+                <path d="M20 95 A70 70 0 0 1 160 95" fill="none" stroke="${g.color}" stroke-width="14" stroke-linecap="round"
+                    stroke-dasharray="${C}" stroke-dashoffset="${C}" data-target-offset="${off}" class="fr-gauge-arc"/>
+                <text x="90" y="80" text-anchor="middle" class="fr-gauge-num" fill="#fff">${score}</text>
+                <text x="90" y="102" text-anchor="middle" class="fr-gauge-label" fill="${g.color}">${g.label}</text>
+            </svg>`;
+    }
+
+    function renderFriendBars(ctx, sc) {
+        const { w } = friendWeights(ctx);
+        const maxV = Math.max(50, ...FIVE_ELS.map(el => Math.max(ctx.mePct[el], sc.combined[el]))) * 1.1;
+        const pct = (v) => (v / maxV * 100).toFixed(2);
+        return `<div class="fr-bars">` + FIVE_ELS.map(el => {
+            const me = ctx.mePct[el], cb = sc.combined[el];
+            const lo = Math.min(me, cb), hi = Math.max(me, cb);
+            const up = cb > me;
+            const deltaCls = up ? (w[el] > 0 ? 'fr-delta-good' : 'fr-delta-up') : 'fr-delta-down';
+            return `
+                <div class="fr-bar-row">
+                    <span class="fr-bar-el${w[el] === 1 ? ' is-fav' : ''}" style="color:${elementColors[el]}">${el}</span>
+                    <div class="fr-bar-track">
+                        <div class="fr-bar-line" style="left:${pct(BALANCE_LINE)}%"></div>
+                        <div class="fr-bar-base" style="width:${pct(me)}%; background:${elementColors[el]};" data-target-width="${pct(lo)}"></div>
+                        <div class="fr-bar-delta ${deltaCls}" style="left:${pct(lo)}%; width:0%;" data-target-width="${pct(hi - lo)}"></div>
+                    </div>
+                    <span class="fr-bar-val">${me.toFixed(0)}→<b>${cb.toFixed(0)}</b>%</span>
+                </div>`;
+        }).join('') + `</div>`;
+    }
+
+    function animateFriendViz() {
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+            document.querySelectorAll('.fr-gauge-arc').forEach(a => a.style.strokeDashoffset = a.dataset.targetOffset);
+            document.querySelectorAll('.fr-bar-base, .fr-bar-delta').forEach(b => b.style.width = b.dataset.targetWidth + '%');
+        }));
+    }
+
+    function renderFriendsTab() {
+        const panel = document.getElementById('friendPanel');
+        const ctx = window.__friendCtx;
+        if (!panel || !ctx) return;
+        const { isWeak, names, w } = friendWeights(ctx);
+        const fav = FIVE_ELS.filter(el => w[el] === 1).map(el => `<b style="color:${elementColors[el]}">${el}</b>（${names[el]}）`).join('、');
+        const friends = getFriends().map((f, i) => {
+            try { const r = calcFriendPct(f.date); return { ...f, idx: i, ...r, score: computeFriendScore(ctx, r.pct) }; }
+            catch (e) { return null; }
+        }).filter(Boolean);
+        if (__selectedFriendIdx === null || !friends.some(f => f.idx === __selectedFriendIdx)) __selectedFriendIdx = friends.length ? friends[friends.length - 1].idx : null;
+        const sel = friends.find(f => f.idx === __selectedFriendIdx);
+
+        let html = `
+            <div class="rel-summary">
+                <span>命主 <b>${ctx.strengthLabel}</b>（${ctx.totalScore}分）${!isWeak && ctx.strengthLabel === '從強格' ? '・視為身強' : ''}${isWeak && ctx.strengthLabel === '從弱格' ? '・視為身弱' : ''}</span>
+                <span>喜 ${fav}</span>
+            </div>
+            <div class="fr-input">
+                <input type="text" id="friendName" placeholder="朋友名字" maxlength="12">
+                <input type="date" id="friendDate">
+                <button onclick="addFriend()">計算</button>
+            </div>
+        `;
+        if (sel) {
+            html += `
+                <div class="fr-result">
+                    <div class="fr-result-head">👤 ${sel.name}<span class="fr-pillars">${sel.pillars.join(' ')}（無時柱）</span></div>
+                    <div class="fr-viz">
+                        <div class="fr-gauge-wrap">
+                            ${renderFriendGauge(sel.score.total)}
+                            <div class="fr-breakdown">主分數 ${sel.score.main}${sel.score.fill === null ? '・無缺口' : `・補缺 ${sel.score.fill}`}</div>
+                        </div>
+                        <div class="fr-bars-wrap">
+                            <div class="fr-bars-title">命主五行 → 合盤後（虛線＝20% 平衡線）</div>
+                            ${renderFriendBars(ctx, sel.score)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            html += `<div class="rel-coming">輸入朋友的出生年月日，計算他對你的五行互補度</div>`;
+        }
+        if (friends.length) {
+            const ranked = [...friends].sort((a, b) => b.score.total - a.score.total);
+            html += `<div class="rel-ev-title" style="margin-top:14px;">🏆 朋友排行榜</div><div class="fr-rank">` + ranked.map((f, r) => {
+                const g = friendGrade(f.score.total);
+                return `
+                    <div class="fr-rank-row${f.idx === __selectedFriendIdx ? ' is-sel' : ''}" onclick="selectFriend(${f.idx})">
+                        <span class="fr-rank-no">${r + 1}</span>
+                        <span class="fr-rank-name">${f.name}</span>
+                        <span class="fr-rank-track"><span style="width:${f.score.total}%; background:${g.color};"></span></span>
+                        <span class="fr-rank-score" style="color:${g.color}">${f.score.total}</span>
+                        <span class="saved-chart-del" onclick="event.stopPropagation(); deleteFriend(${f.idx})">✕</span>
+                    </div>`;
+            }).join('') + `</div>`;
+        }
+        panel.innerHTML = html;
+        animateFriendViz();
+    }
+
+    function addFriend() {
+        const name = (document.getElementById('friendName').value || '').trim();
+        const date = document.getElementById('friendDate').value;
+        if (!name || !date) { alert('請輸入朋友名字與出生日期'); return; }
+        const list = getFriends();
+        list.push({ name, date });
+        setFriends(list);
+        __selectedFriendIdx = list.length - 1;
+        renderFriendsTab();
+    }
+    function selectFriend(idx) { __selectedFriendIdx = idx; renderFriendsTab(); }
+    function deleteFriend(idx) {
+        const list = getFriends();
+        if (!list[idx] || !confirm(`確定刪除「${list[idx].name}」？`)) return;
+        list.splice(idx, 1); setFriends(list);
+        __selectedFriendIdx = null;
+        renderFriendsTab();
+    }
+
     const SAVED_CHARTS_KEY = 'bazi_saved_charts_v1';
 
     function getSavedCharts() {
@@ -2534,13 +2760,13 @@
                     <div class="rel-tab-btn" data-tab="parents" onclick="switchRelTab('parents')">父母</div>
                     <div class="rel-tab-btn" data-tab="siblings" onclick="switchRelTab('siblings')">兄弟</div>
                     <div class="rel-tab-btn active" data-tab="children" onclick="switchRelTab('children')">子女</div>
-                    <div class="rel-tab-btn" data-tab="peer" onclick="switchRelTab('peer')">同儕</div>
+                    <div class="rel-tab-btn" data-tab="peer" onclick="switchRelTab('peer')">朋友</div>
                     <div class="rel-tab-btn" data-tab="marriage" onclick="switchRelTab('marriage')">婚姻</div>
                 </div>
                 <div class="rel-tab-panel" data-tab="parents" style="display:none;">${renderParentScanHtml(parentScan)}</div>
                 <div class="rel-tab-panel" data-tab="siblings" style="display:none;">${renderSiblingScanHtml(siblingScan)}</div>
                 <div class="rel-tab-panel" data-tab="children" style="display:block;">${renderChildScanHtml(childScan)}</div>
-                <div class="rel-tab-panel" data-tab="peer" style="display:none;"><div class="rel-coming">同事・朋友 規劃中</div></div>
+                <div class="rel-tab-panel" data-tab="peer" style="display:none;"><div id="friendPanel"></div></div>
                 <div class="rel-tab-panel" data-tab="marriage" style="display:none;"><div class="rel-coming">婚姻 規劃中</div></div>
             `;
             document.getElementById('relativesOutput').innerHTML = wrapAccordion('👥 我的人際圈', relBody, false);
@@ -2564,6 +2790,14 @@
 
         let totalElements = 0;
         Object.values(elementCount).forEach(v => totalElements += v);
+
+        // ===== 朋友契合度分頁：提供命主資料（此分頁不列入 AI 提詞） =====
+        try {
+            const mePct = {};
+            Object.keys(elementCount).forEach(el => mePct[el] = totalElements > 0 ? elementCount[el] / totalElements * 100 : 0);
+            window.__friendCtx = { dayElement, strengthLabel, totalScore, mePct };
+            renderFriendsTab();
+        } catch (e) { console.warn('朋友分頁計算失敗:', e); }
         
         let powerScore = 0;
         if(totalElements > 0) {
