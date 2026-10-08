@@ -323,8 +323,10 @@
         .rc-palace { font-size: 9px; color: var(--accent); font-weight: normal; }
         .rc-gz { font-size: 17px; font-weight: bold; }
         .rc-tg { color: #999; }
-        .rc-ring { display: inline-flex; align-items: center; justify-content: center; border: 1.5px solid #2ed573; border-radius: 50%; min-width: 1.5em; height: 1.5em; line-height: 1; box-sizing: border-box; }
-        .rc-hidden .rc-ring { min-width: 1.6em; height: 1.6em; border-width: 1px; }
+        /* 每個字都放在同尺寸的圓框裡（未圈時框線透明），圈與不圈的字寬度一致，十神才會對齊 */
+        .rc-ch { display: inline-flex; align-items: center; justify-content: center; width: 1.6em; height: 1.6em; line-height: 1; border: 1.5px solid transparent; border-radius: 50%; box-sizing: border-box; }
+        .rc-hidden .rc-ch { border-width: 1px; }
+        .rc-ring { border-color: #2ed573; }
         .rel-persona { font-size: 12px; color: #999; margin: -4px 0 12px 0; }
         .rel-persona b { color: #ddd; }
         .rel-ev-row.is-past .rel-ev-time { color: #2b6a85; }
@@ -1425,7 +1427,7 @@
         const hiddenOf = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
         const tg = (g, isDm) => isDm ? '日主' : (ssShort[getPreciseTenGod(g, dg)] || '');
         // 屬於該星的字加圈；地支只要藏有該星也圈起來
-        const ring = (ch, color, on) => `<span class="${on ? 'rc-ring' : ''}" style="color:${color}">${ch}</span>`;
+        const ring = (ch, color, on) => `<span class="rc-ch${on ? ' rc-ring' : ''}" style="color:${color}">${ch}</span>`;
         let h = `<div class="rc-wrap"><table class="rc-table"><tr>`;
         order.forEach(i => h += `<td class="rc-head">${names[i]}${i === palaceIdx ? `<div class="rc-palace">${palaceLabel}</div>` : ''}</td>`);
         h += `</tr><tr>`;
@@ -1542,12 +1544,24 @@
         const el = dayElement;
         const hiddenOf = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
 
-        // 擷取順序同子女星：天干 → 地支主氣 → 地支中/餘氣，最多 3 顆
+        // 擷取規則同父母星：天干有比劫必取 1 顆；地支主氣有比劫必取 1 顆；
+        // 兩者皆無，才往地支中氣→餘氣找 1 顆（同層取比重最高）。順序：月→年→日→時（月柱為兄弟宮）
         const stars = [];
-        const push = (st) => { if (stars.length < 3) stars.push(st); };
-        baseGans.forEach((g, i) => { if (i !== 2 && g !== '-' && ganElementMap[g] === el) push({ gan: g, pillarIdx: i, layer: '天干' }); });
-        baseZhis.forEach((z, i) => { const h = hiddenOf(z); if (h[0] && ganElementMap[h[0]] === el) push({ gan: h[0], pillarIdx: i, layer: '地支主氣' }); });
-        baseZhis.forEach((z, i) => hiddenOf(z).slice(1).forEach((hg, k) => { if (ganElementMap[hg] === el) push({ gan: hg, pillarIdx: i, layer: k === 0 ? '地支中氣' : '地支餘氣' }); }));
+        const ORDER = [1, 0, 2, 3];
+        const gi = ORDER.find(i => i !== 2 && baseGans[i] !== '-' && ganElementMap[baseGans[i]] === el);
+        if (gi !== undefined) stars.push({ gan: baseGans[gi], pillarIdx: gi, layer: '天干' });
+        const zi = ORDER.find(i => baseZhis[i] !== '-' && ganElementMap[hiddenOf(baseZhis[i])[0]] === el);
+        if (zi !== undefined) stars.push({ gan: hiddenOf(baseZhis[zi])[0], pillarIdx: zi, layer: '地支主氣' });
+        if (!stars.length) {
+            for (const [pos, layerName] of [[1, '地支中氣'], [2, '地支餘氣']]) {
+                let best = null;
+                ORDER.forEach(i => {
+                    const z = baseZhis[i], hg = hiddenOf(z)[pos];
+                    if (hg && ganElementMap[hg] === el && (!best || zhiHiddenWeights[z][hg] > best.w)) best = { i, hg, w: zhiHiddenWeights[z][hg] };
+                });
+                if (best) { stars.push({ gan: best.hg, pillarIdx: best.i, layer: layerName }); break; }
+            }
+        }
 
         stars.forEach(st => {
             st.tenGod = getPreciseTenGod(st.gan, dg);
@@ -1624,8 +1638,15 @@
                 <span>比劫坐支 <b>${scan.targets.length ? scan.targets.map(t => `${t.zhi}`).join('、') : '無'}</b></span>
             </div>
         `;
-        html += renderRoleChart(scan.baseGans, scan.baseZhis, scan.dg,
-            (g) => ganElementMap[g] === scan.el, -1, '', scan.targets.map(t => t.idx));
+        // 只圈選中的那顆比劫星，以及它的坐支
+        const SIB_RING = '#2ed573';
+        const marks = [];
+        scan.stars.forEach(st => {
+            if (st.layer === '天干') marks.push({ type: 'gan', idx: st.pillarIdx, gan: null, color: SIB_RING });
+            else marks.push({ type: 'zhi', idx: st.pillarIdx, gan: st.gan, color: SIB_RING });
+            marks.push({ type: 'zhi', idx: st.pillarIdx, gan: null, color: SIB_RING });
+        });
+        html += renderMarkedChart(scan.baseGans, scan.baseZhis, scan.dg, marks);
         if (scan.stars.length === 0) {
             html += `<div class="rel-empty"><span class="tag tag-neutral">原局不見比劫星</span></div>`;
         } else {
@@ -1646,7 +1667,7 @@
     }
 
     function buildSiblingScanPromptText(scan) {
-        let t = `兄弟星＝比劫（${scan.el}，與日主同五行）。\n`;
+        let t = `兄弟星＝比劫（${scan.el}，與日主同五行），天干有取 1 顆、地支主氣有取 1 顆；兩者皆無才取地支中氣或餘氣 1 顆（用於提醒手足安危）。\n`;
         if (scan.stars.length === 0) t += '原局比劫星：無\n';
         scan.stars.forEach((st, i) => {
             t += `比劫星${i + 1}：${st.gan}（${st.tenGod}）位於${st.pillarName}柱${st.layer}，坐支「${st.sittingBranch}」；通根：${st.tonggenLabel}；透干：${st.touganLabel}\n`;
@@ -1774,7 +1795,7 @@
         const hiddenOf = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
         const tg = (g, isDm) => isDm ? '日主' : (ssShort[getPreciseTenGod(g, dg)] || '');
         const ringColor = (type, idx, g) => { const m = marks.find(mk => mk.type === type && mk.idx === idx && (!g || mk.gan === g)); return m ? m.color : null; };
-        const ch = (c, color, rc) => `<span class="${rc ? 'rc-ring' : ''}" style="color:${color};${rc ? `border-color:${rc};` : ''}">${c}</span>`;
+        const ch = (c, color, rc) => `<span class="rc-ch${rc ? ' rc-ring' : ''}" style="color:${color};${rc ? `border-color:${rc};` : ''}">${c}</span>`;
         let h = `<div class="rc-wrap"><table class="rc-table"><tr>`;
         order.forEach(i => h += `<td class="rc-head">${names[i]}</td>`);
         h += `</tr><tr>`;
