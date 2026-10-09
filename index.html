@@ -729,7 +729,7 @@
     </div>
 
     <div style="text-align:center; margin-top:20px; opacity:0.6;">
-        <img src="https://visitor-badge.laobi.icu/badge?page_id=uptronyx-debug.bazi-app" alt="訪客累計人次" style="height:20px;">
+        <img loading="lazy" src="https://visitor-badge.laobi.icu/badge?page_id=uptronyx-debug.bazi-app" alt="訪客累計人次" style="height:20px;">
     </div>
     
 </div>
@@ -737,7 +737,9 @@
 <script>
     window.currentBaziDataForAI = null;
 
-    window.onload = function() {
+    // 頁面初始化：DOM 解析完成就執行，不等待外部圖片（訪客徽章等）載入完成，
+    // 避免外部圖片伺服器緩慢時，下拉選單遲遲沒有選項
+    function initPage() {
         if (typeof Solar === 'undefined') {
             document.querySelector('.container').innerHTML =
                 '<h2 style="color:#ff5252;">⚠️ 排盤引擎載入失敗</h2>' +
@@ -792,7 +794,9 @@
             document.getElementById('tg').value = '乙'; document.getElementById('tz').value = '巳';
         }
         renderSavedChartsList();
-    };
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPage);
+    else initPage();
 
     function toggleTrueSolar() {
         const isChecked = document.getElementById('useTrueSolar').checked;
@@ -1660,5 +1664,4 @@
             s += `<line x1="${lx.toFixed(1)}" y1="${ly.toFixed(1)}" x2="${lx2.toFixed(1)}" y2="${ly2.toFixed(1)}" stroke="${cfg.marker.color}" stroke-width="2"/>`;
         }
         // 動態：亮起的填充弧、指針、數值
-        s += `<path class="pg-fill" d="" stroke="${pgZoneColor(cfg, cfg.min)}" stroke-width="10" fill="none" stroke-linecap="butt" filter="url(#pgGlow)"/>`;
-        s += `<g class="pg-needle" transform="rotate(-90 ${PG.cx} ${PG.cy})" filter="url(#pgNeedle
+        s += `<path class="pg-fill" d="" stroke="${
