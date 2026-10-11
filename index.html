@@ -359,7 +359,7 @@
         .lc-cell.past .lc-n { color:#2b6a85; }
         .lc-n { font-size:12px; font-weight:bold; color:#ddd; line-height:1.1; }
         .lc-gz { font-size:10px; letter-spacing:0; }
-        .lc-tags { display:flex; gap:2px; min-height:13px; }
+        .lc-tags { display:flex; gap:1px; min-height:13px; flex-wrap:wrap; justify-content:center; }
         .lc-tags i { font-style:normal; font-size:9px; font-weight:bold; width:13px; height:13px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; }
         .lc-wang { background:#ffb347; color:#000; box-shadow:0 0 5px #ffb347; }
         .lc-po { background:#2a0d0d; color:#ff6b6b; border:1px solid #ff5252; box-sizing:border-box; }
@@ -368,6 +368,67 @@
         .lc-dt { font-size:12px; color:#aaa; margin-bottom:6px; }
         .lc-dt b { font-size:15px; margin-left:4px; }
         @media (max-width: 500px) { .lc-cell { min-height:52px; padding:3px 1px 2px; } .lc-gz { font-size:9px; } .lw-vbtn { font-size:11px; padding:3px 10px; } }
+        .lw-ju-line .lw-chip { color:#d0b3ff; border-color:#b388ff; background:rgba(179,136,255,.12); }
+        .lc-ju { background:#b388ff; color:#000; box-shadow:0 0 5px #b388ff; }
+        .lw-ju-ring { transform-box: fill-box; transform-origin: center; animation: stSpin 8s linear infinite; }
+        /* ===== 流日：工作主題（藍） ===== */
+        .lw-官旺日 .lw-chip { color:#000; background:#5ab0ff; border-color:#5ab0ff; box-shadow:0 0 6px rgba(90,176,255,.6); }
+        .lw-半官 .lw-chip { color:#7fb8ea; border-color:#3a6fa8; }
+        .lw-topic { cursor:pointer; }
+        .lw-topic.off { cursor:default; }
+        .topic-work .lw-topic.on { color:#5ab0ff; border-color:#5ab0ff; background:rgba(90,176,255,.12); box-shadow:0 0 8px rgba(90,176,255,.35); }
+        .topic-work .lc-cell { background: linear-gradient(180deg, rgba(90,176,255,var(--a)), rgba(90,176,255,calc(var(--a) * .35))), #121212; }
+        .topic-work .lc-cell.wang { border-color:rgba(90,176,255,.7); box-shadow:0 0 8px rgba(90,176,255,.25); }
+        .topic-work .lc-wang { background:#5ab0ff; box-shadow:0 0 5px #5ab0ff; }
+        /* ===== 轉職窗口 ===== */
+        .zh-strip { margin:2px 0 12px; padding:10px 0 4px; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06); }
+        .zh-head { display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; font-size:12px; color:#ccc; font-weight:bold; }
+        .zh-basis { font-size:10px; color:#888; font-weight:normal; }
+        .zh-basis b { color:#2ed573; }
+        .zh-year { font-size:11px; color:#999; margin:4px 0 8px; }
+        .zh-year b { font-size:13px; }
+        .zh-row { display:grid; grid-template-columns:repeat(12, minmax(0,1fr)); gap:4px; }
+        .zh-chip { display:flex; flex-direction:column; align-items:center; gap:2px; padding:4px 0; border-radius:6px; animation: peFade .35s ease-out both; animation-delay: var(--d); }
+        .zh-chip.now { outline:1px solid rgba(0,210,255,.6); }
+        .zh-chip.ok { background:rgba(46,213,115,.08); }
+        .zh-m { font-size:9px; color:#777; white-space:nowrap; }
+        .zh-gz { font-size:11px; letter-spacing:0; }
+        .zh-bar { width:70%; height:3px; border-radius:2px; background:#222; overflow:hidden; }
+        .zh-bar i { display:block; height:100%; background:#2ed573; }
+        .zh-tag { font-size:9px; font-weight:bold; width:14px; height:14px; border-radius:3px; display:inline-flex; align-items:center; justify-content:center; background:#2ed573; color:#000; box-shadow:0 0 6px rgba(46,213,115,.6); }
+        .zh-tag.off { background:none; color:#333; box-shadow:none; }
+        .lw-zh-line .lw-chip { color:#7fdca4; border-color:#2b7a4b; }
+        .lw-zh-line.ok .lw-chip { color:#000; background:#2ed573; border-color:#2ed573; }
+        .lw-zh-line b { color:#2ed573; }
+        .lc-zh { background:#2ed573; color:#000; box-shadow:0 0 5px #2ed573; border-radius:3px !important; }
+        .lw-zhuan { animation: peFade .4s ease-out both; animation-delay: 1s; }
+        @media (max-width: 600px) { .zh-row { grid-template-columns:repeat(6, minmax(0,1fr)); } }
+        .zy-row { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; margin-top:8px; }
+        .zy { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 2px; border-radius:8px; border:1px solid #262626; background:#111; animation: peFade .35s ease-out both; animation-delay: var(--d); }
+        .zy.now { border-color:rgba(0,210,255,.6); }
+        .zy.half { border-color:rgba(46,213,115,.4); }
+        .zy.full { border-color:#2ed573; background:rgba(46,213,115,.1); box-shadow:0 0 10px rgba(46,213,115,.25); }
+        .zy-y { font-size:11px; color:#888; }
+        .zy-gz { font-size:15px; letter-spacing:1px; }
+        .zy-dots { display:flex; gap:3px; }
+        .zy-dots i { width:7px; height:7px; border-radius:50%; background:#2a2a2a; }
+        .zy-dots i.on { background:#2ed573; box-shadow:0 0 5px #2ed573; }
+        .zy-t { font-size:9px; color:#666; white-space:nowrap; }
+        .zh-chart { margin-top:6px; overflow-x:auto; }
+        .zh-svg { min-width:560px; }
+        .zh-next { font-size:11px; color:#aaa; margin-top:6px; line-height:1.6; }
+        @media (max-width: 600px) { .zy-row { grid-template-columns:repeat(3, minmax(0,1fr)); } }
+        .zh-card { margin-top:10px; }
+        .zh-pill { display:flex; align-items:center; gap:3px; font-size:15px; margin:4px 0; flex-wrap:wrap; }
+        .zh-pl { font-size:11px; color:#888; width:30px; }
+        .zh-ck { font-style:normal; font-size:10px; color:#ff5252; margin:0 8px 0 2px; }
+        .zh-ck.on { color:#2ed573; }
+        .zh-sc { font-size:11px; color:#888; margin-left:auto; }
+        .zh-basis2 { font-size:10px; color:#777; margin-top:6px; }
+        .zh-basis2 b { color:#2ed573; }
+        .zy { cursor:pointer; transition: transform .15s; }
+        .zy:hover { transform: translateY(-1px); }
+        .zy.sel { outline:2px solid #fff; outline-offset:-1px; }
         /* ===== 十神星圖（儀表風）＋大運捲軸 ===== */
         .st-panel { width:100%; flex:1; display:flex; flex-direction:column; }
         .st-head-r { display:flex; align-items:center; gap:8px; }
@@ -2294,6 +2355,138 @@
      *  ④ 天干財星被合絆：流日天干合原局天干財星
      * （大運／流年層級的身強弱破財時機，留待「體感趨勢」處理）
      */
+    /**
+     * 轉職時機（教材整理）：大運只用來判斷「以身強或身弱論」，轉職分數看流年＋流月
+     *  身強 → 宜財、官殺；身弱＋大運幫扶（印比）→ 以身強論，宜財、官殺；身弱＋大運削弱（財官食傷）→ 宜比劫、印
+     *  從格：大運五行與格局相符＝成格，以身強論；不符＝破格，以身弱論
+     *  每柱：天干、地支主氣各 1 分（0–2）；轉職分＝流年 40％＋流月 60％；≥60 標「轉」
+     */
+    function careerCatOf(el, dayElement) {
+        if (el === dayElement) return '比劫';
+        if (wuxingRel[el].sheng === dayElement) return '印';
+        if (wuxingRel[dayElement].sheng === el) return '食傷';
+        if (wuxingRel[dayElement].ke === el) return '財';
+        return '官殺';
+    }
+    function zhiMainGan(z) { const hw = zhiHiddenWeights[z] || {}; return Object.keys(hw).sort((a, b) => hw[b] - hw[a])[0]; }
+    function computeCareerContext(strengthLabel, totalScore, dayElement, dy, gans, zhis, year) {
+        const dyEls = dy ? [ganElementMap[dy.gan], ganElementMap[zhiMainGan(dy.zhi)]] : [];
+        const dyCats = dyEls.map(e => careerCatOf(e, dayElement));
+        // 大運權重：天干 30％、地支 70％；大運後五年幾乎以地支為主（天干 0％、地支 100％）
+        const late = dy && year != null && year >= dy.startYear + 5;
+        const wG = late ? 0 : 0.3, wZ = late ? 1 : 0.7;
+        const phase = dy ? (late ? '後五年・地支主導' : '前五年・干3支7') : '';
+        let asStrong, basis;
+        if (strengthLabel === '從強格' || strengthLabel === '從弱格') {
+            let geEls;
+            if (strengthLabel === '從強格') geEls = [dayElement, Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement)];
+            else {
+                // 從弱：以原局（含藏干）最旺的財／官殺／食傷五行為格局五行
+                const cnt = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
+                gans.forEach(g => { if (g && g !== '-') cnt[ganElementMap[g]] += 1; });
+                zhis.forEach(z => { const hw = zhiHiddenWeights[z] || {}; Object.keys(hw).forEach(hg => cnt[ganElementMap[hg]] += hw[hg]); });
+                const cands = Object.keys(cnt).filter(e => !['比劫', '印'].includes(careerCatOf(e, dayElement)));
+                geEls = [cands.sort((a, b) => cnt[b] - cnt[a])[0]];
+            }
+            const hit = dy ? ((geEls.includes(dyEls[0]) ? wG : 0) + (geEls.includes(dyEls[1]) ? wZ : 0)) >= 0.5 : false;
+            asStrong = hit;
+            basis = `${strengthLabel}（格局五行${geEls.join('、')}）・${dy ? dy.ganZhi + '運（' + phase + '）' : '未起運'}${hit ? '與格局相符＝成格，以身強論' : '不符格局＝破格，以身弱論'}`;
+        } else if (strengthLabel === '身強') {
+            asStrong = true;
+            basis = `身強（${totalScore}分）`;
+        } else {
+            const isHelp = c => c === '比劫' || c === '印';
+            const helpful = dy ? ((isHelp(dyCats[0]) ? wG : 0) + (isHelp(dyCats[1]) ? wZ : 0)) >= 0.5 : false;
+            asStrong = helpful;
+            basis = `身弱（${totalScore}分）・${dy ? dy.ganZhi + '運（' + phase + '）' : '未起運'}${helpful ? '印比幫扶，以身強論' : '財官食傷削弱，以身弱論'}`;
+        }
+        const targets = asStrong ? ['財', '官殺'] : ['比劫', '印'];
+        return { asStrong, basis, targets, targetTxt: targets.join('、') };
+    }
+    function careerPillarScore(gan, zhi, ctx, dayElement) {
+        let n = 0;
+        if (ctx.targets.includes(careerCatOf(ganElementMap[gan], dayElement))) n++;
+        if (ctx.targets.includes(careerCatOf(ganElementMap[zhiMainGan(zhi)], dayElement))) n++;
+        return n;
+    }
+    function careerScore(yG, yZ, mG, mZ, ctx, dayElement) {
+        const y = careerPillarScore(yG, yZ, ctx, dayElement), m = careerPillarScore(mG, mZ, ctx, dayElement);
+        const score = Math.round(y / 2 * 40 + m / 2 * 60);
+        return { y, m, score, ok: score >= 60 };
+    }
+
+    /**
+     * 官運旺流日（教材整理；教材組合為舉例，包含但不限於）：
+     *  主看官殺星（剋我者），財星可生官為輔（天干官殺×地支財亦可）
+     *  天干：官殺 1.0、財 0.5；地支：依藏干比重，官殺×1.0、財×0.5
+     *  天干、地支皆含官殺或財，且當日有官殺出現 → 官旺日
+     */
+    function computeLiuriWork(dGan, dZhi, dayGan, dayElement) {
+        const caiEl = wuxingRel[dayElement].ke;
+        const gsEl = Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement);
+        const val = g => ganElementMap[g] === gsEl ? 1.0 : (ganElementMap[g] === caiEl ? 0.5 : 0);
+        const C = g => elementColors[ganElementMap[g]];
+        const ganOK = val(dGan) > 0;
+        let zhiE = 0; const zhiParts = [];
+        const hw = zhiHiddenWeights[dZhi] || {};
+        Object.keys(hw).forEach(hg => {
+            const v = val(hg) * hw[hg];
+            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
+        });
+        const zhiOK = zhiE > 0;
+        const hasGS = ganElementMap[dGan] === gsEl || Object.keys(hw).some(hg => ganElementMap[hg] === gsEl);
+        const score = Math.max(0, Math.min(100, Math.round((val(dGan) + zhiE) / 2 * 100)));
+        const tier = (ganOK && zhiOK && hasGS) ? '官旺日' : ((ganOK || zhiOK) ? '半官' : '平');
+        const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
+        const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
+        return { score, tier, ganOK, zhiOK, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
+    }
+
+    /**
+     * 流日三合／三會偵測（延伸應用，非教材規則）：
+     *  只在「原局＋大運＋流年」已具兩字、由流日補上第三字時成立（原局本身已成局者不算）
+     *  財局 → 財星加強；食傷局 → 食傷生財；比劫局 → 比劫奪財（破財）；
+     *  印局／官殺局且原局含財地支被拉入 → 財星被化走（破財）
+     */
+    const JU_LIST = [
+        { kind: '三合', zhi: ['申','子','辰'], el: '水' }, { kind: '三合', zhi: ['亥','卯','未'], el: '木' },
+        { kind: '三合', zhi: ['寅','午','戌'], el: '火' }, { kind: '三合', zhi: ['巳','酉','丑'], el: '金' },
+        { kind: '三會', zhi: ['寅','卯','辰'], el: '木' }, { kind: '三會', zhi: ['巳','午','未'], el: '火' },
+        { kind: '三會', zhi: ['申','酉','戌'], el: '金' }, { kind: '三會', zhi: ['亥','子','丑'], el: '水' }
+    ];
+    // srcs：[{ zhi, from:'年支'|'月支'|'日支'|'時支'|'大運'|'流年', natal:bool }]
+    function detectLiuriJu(dZhi, srcs, dayElement, topic) {
+        const caiEl = wuxingRel[dayElement].ke, ssEl = wuxingRel[dayElement].sheng;
+        const gsEl = Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement);
+        const out = [];
+        JU_LIST.forEach(ju => {
+            if (!ju.zhi.includes(dZhi)) return;
+            if (srcs.some(x => x.zhi === dZhi)) return; // 流日需補上「新的」一字
+            const others = ju.zhi.filter(z => z !== dZhi);
+            const used = others.map(z => srcs.find(x => x.zhi === z));
+            if (used.some(u => !u)) return;
+            const name = `${ju.zhi.join('')}${ju.kind === '三會' ? '會' : '合'}${ju.el}`;
+            const from = used.map(u => `${u.from}${u.zhi}`).join('、');
+            const strong = ju.kind === '三會';
+            let effect = null;
+            if (topic === 'work') {
+                if (ju.el === gsEl) effect = { type: 'boost', label: '官殺局', bonus: strong ? 30 : 25 };
+                else if (ju.el === caiEl) effect = { type: 'boost', label: '財局（財生官）', bonus: strong ? 15 : 12 };
+                if (effect) out.push({ name, kind: ju.kind, from, members: ju.zhi, ...effect });
+                return;
+            }
+            if (ju.el === caiEl) effect = { type: 'boost', label: '財局', bonus: strong ? 30 : 25 };
+            else if (ju.el === ssEl) effect = { type: 'boost', label: '食傷局', bonus: strong ? 15 : 12 };
+            else if (ju.el === dayElement) effect = { type: 'po', label: '比劫局', txt: `${name}成比劫局，比劫奪財` };
+            else {
+                const caiMembers = used.filter(u => u.natal && Object.keys(zhiHiddenWeights[u.zhi] || {}).some(hg => ganElementMap[hg] === caiEl));
+                if (caiMembers.length) effect = { type: 'po', label: (ju.el === wuxingRel[caiEl].sheng ? '官殺局' : '印局'), txt: `${name}，${caiMembers.map(u => u.from + u.zhi).join('、')}財星被化走` };
+            }
+            if (effect) out.push({ name, kind: ju.kind, from, members: ju.zhi, ...effect });
+        });
+        return out;
+    }
+
     function detectPoCai(dGan, dZhi, baseGans, baseZhis, dayGan, dayElement) {
         const caiEl = wuxingRel[dayElement].ke;
         const P = ['年', '月', '日', '時'];
@@ -2302,7 +2495,7 @@
         baseZhis.forEach((z, i) => {
             if (!z || z === '-') return;
             if (zhiHasCai(z) && zhiChongMap[z] === dZhi) hits.push({ type: '沖', txt: `${dZhi}沖${P[i]}支${z}（財星）` });
-            if (zhiHasCai(z) && zhiHeMap[z] === dZhi) hits.push({ type: '合', txt: `${dZhi}${z}合，${P[i]}支財星被合絆` });
+            if (zhiHasCai(z) && zhiHeMap[z] === dZhi) hits.push({ type: '合', liuheZhi: z, txt: `${dZhi}${z}合，${P[i]}支財星被合絆` });
         });
         baseGans.forEach((g, i) => {
             if (i === 2 || !g || g === '-' || ganElementMap[g] !== caiEl) return;
@@ -3492,16 +3685,41 @@
         const baseGans = originalPillars.map(p => p.gan);
 
         // ===== 流日速覽（過去 3 日＋未來 7 日，共 10 天，單一長條圖一行呈現趨勢） =====
-        (function renderLiuriPanel() {
+        window.__renderLiuri = function renderLiuriPanel() {
             try {
+                const topic = window.__lwTopic || 'cai';
+                const T = topic === 'work'
+                    ? { c: '#5ab0ff', c2: '#3a6fa8', c3: '#a8d4ff', rgb: '90,176,255', hot: '官旺日', mark: '旺', energy: '官殺能量', hotShort: '官旺' }
+                    : { c: '#ffb347', c2: '#c98a3a', c3: '#ffcf7a', rgb: '255,179,71', hot: '財旺日', mark: '旺', energy: '財星能量', hotShort: '財旺' };
+                const isHot = t => t === T.hot;
                 if (typeof Solar === 'undefined') { document.getElementById('liuriOutput').innerHTML = ''; return; }
                 const todayD = new Date();
                 const weekChar = ['日', '一', '二', '三', '四', '五', '六'];
-                const dayInfo = (d) => {
-                    const bz = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0).getLunar().getEightChar();
-                    const g = bz.getDayGan(), z = bz.getDayZhi();
-                    return { g, z, w: computeLiuriWealth(g, z, dayGan, dayElement), po: detectPoCai(g, z, baseGans, baseZhis, dayGan, dayElement) };
+                const juSources = (bz, year) => {
+                    const src = baseZhis.map((z, i) => ({ zhi: z, from: ['年支','月支','日支','時支'][i], natal: true })).filter(x => x.zhi && x.zhi !== '-');
+                    const dy = daYunData.find(x => year >= x.startYear && year < x.startYear + 10);
+                    if (dy) src.push({ zhi: dy.zhi, from: '大運', natal: false });
+                    src.push({ zhi: bz.getYearZhi(), from: '流年', natal: false });
+                    return src;
                 };
+                const careerCtxOf = (year) => computeCareerContext(strengthLabel, totalScore, dayElement,
+                    daYunData.find(x => year >= x.startYear && year < x.startYear + 10), baseGans, baseZhis, year);
+                // 財星能量＋三合三會加權＋破財
+                const fullDay = (bz, year) => {
+                    const g = bz.getDayGan(), z = bz.getDayZhi();
+                    const w = topic === 'work' ? computeLiuriWork(g, z, dayGan, dayElement) : computeLiuriWealth(g, z, dayGan, dayElement);
+                    const ju = detectLiuriJu(z, juSources(bz, year), dayElement, topic);
+                    const bonus = ju.filter(j => j.type === 'boost').reduce((a, j) => a + j.bonus, 0);
+                    if (bonus) w.score = Math.min(100, w.score + bonus);
+                    // 三合／三會成局（加強）時，局內的六合被局取代，不再視為合絆破財
+                    const boostMembers = ju.filter(j => j.type === 'boost').flatMap(j => j.members);
+                    const po = topic === 'work' ? [] : detectPoCai(g, z, baseGans, baseZhis, dayGan, dayElement)
+                        .filter(h => !(h.liuheZhi && boostMembers.includes(h.liuheZhi)))
+                        .concat(ju.filter(j => j.type === 'po').map(j => ({ type: j.kind, txt: j.txt })));
+                    const career = null; // 轉職改以「轉職」檢視（月為單位）呈現，不與流日重疊
+                    return { g, z, w, ju, po, career };
+                };
+                const dayInfo = (d) => fullDay(Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0).getLunar().getEightChar(), d.getFullYear());
                 window.__liuriDayInfo = dayInfo;
                 const days = [];
                 for (let offset = -3; offset <= 6; offset++) { // 過去3日 + 今日起未來7日 = 共10天
@@ -3515,8 +3733,8 @@
                     const zhiHiddenGans = Object.keys(zhiHiddenWeights[dZhiD] || {})
                         .sort((a, b) => zhiHiddenWeights[dZhiD][b] - zhiHiddenWeights[dZhiD][a]);
                     const zhiHiddenTenGods = zhiHiddenGans.map(hg => getSpecificShiShen(hg, dayGan));
-                    const wealthDay = computeLiuriWealth(dGanD, dZhiD, dayGan, dayElement);
-                    const poCai = detectPoCai(dGanD, dZhiD, baseGans, baseZhis, dayGan, dayElement);
+                    const fd = fullDay(baziD, d.getFullYear());
+                    const wealthDay = fd.w, poCai = fd.po, juList = fd.ju;
                     const chongXingBadges = checkDayunChongXing(dGanD, dZhiD, baseGans, baseZhis, pNames);
                     const hejuBadges = checkDayunHeju(dZhiD, baseZhis);
                     days.push({
@@ -3525,7 +3743,7 @@
                         isToday: offset === 0,
                         dateShort: `${d.getMonth() + 1}/${d.getDate()}`,
                         weekLabel: weekChar[d.getDay()],
-                        wealth: wealthDay.score, wealthTier: wealthDay.tier, wealthDetail: wealthDay.detail, poCai,
+                        wealth: wealthDay.score, wealthTier: wealthDay.tier, wealthDetail: wealthDay.detail, poCai, juList, career: fd.career,
                         chongXingBadges, hejuBadges
                     });
                 }
@@ -3565,8 +3783,8 @@
                 const areaPath = `${linePath} L${pts[pts.length - 1].x.toFixed(1)},${baseY} L${pts[0].x.toFixed(1)},${baseY} Z`;
                 let svg = `<svg class="lw-svg" viewBox="0 0 ${w} ${h}" width="100%" height="auto" style="display:block; max-width:100%; overflow:visible;">`;
                 svg += `<defs>
-                        <linearGradient id="lwArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ffb347" stop-opacity="0.35"/><stop offset="100%" stop-color="#ffb347" stop-opacity="0"/></linearGradient>
-                        <linearGradient id="lwLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#c98a3a"/><stop offset="50%" stop-color="#ffcf7a"/><stop offset="100%" stop-color="#c98a3a"/></linearGradient>
+                        <linearGradient id="lwArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${T.c}" stop-opacity="0.35"/><stop offset="100%" stop-color="${T.c}" stop-opacity="0"/></linearGradient>
+                        <linearGradient id="lwLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="${T.c2}"/><stop offset="50%" stop-color="${T.c3}"/><stop offset="100%" stop-color="${T.c2}"/></linearGradient>
                         <filter id="lwGlow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
                     </defs>`;
                 [25, 50, 75].forEach(v => { const yy = padT + plotH * (1 - v / 100); svg += `<line x1="${padL}" y1="${yy}" x2="${w - padR}" y2="${yy}" stroke="#242424" stroke-width="0.8" stroke-dasharray="2,3"/><text x="${padL - 4}" y="${yy + 3}" text-anchor="end" font-size="7" fill="#444">${v}</text>`; });
@@ -3574,12 +3792,14 @@
                 svg += `<path class="lw-area" d="${areaPath}" fill="url(#lwArea)"/>`;
                 svg += `<path class="lw-trend" d="${linePath}" fill="none" stroke="url(#lwLine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="1" filter="url(#lwGlow)"/>`;
                 pts.forEach(pt => {
-                    const wang = pt.d.wealthTier === '財旺日';
+                    const wang = isHot(pt.d.wealthTier);
                     svg += `<g class="lw-pt ${wang ? 'wang' : ''}" data-i="${pt.i}" style="--d:${(0.35 + pt.i * 0.07).toFixed(2)}s; cursor:pointer;" onclick="lwPick(${pt.i})">
                         <circle class="lw-pulse" cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="4" fill="none" stroke="#00d2ff" stroke-width="1.5"/>
-                        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${wang ? 4.2 : 3}" fill="${wang ? '#ffb347' : '#141414'}" stroke="${wang ? '#ffe2a8' : '#c98a3a'}" stroke-width="1.4"/>
+                        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${wang ? 4.2 : 3}" fill="${wang ? T.c : '#141414'}" stroke="${wang ? T.c3 : T.c2}" stroke-width="1.4"/>
                         <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="12" fill="transparent"/>
-                        ${wang ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y - 9).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="bold" fill="#ffd27a">旺</text>` : ''}
+                        ${wang ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y - 9).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="bold" fill="${T.c3}">旺</text>` : ''}
+                        ${pt.d.career && pt.d.career.ok ? `<g class="lw-zhuan"><rect x="${(pt.x - 6.5).toFixed(1)}" y="${(pt.y - (wang ? 30 : 21)).toFixed(1)}" width="13" height="12" rx="3" fill="#2ed573"/><text x="${pt.x.toFixed(1)}" y="${(pt.y - (wang ? 30 : 21) + 9.3).toFixed(1)}" text-anchor="middle" font-size="8.5" font-weight="bold" fill="#000">轉</text></g>` : ''}
+                        ${pt.d.juList.some(j => j.type === 'boost') ? `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="8" fill="none" stroke="#b388ff" stroke-width="1.2" stroke-dasharray="2 2" class="lw-ju-ring"/>` : ''}
                         ${pt.d.poCai.length ? `<g class="lw-po"><circle cx="${pt.x.toFixed(1)}" cy="${(Math.min(baseY - 9, pt.y + 13)).toFixed(1)}" r="6.5" fill="#2a0d0d" stroke="#ff5252" stroke-width="1"/><text x="${pt.x.toFixed(1)}" y="${(Math.min(baseY - 9, pt.y + 13) + 3.2).toFixed(1)}" text-anchor="middle" font-size="8" font-weight="bold" fill="#ff6b6b">破</text></g>` : ''}
                         <title>${pt.d.dateShort}（${pt.d.weekLabel}）${pt.d.gan}${pt.d.zhi}｜${pt.d.wealth}</title>
                     </g>`;
@@ -3588,6 +3808,117 @@
                 });
                 svg += `</svg>`;
 
+                // 轉職小卡：點選流月圓點顯示該月細節
+                const zhCardHtml = (m) => {
+                    const cx = careerCtxOf(m.dm.getFullYear());
+                    const pill = (g, z) => {
+                        const zg = zhiMainGan(z);
+                        const okG = cx.targets.includes(careerCatOf(ganElementMap[g], dayElement));
+                        const okZ = cx.targets.includes(careerCatOf(ganElementMap[zg], dayElement));
+                        const tg = x => SS_SHORT[getPreciseTenGod(x, dayGan)] || '';
+                        return `<b style="color:${elementColors[ganElementMap[g]]}">${g}</b><span class="liuri-advice-tg" style="color:${elementColors[ganElementMap[g]]}">${tg(g)}</span><i class="zh-ck ${okG ? 'on' : ''}">${okG ? '✓' : '✗'}</i>
+                                <b style="color:${elementColors[zhiElementMap[z]]}">${z}</b><span class="liuri-advice-tg" style="color:${elementColors[ganElementMap[zg]]}">${tg(zg)}</span><i class="zh-ck ${okZ ? 'on' : ''}">${okZ ? '✓' : '✗'}</i>`;
+                    };
+                    return `<div class="liuri-advice-card zh-card ${m.k === 0 ? 'is-today' : ''}">
+                        <div class="liuri-advice-topline"><span class="liuri-advice-date">${m.dm.getFullYear()}/${m.dm.getMonth() + 1} 月${m.k === 0 ? '・本月' : (m.k < 0 ? '・已過' : '')}</span>
+                            <span class="lw-line lw-zh-line ${m.c.ok ? 'ok' : ''}" style="margin:0;"><span class="lw-chip">轉職 ${m.c.score}${m.c.ok ? '・宜轉職' : ''}</span></span></div>
+                        <div class="zh-pill"><span class="zh-pl">流年</span>${pill(m.yGZ[0], m.yGZ[1])}<span class="zh-sc">${m.c.y}/2</span></div>
+                        <div class="zh-pill"><span class="zh-pl">流月</span>${pill(m.mg, m.mz)}<span class="zh-sc">${m.c.m}/2</span></div>
+                        <div class="zh-basis2">${cx.basis} → 宜 <b>${cx.targetTxt}</b></div>
+                    </div>`;
+                };
+                const zhYearCardHtml = (Yd) => {
+                    const cx = Yd.cx, tg = x => SS_SHORT[getPreciseTenGod(x, dayGan)] || '';
+                    const zg = zhiMainGan(Yd.yz);
+                    const okG = cx.targets.includes(careerCatOf(ganElementMap[Yd.yg], dayElement));
+                    const okZ = cx.targets.includes(careerCatOf(ganElementMap[zg], dayElement));
+                    const label = ['不符', '半符', '干支皆符'][Yd.ys];
+                    return `<div class="liuri-advice-card zh-card ${Yd.yy === todayD.getFullYear() ? 'is-today' : ''}">
+                        <div class="liuri-advice-topline"><span class="liuri-advice-date">${Yd.yy} 年${Yd.yy === todayD.getFullYear() ? '・今年' : ''}</span>
+                            <span class="lw-line lw-zh-line ${Yd.ys === 2 ? 'ok' : ''}" style="margin:0;"><span class="lw-chip">流年 ${label}</span></span></div>
+                        <div class="zh-pill"><span class="zh-pl">流年</span>
+                            <b style="color:${elementColors[ganElementMap[Yd.yg]]}">${Yd.yg}</b><span class="liuri-advice-tg" style="color:${elementColors[ganElementMap[Yd.yg]]}">${tg(Yd.yg)}</span><i class="zh-ck ${okG ? 'on' : ''}">${okG ? '✓' : '✗'}</i>
+                            <b style="color:${elementColors[zhiElementMap[Yd.yz]]}">${Yd.yz}</b><span class="liuri-advice-tg" style="color:${elementColors[ganElementMap[zg]]}">${tg(zg)}</span><i class="zh-ck ${okZ ? 'on' : ''}">${okZ ? '✓' : '✗'}</i>
+                            <span class="zh-sc">${Yd.ys}/2</span></div>
+                        <div class="zh-basis2">${cx.basis} → 宜 <b>${cx.targetTxt}</b></div>
+                    </div>`;
+                };
+                window.lwZyPick = (k) => {
+                    const Yd = (window.__zhYears || [])[k]; if (!Yd) return;
+                    document.querySelectorAll('#lwZh .zy').forEach(e => e.classList.toggle('sel', +e.dataset.k === k));
+                    document.querySelectorAll('#lwZh .zh-pt').forEach(g => g.classList.remove('active'));
+                    const c = document.getElementById('zhCard'); if (c) c.innerHTML = zhYearCardHtml(Yd);
+                };
+                window.lwZhPick = (i) => {
+                    document.querySelectorAll('#lwZh .zy').forEach(e => e.classList.remove('sel'));
+                    const ms = window.__zhMonths; if (!ms || !ms[i]) return;
+                    document.querySelectorAll('#lwZh .zh-pt').forEach(g => g.classList.toggle('active', +g.dataset.i === i));
+                    const c = document.getElementById('zhCard'); if (c) c.innerHTML = zhCardHtml(ms[i]);
+                    // 手機版圖表可橫向捲動：把選取的月份捲到中間
+                    const wrap = document.querySelector('#lwZh .zh-chart'), svgEl = wrap && wrap.querySelector('svg');
+                    if (wrap && svgEl && svgEl.scrollWidth > wrap.clientWidth) {
+                        const x = (i + 0.5) / ms.length * svgEl.getBoundingClientRect().width;
+                        wrap.scrollTo({ left: x - wrap.clientWidth / 2, behavior: 'smooth' });
+                    }
+                };
+                // ---- 轉職檢視（工作分頁）：上方年度橫排、下方流月趨勢折線 ----
+                const buildCareerView = () => {
+                    const Y0 = todayD.getFullYear();
+                    // 年度橫排：今年起 6 年
+                    let yrs = '';
+                    for (let k = 0; k < 6; k++) {
+                        const yy = Y0 + k, ybz = Solar.fromYmdHms(yy, 7, 1, 12, 0, 0).getLunar().getEightChar();
+                        const cx = careerCtxOf(yy), ys = careerPillarScore(ybz.getYearGan(), ybz.getYearZhi(), cx, dayElement);
+                        const yg = ybz.getYearGan(), yz = ybz.getYearZhi();
+                        window.__zhYears = window.__zhYears || [];
+                        window.__zhYears[k] = { yy, yg, yz, ys, cx };
+                        yrs += `<div class="zy ${ys === 2 ? 'full' : (ys === 1 ? 'half' : '')} ${k === 0 ? 'now' : ''}" data-k="${k}" onclick="lwZyPick(${k})" style="--d:${(k * 0.06).toFixed(2)}s;">
+                            <span class="zy-y">${yy}</span>
+                            <span class="zy-gz"><b style="color:${elementColors[ganElementMap[yg]]}">${yg}</b><b style="color:${elementColors[zhiElementMap[yz]]}">${yz}</b></span>
+                            <span class="zy-dots"><i class="${ys >= 1 ? 'on' : ''}"></i><i class="${ys >= 2 ? 'on' : ''}"></i></span>
+                        </div>`;
+                    }
+                    const cy = careerCtxOf(Y0);
+                    // 流月趨勢：前 3 個月＋未來 21 個月，共 24 個月
+                    const ms = [];
+                    for (let k = -3; k < 21; k++) {
+                        const dm = new Date(Y0, todayD.getMonth() + k, 15);
+                        const bz = Solar.fromYmdHms(dm.getFullYear(), dm.getMonth() + 1, 15, 12, 0, 0).getLunar().getEightChar();
+                        const c = careerScore(bz.getYearGan(), bz.getYearZhi(), bz.getMonthGan(), bz.getMonthZhi(), careerCtxOf(dm.getFullYear()), dayElement);
+                        ms.push({ dm, k, c, mg: bz.getMonthGan(), mz: bz.getMonthZhi(), yGZ: bz.getYearGan() + bz.getYearZhi() });
+                    }
+                    const W = 720, H = 210, pL = 26, pR = 10, pT = 22, pB = 50, pw = W - pL - pR, ph = H - pT - pB, gw = pw / ms.length, bY = pT + ph;
+                    const P = ms.map((m, i) => ({ x: pL + i * gw + gw / 2, y: bY - ph * m.c.score / 100, m, i }));
+                    let svg = `<svg class="zh-svg" viewBox="0 0 ${W} ${H}" width="100%" style="display:block; overflow:visible;">
+                        <defs><linearGradient id="zhArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2ed573" stop-opacity=".3"/><stop offset="100%" stop-color="#2ed573" stop-opacity="0"/></linearGradient></defs>`;
+                    [20, 40, 60, 80].forEach(v => { const yy = pT + ph * (1 - v / 100); svg += `<line x1="${pL}" y1="${yy}" x2="${W - pR}" y2="${yy}" stroke="${v === 60 ? 'rgba(46,213,115,.35)' : '#242424'}" stroke-width="0.8" stroke-dasharray="2,3"/><text x="${pL - 4}" y="${yy + 3}" text-anchor="end" font-size="8" fill="${v === 60 ? '#2ed573' : '#444'}">${v}</text>`; });
+                    // 年份分隔
+                    P.forEach((p, i) => { if (i > 0 && p.m.dm.getMonth() === 0) svg += `<line x1="${(p.x - gw / 2).toFixed(1)}" y1="${pT - 8}" x2="${(p.x - gw / 2).toFixed(1)}" y2="${bY}" stroke="#333" stroke-width="1"/><text x="${(p.x - gw / 2 + 3).toFixed(1)}" y="${pT - 10}" font-size="9" fill="#666">${p.m.dm.getFullYear()}</text>`; });
+                    const line = smooth(P);
+                    svg += `<path d="${line} L${P[P.length - 1].x.toFixed(1)},${bY} L${P[0].x.toFixed(1)},${bY} Z" fill="url(#zhArea)" class="lw-area"/>`;
+                    svg += `<path d="${line}" fill="none" stroke="#2ed573" stroke-width="1.8" stroke-linejoin="round" pathLength="1" class="lw-trend"/>`;
+                    P.forEach(p => {
+                        const ok = p.m.c.ok, past = p.m.k < 0, now = p.m.k === 0;
+                        svg += `<g class="lw-pt zh-pt" data-i="${p.i}" onclick="lwZhPick(${p.i})" style="--d:${(0.3 + p.i * 0.03).toFixed(2)}s; cursor:pointer;">
+                            <circle class="lw-pulse" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="4" fill="none" stroke="#00d2ff" stroke-width="1.5"/>
+                            <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="12" fill="transparent"/>
+                            <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${ok ? 4 : 2.8}" fill="${ok ? '#2ed573' : '#141414'}" stroke="${now ? '#00d2ff' : (ok ? '#c9ffdf' : '#2b7a4b')}" stroke-width="${now ? 2 : 1.3}" opacity="${past ? .55 : 1}"/>
+                            ${ok ? `<rect x="${(p.x - 7).toFixed(1)}" y="${(p.y - 22).toFixed(1)}" width="14" height="13" rx="3" fill="#2ed573" opacity="${past ? .55 : 1}"/><text x="${p.x.toFixed(1)}" y="${(p.y - 12).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="bold" fill="#000">轉</text>` : ''}
+                        </g>`;
+                        svg += `<text x="${p.x.toFixed(1)}" y="${bY + 14}" text-anchor="middle" font-size="8.5" fill="${now ? '#00d2ff' : (past ? '#2b6a85' : '#888')}" font-weight="${now ? 'bold' : 'normal'}">${p.m.dm.getMonth() + 1}月</text>`;
+                        svg += `<text x="${p.x.toFixed(1)}" y="${bY + 27}" text-anchor="middle" font-size="9" font-weight="bold"><tspan fill="${elementColors[ganElementMap[p.m.mg]]}">${p.m.mg}</tspan><tspan fill="${elementColors[zhiElementMap[p.m.mz]]}">${p.m.mz}</tspan></text>`;
+                    });
+                    svg += `</svg>`;
+                    const okList = ms.filter(m => m.c.ok && m.k >= 0).slice(0, 6).map(m => `${m.dm.getFullYear()}/${m.dm.getMonth() + 1}（${m.mg}${m.mz}）`).join('、');
+                    window.__zhMonths = ms;
+                    return `<div class="zh-wrap">
+                        <div class="zh-head"><span>轉職年度</span></div>
+                        <div class="zy-row">${yrs}</div>
+                        <div class="zh-head" style="margin-top:14px;"><span>流月趨勢</span></div>
+                        <div class="zh-chart">${svg}</div>
+                        <div id="zhCard"></div>
+                    </div>`;
+                };
                 const ssShort = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
                 const adviceCardsHtml = days.map(dday => {
                     const relation = (dday.chongXingBadges || dday.hejuBadges)
@@ -3604,6 +3935,8 @@
                                 </span>
                             </div>
                             <div class="lw-line lw-${dday.wealthTier}"><span class="lw-chip">${dday.wealthTier}${dday.wealthTier !== '平' ? ' ' + dday.wealth : ''}</span><span>${dday.wealthDetail || '—'}</span></div>
+                            ${dday.juList.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
+                            ${dday.career ? `<div class="lw-line lw-zh-line ${dday.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${dday.career.score}</span><span>流年${dday.career.yGZ}（${dday.career.y}/2）・流月${dday.career.mGZ}（${dday.career.m}/2）${dday.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
                             ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}</span></div>` : ''}
                         </div>
                     `;
@@ -3612,20 +3945,22 @@
                 const body = `
                     <div class="lw-bar-top">
                     <div class="lw-topics">
-                        <span class="lw-topic on">💰 財</span>
+                        <span class="lw-topic ${topic === 'cai' ? 'on' : ''}" onclick="lwTopic('cai')">💰 財</span>
+                        <span class="lw-topic ${topic === 'work' ? 'on' : ''}" onclick="lwTopic('work')">💼 工作</span>
                         <span class="lw-topic off" title="規劃中">🤝 人際</span>
-                        <span class="lw-topic off" title="規劃中">💼 工作</span>
                         <span class="lw-topic off" title="規劃中">🌸 桃花</span>
                     </div>
                     <div class="lw-view">
                         <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近10日</span>
                         <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
+                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : ''}
                     </div>
                     </div>
                     <div class="liuri-legend">
-                        <span><span class="liuri-legend-dot" style="background:#ffb347; border-radius:50%; box-shadow:0 0 6px #ffb347;"></span>財旺日</span>
-                        <span><span class="liuri-legend-dot" style="background:#141414; border:1.4px solid #c98a3a; border-radius:50%;"></span>財星能量</span>
-                        <span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財</span>
+                        <span><span class="liuri-legend-dot" style="background:${T.c}; border-radius:50%; box-shadow:0 0 6px ${T.c};"></span>${T.hot}</span>
+                        <span><span class="liuri-legend-dot" style="background:#141414; border:1.4px solid ${T.c2}; border-radius:50%;"></span>${T.energy}</span>
+                        ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財</span>` : ''}
+                        <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
                     </div>
                     <div class="lw-pane" data-v="d10">
                     <div class="liuri-chart-wrap">${svg}</div>
@@ -3634,8 +3969,10 @@
                     </div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
+                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : ''}
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('📆 流日速覽', body, true);
+                document.getElementById('liuriOutput').className = 'topic-' + topic;
 
                 // 用「索引 × 卡片寬度」精準定位，避開 scroll-snap 在 offsetLeft 讀取時機不穩導致停錯一天的問題
                 const scrollWrap = document.getElementById('liuriAdviceScroll');
@@ -3669,11 +4006,21 @@
                 // ---- 月曆檢視 ----
                 window.__lwCalMonth = new Date(todayD.getFullYear(), todayD.getMonth(), 1);
                 window.__lwCalSel = null;
+                window.lwTopic = (t) => {
+                    if ((window.__lwTopic || 'cai') === t) return;
+                    window.__lwTopic = t;
+                    const keepView = window.__lwViewCur || 'd10';
+                    window.__renderLiuri();
+                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work')) window.lwView(keepView);
+                };
                 window.lwView = (v) => {
+                    window.__lwViewCur = v;
                     const root = document.getElementById('liuriOutput');
                     root.querySelectorAll('.lw-vbtn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
                     root.querySelectorAll('.lw-pane').forEach(pn => pn.style.display = pn.dataset.v === v ? '' : 'none');
                     if (v === 'cal') renderLwCalendar();
+                    if (v === 'zh') { const z = document.getElementById('lwZh'); if (z) { z.innerHTML = buildCareerView(); window.lwZhPick(window.__zhMonths.findIndex(m => m.k === 0)); } }
+                    const lg = document.querySelector('#liuriOutput .liuri-legend'); if (lg) lg.style.display = v === 'zh' ? 'none' : '';
                 };
                 window.lwCalShift = (k) => { const m = window.__lwCalMonth; window.__lwCalMonth = new Date(m.getFullYear(), m.getMonth() + k, 1); window.__lwCalSel = null; renderLwCalendar(); };
                 window.lwCalPick = (ds) => { window.__lwCalSel = ds; renderLwCalendar(); };
@@ -3685,7 +4032,7 @@
                     for (let i = 0; i < first; i++) cells += '<div class="lc-cell empty"></div>';
                     for (let dn = 1; dn <= nDays; dn++) {
                         const d = new Date(Y, M, dn), info = dayInfo(d), key = `${Y}-${M}-${dn}`;
-                        const wang = info.w.tier === '財旺日', po = info.po.length > 0;
+                        const wang = isHot(info.w.tier), po = info.po.length > 0;
                         if (wang) cntWang++; if (po) cntPo++;
                         const isPast = d < new Date(todayD.getFullYear(), todayD.getMonth(), todayD.getDate());
                         const a = (info.w.score / 100 * 0.55).toFixed(2);
@@ -3694,7 +4041,7 @@
                                 style="--a:${a}; --d:${(dn * 0.012).toFixed(3)}s;" onclick="lwCalPick('${key}')">
                             <span class="lc-n">${dn}</span>
                             <span class="lc-gz"><b style="color:${elementColors[ganElementMap[info.g]]}">${info.g}</b><b style="color:${elementColors[zhiElementMap[info.z]]}">${info.z}</b></span>
-                            <span class="lc-tags">${wang ? '<i class="lc-wang">旺</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}</span>
+                            <span class="lc-tags">${wang ? '<i class="lc-wang">旺</i>' : ''}${info.ju.some(j => j.type === 'boost') ? '<i class="lc-ju">局</i>' : ''}${info.career && info.career.ok ? '<i class="lc-zh">轉</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}</span>
                         </div>`;
                     }
                     let detail = '<div class="lc-detail lc-hint">點選日期查看財星與破財細節</div>';
@@ -3703,13 +4050,15 @@
                         detail = `<div class="lc-detail">
                             <div class="lc-dt">${d.getMonth() + 1}/${d.getDate()}（${weekChar[d.getDay()]}）<b style="color:${elementColors[ganElementMap[info.g]]}">${info.g}</b><b style="color:${elementColors[zhiElementMap[info.z]]}">${info.z}</b></div>
                             <div class="lw-line lw-${info.w.tier}"><span class="lw-chip">${info.w.tier}${info.w.tier !== '平' ? ' ' + info.w.score : ''}</span><span>${info.w.detail || '—'}</span></div>
+                            ${info.ju.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
+                            ${info.career ? `<div class="lw-line lw-zh-line ${info.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${info.career.score}</span><span>流年${info.career.yGZ}（${info.career.y}/2）・流月${info.career.mGZ}（${info.career.m}/2）${info.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
                             ${info.po.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${info.po.map(h => h.txt).join('；')}</span></div>` : ''}
                         </div>`;
                     }
                     document.getElementById('lwCal').innerHTML = `
                         <div class="lc-head">
                             <span class="lw-nav-btn" onclick="lwCalShift(-1)">‹</span>
-                            <div class="lc-title">${Y} 年 ${M + 1} 月<small>財旺 ${cntWang} 日・破財 ${cntPo} 日</small></div>
+                            <div class="lc-title">${Y} 年 ${M + 1} 月<small>${T.hotShort} ${cntWang} 日${topic === 'cai' ? `・破財 ${cntPo} 日` : ''}</small></div>
                             <span class="lw-nav-btn" onclick="lwCalShift(1)">›</span>
                         </div>
                         <div class="lc-grid">${weekChar.map(w => `<div class="lc-wk">${w}</div>`).join('')}${cells}</div>
@@ -3724,7 +4073,8 @@
                 console.warn('流日面板計算失敗:', e);
                 document.getElementById('liuriOutput').innerHTML = '';
             }
-        })();
+        };
+        window.__renderLiuri();
 
         // ===== 六親人際：子女星專屬偵測 =====
         let childScanPromptText = '', siblingScanPromptText = '', parentScanPromptText = '';
