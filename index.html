@@ -438,6 +438,30 @@
         @keyframes swL { from { opacity:.3; transform: translateX(28px); } }
         @keyframes swR { from { opacity:.3; transform: translateX(-28px); } }
         #liuriCard, #zhCard, #lcDetailWrap { touch-action: pan-y; }
+        /* ===== 充能顏色 ===== */
+        .cc-big { display:flex; flex-wrap:wrap; gap:18px; margin-top:10px; }
+        .cc-grp { display:flex; flex-direction:column; gap:6px; }
+        .cc-el { font-size:13px; font-weight:bold; letter-spacing:1px; }
+        .cc-sw { display:flex; gap:10px; flex-wrap:wrap; }
+        .cc-chip { display:flex; flex-direction:column; align-items:center; gap:4px; animation: pePop .5s cubic-bezier(.34,1.56,.64,1) both; }
+        .cc-chip i { display:block; width:22px; height:22px; border-radius:6px; border:1px solid rgba(255,255,255,.18); }
+        .cc-chip.big i { width:46px; height:46px; border-radius:10px; box-shadow:0 4px 14px rgba(0,0,0,.5); }
+        .cc-chip em { font-style:normal; font-size:11px; color:#aaa; }
+        .cc-row { display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:6px; margin-top:8px; }
+        .cc-dy { padding:8px 6px; border-radius:8px; border:1px solid #262626; background:#111; display:flex; flex-direction:column; align-items:center; gap:4px; animation: peFade .35s ease-out both; animation-delay: var(--d); }
+        .cc-dy.now { border-color:#ffb347; box-shadow:0 0 10px rgba(255,179,71,.25); }
+        .cc-dy.past { opacity:.5; }
+        .cc-dy.past .cc-age { color:#2b6a85; }
+        .cc-dy-h { display:flex; align-items:center; gap:3px; flex-wrap:wrap; justify-content:center; }
+        .cc-dy-h .rel-now { white-space:nowrap; }
+        .cc-chip i, .cc-mini i { outline:1px solid rgba(255,255,255,.08); }
+        .cc-age { font-size:10px; color:#888; white-space:nowrap; }
+        .cc-dy-gz { font-size:15px; letter-spacing:1px; }
+        .cc-mini { display:flex; gap:2px; flex-wrap:wrap; justify-content:center; }
+        .cc-mini i { width:10px; height:10px; border-radius:2px; border:1px solid rgba(255,255,255,.15); }
+        .cc-sep { width:4px; }
+        .cc-dy-t { font-size:10px; color:#aaa; }
+        @media (max-width: 600px) { .cc-row { grid-template-columns:repeat(3, minmax(0,1fr)); } .cc-chip.big i { width:40px; height:40px; } }
         /* ===== 十神星圖（儀表風）＋大運捲軸 ===== */
         .st-panel { width:100%; flex:1; display:flex; flex-direction:column; }
         .st-head-r { display:flex; align-items:center; gap:8px; }
@@ -2429,6 +2453,34 @@
         const targets = asStrong ? ['財', '官殺'] : ['比劫', '印'];
         return { asStrong, basis, targets, targetTxt: targets.join('、') };
     }
+    /**
+     * 充能顏色（教材整理）：決定該補的五行
+     *  從強格 → 繼續補幫扶（比劫、印）；從弱格 → 繼續補耗洩（以格局五行為主）
+     *  身強 → 補財；身弱＋大運幫扶 → 補財；身弱＋大運耗洩 → 補比劫、印
+     */
+    const CHARGE_COLORS = {
+        '金': [['金', '#d4af37'], ['銀', '#c7ccd1'], ['白', '#f4f4f4'], ['灰', '#8a8a8a']],
+        '木': [['藍', '#1f6fd6'], ['黑', '#111111'], ['綠', '#2e7d32'], ['藍綠', '#2a8a8a']],
+        '水': [['黑', '#111111'], ['藍', '#1f6fd6'], ['白', '#f4f4f4'], ['灰', '#8a8a8a']],
+        '火': [['紅', '#b71c1c'], ['橘', '#e67e22'], ['黃', '#f4d03f'], ['綠', '#3e8e41']],
+        '土': [['紅', '#b71c1c'], ['橘', '#e67e22'], ['黃', '#f4d03f'], ['土', '#9c5a1a'], ['咖啡', '#8d6e63']]
+    };
+    function computeChargeContext(strengthLabel, totalScore, dayElement, dy, gans, zhis) {
+        const caiEl = wuxingRel[dayElement].ke;
+        const yinEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
+        if (strengthLabel === '從強格') return { els: [dayElement, yinEl], basis: '從強格・繼續補幫扶（比劫、印）' };
+        if (strengthLabel === '從弱格') {
+            const ctx = computeCareerContext(strengthLabel, totalScore, dayElement, dy, gans, zhis, dy ? dy.startYear : null);
+            const ge = (ctx.basis.match(/格局五行(.)/) || [])[1];
+            return { els: ge ? [ge] : [caiEl], basis: `從弱格・繼續補耗洩（格局五行${ge || caiEl}）` };
+        }
+        if (strengthLabel === '身強') return { els: [caiEl], basis: `身強（${totalScore}分）・補財` };
+        const ctx = computeCareerContext(strengthLabel, totalScore, dayElement, dy, gans, zhis, dy ? dy.startYear : null);
+        return ctx.asStrong
+            ? { els: [caiEl], basis: `身弱（${totalScore}分）・${dy ? dy.ganZhi + '運' : ''}印比幫扶・補財` }
+            : { els: [dayElement, yinEl], basis: `身弱（${totalScore}分）・${dy ? dy.ganZhi + '運' : '未起運'}財官食傷耗洩・補比劫、印` };
+    }
+
     function careerPillarScore(gan, zhi, ctx, dayElement) {
         let n = 0;
         if (ctx.targets.includes(careerCatOf(ganElementMap[gan], dayElement))) n++;
@@ -3947,6 +3999,20 @@
                         <div id="zhCard"></div>
                     </div>`;
                 };
+                // ---- 充能顏色（財分頁）：依目前大運 ----
+                const buildColorView = () => {
+                    const Y0 = todayD.getFullYear();
+                    // 多個五行時，重複的顏色只顯示一次（例如木、水都有藍、黑）
+                    const swatches = (els, big) => { const seen = new Set(); return els.map(el => `<div class="cc-grp"><div class="cc-el" style="color:${elementColors[el]}">補${el}</div><div class="cc-sw">${CHARGE_COLORS[el].filter(([n, c]) => !seen.has(c) && seen.add(c)).map(([n, c]) => `<span class="cc-chip ${big ? 'big' : ''}"><i style="background:${c}"></i>${big ? `<em>${n}</em>` : ''}</span>`).join('')}</div></div>`).join(''); };
+                    const curDy = daYunData.find(x => Y0 >= x.startYear && Y0 < x.startYear + 10);
+                    const cur = computeChargeContext(strengthLabel, totalScore, dayElement, curDy, baseGans, baseZhis);
+                    return `<div class="cc-wrap">
+                        <div class="cc-now">
+                            <div class="zh-head"><span>財旺日充能</span><span class="zh-basis">${cur.basis}</span></div>
+                            <div class="cc-big">${swatches(cur.els, true)}</div>
+                        </div>
+                    </div>`;
+                };
                 const ssShort = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
                 const adviceCards = days.map(dday => {
                     const relation = (dday.chongXingBadges || dday.hejuBadges)
@@ -3981,12 +4047,11 @@
                     <div class="lw-view">
                         <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
                         <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
-                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : ''}
+                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>`}
                     </div>
                     </div>
                     <div class="liuri-legend">
                         <span><span class="liuri-legend-dot" style="background:${T.c}; border-radius:50%; box-shadow:0 0 6px ${T.c};"></span>${T.hot}</span>
-                        <span><span class="liuri-legend-dot" style="background:#141414; border:1.4px solid ${T.c2}; border-radius:50%;"></span>${T.energy}</span>
                         ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財</span>` : ''}
                         <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
                     </div>
@@ -3995,9 +4060,9 @@
                     <div id="liuriCard"></div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
-                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : ''}
+                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>`}
                 `;
-                document.getElementById('liuriOutput').innerHTML = wrapAccordion('📆 流日速覽', body, true);
+                document.getElementById('liuriOutput').innerHTML = wrapAccordion('⚡ 流日動能', body, true);
                 document.getElementById('liuriOutput').className = 'topic-' + topic;
 
                 const todayIdx = days.findIndex(d => d.isToday);
@@ -4022,7 +4087,7 @@
                     window.__lwTopic = t;
                     const keepView = window.__lwViewCur || 'd10';
                     window.__renderLiuri();
-                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work')) window.lwView(keepView);
+                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work') || (keepView === 'cc' && t === 'cai')) window.lwView(keepView);
                 };
                 window.lwView = (v) => {
                     window.__lwViewCur = v;
@@ -4035,7 +4100,8 @@
                             if (sel.t === 'y') { const n = sel.i + d; if (n >= 0 && n < 6) window.lwZyPick(n); }
                             else { const n = sel.i + d; if (n >= 0 && n < window.__zhMonths.length) window.lwZhPick(n); } };
                         attachSwipe(document.getElementById('zhCard'), () => step(-1), () => step(1)); } }
-                    const lg = document.querySelector('#liuriOutput .liuri-legend'); if (lg) lg.style.display = v === 'zh' ? 'none' : '';
+                    if (v === 'cc') { const c = document.getElementById('lwCc'); if (c) c.innerHTML = buildColorView(); }
+                    const lg = document.querySelector('#liuriOutput .liuri-legend'); if (lg) lg.style.display = (v === 'zh' || v === 'cc') ? 'none' : '';
                 };
                 window.lwCalShift = (k) => { const m = window.__lwCalMonth; window.__lwCalMonth = new Date(m.getFullYear(), m.getMonth() + k, 1); window.__lwCalSel = null; renderLwCalendar(); };
                 window.lwCalPick = (ds) => { window.__lwCalSel = ds; renderLwCalendar(); };
