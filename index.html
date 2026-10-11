@@ -429,6 +429,15 @@
         .zy { cursor:pointer; transition: transform .15s; }
         .zy:hover { transform: translateY(-1px); }
         .zy.sel { outline:2px solid #fff; outline-offset:-1px; }
+        .liuri-chart-wrap.lw-scroll, .zh-chart { overflow-x:auto !important; overflow-y:hidden; -webkit-overflow-scrolling:touch; touch-action:pan-x pan-y; max-width:100%; min-width:0; }
+        .lw-scroll > svg { min-width: 640px; }
+        #liuriCard .liuri-advice-card { margin-top:10px; width:100%; }
+        @media (min-width: 1000px) { .liuri-chart-wrap { max-width:none !important; } }
+        .swipe-l { animation: swL .28s ease-out; }
+        .swipe-r { animation: swR .28s ease-out; }
+        @keyframes swL { from { opacity:.3; transform: translateX(28px); } }
+        @keyframes swR { from { opacity:.3; transform: translateX(-28px); } }
+        #liuriCard, #zhCard, #lcDetailWrap { touch-action: pan-y; }
         /* ===== 十神星圖（儀表風）＋大運捲軸 ===== */
         .st-panel { width:100%; flex:1; display:flex; flex-direction:column; }
         .st-head-r { display:flex; align-items:center; gap:8px; }
@@ -2229,6 +2238,23 @@
         }, 90);
     }
 
+    // 小卡左右滑動：手機上左滑看下一筆、右滑看上一筆
+    function attachSwipe(el, onPrev, onNext) {
+        if (!el || el._swipe) return; el._swipe = true;
+        let x0 = null, y0 = null;
+        el.addEventListener('touchstart', e => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
+        el.addEventListener('touchend', e => {
+            if (x0 === null) return;
+            const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+            x0 = null;
+            if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+            const card = el.firstElementChild;
+            if (dx < 0) onNext(); else onPrev();
+            const nc = el.firstElementChild;
+            if (nc) { nc.classList.remove('swipe-l', 'swipe-r'); void nc.offsetWidth; nc.classList.add(dx < 0 ? 'swipe-l' : 'swipe-r'); }
+        }, { passive: true });
+    }
+
     function initDashAnims(root) {
         if (!root) return;
         const details = root.closest('details');
@@ -3722,7 +3748,7 @@
                 const dayInfo = (d) => fullDay(Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0).getLunar().getEightChar(), d.getFullYear());
                 window.__liuriDayInfo = dayInfo;
                 const days = [];
-                for (let offset = -3; offset <= 6; offset++) { // 過去3日 + 今日起未來7日 = 共10天
+                for (let offset = -6; offset <= 14; offset++) { // 過去6日 + 今日 + 未來14日 = 共21天
                     const d = new Date(todayD.getFullYear(), todayD.getMonth(), todayD.getDate() + offset);
                     const solarD = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0);
                     const baziD = solarD.getLunar().getEightChar();
@@ -3749,8 +3775,8 @@
                 }
 
                 // ---- 組裝 SVG 分組長條圖：X軸=10天，每天兩條bar（整體／財運），風格比照「原局五行」的漸層細長條 ----
-                const w = 360, h = 200;
-                const padL = 22, padR = 8, padT = 14, padB = 46;
+                const w = 40 * 21 + 30, h = 230;
+                const padL = 26, padR = 10, padT = 28, padB = 46;
                 const plotW = w - padL - padR, plotH = h - padT - padB;
                 const n = days.length;
                 const groupW = plotW / n;
@@ -3848,12 +3874,14 @@
                     document.querySelectorAll('#lwZh .zy').forEach(e => e.classList.toggle('sel', +e.dataset.k === k));
                     document.querySelectorAll('#lwZh .zh-pt').forEach(g => g.classList.remove('active'));
                     const c = document.getElementById('zhCard'); if (c) c.innerHTML = zhYearCardHtml(Yd);
+                    window.__zhSel = { t: 'y', i: k };
                 };
                 window.lwZhPick = (i) => {
                     document.querySelectorAll('#lwZh .zy').forEach(e => e.classList.remove('sel'));
                     const ms = window.__zhMonths; if (!ms || !ms[i]) return;
                     document.querySelectorAll('#lwZh .zh-pt').forEach(g => g.classList.toggle('active', +g.dataset.i === i));
                     const c = document.getElementById('zhCard'); if (c) c.innerHTML = zhCardHtml(ms[i]);
+                    window.__zhSel = { t: 'm', i };
                     // 手機版圖表可橫向捲動：把選取的月份捲到中間
                     const wrap = document.querySelector('#lwZh .zh-chart'), svgEl = wrap && wrap.querySelector('svg');
                     if (wrap && svgEl && svgEl.scrollWidth > wrap.clientWidth) {
@@ -3920,7 +3948,7 @@
                     </div>`;
                 };
                 const ssShort = { '比肩':'比', '劫財':'劫', '食神':'食', '傷官':'傷', '偏財':'才', '正財':'財', '七殺':'殺', '正官':'官', '偏印':'梟', '正印':'印' };
-                const adviceCardsHtml = days.map(dday => {
+                const adviceCards = days.map(dday => {
                     const relation = (dday.chongXingBadges || dday.hejuBadges)
                         ? `${dday.chongXingBadges || ''} ${dday.hejuBadges || ''}`.trim()
                         : '<span class="tag tag-neutral">無明顯沖合</span>';
@@ -3940,7 +3968,7 @@
                             ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}</span></div>` : ''}
                         </div>
                     `;
-                }).join('');
+                });
 
                 const body = `
                     <div class="lw-bar-top">
@@ -3951,7 +3979,7 @@
                         <span class="lw-topic off" title="規劃中">🌸 桃花</span>
                     </div>
                     <div class="lw-view">
-                        <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近10日</span>
+                        <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
                         <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
                         ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : ''}
                     </div>
@@ -3963,10 +3991,8 @@
                         <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
                     </div>
                     <div class="lw-pane" data-v="d10">
-                    <div class="liuri-chart-wrap">${svg}</div>
-                    <div class="liuri-advice-wrap">
-                        <div class="liuri-advice-scroll" id="liuriAdviceScroll">${adviceCardsHtml}</div>
-                    </div>
+                    <div class="liuri-chart-wrap lw-scroll">${svg}</div>
+                    <div id="liuriCard"></div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
                     ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : ''}
@@ -3974,35 +4000,20 @@
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('📆 流日速覽', body, true);
                 document.getElementById('liuriOutput').className = 'topic-' + topic;
 
-                // 用「索引 × 卡片寬度」精準定位，避開 scroll-snap 在 offsetLeft 讀取時機不穩導致停錯一天的問題
-                const scrollWrap = document.getElementById('liuriAdviceScroll');
                 const todayIdx = days.findIndex(d => d.isToday);
-                const scrollToIndex = (idx) => {
-                    idx = Math.max(0, Math.min(days.length - 1, idx));
-                    if (!scrollWrap) return;
-                    const card = scrollWrap.children[idx];
-                    // 以卡片實際位置置中（手機一次一張、電腦一次三張皆適用）
-                    if (card) scrollWrap.scrollLeft = card.offsetLeft - (scrollWrap.clientWidth - card.offsetWidth) / 2;
-                };
-                // 等瀏覽器完成這一輪的版面配置（手風琴展開、卡片實際寬度確定）後再定位，比固定 50ms 更可靠
-                requestAnimationFrame(() => requestAnimationFrame(() => scrollToIndex(todayIdx)));
-
-                const prevBtn = document.getElementById('liuriPrevBtn');
-                const nextBtn = document.getElementById('liuriNextBtn');
-                // 小卡 ↔ 折線點 連動：目前置中的小卡，對應的點閃爍
+                // 折線點 ↔ 單張小卡：點哪天就顯示哪天；手機版圖表可橫向滑動
                 const setActive = (idx) => {
                     const root = document.getElementById('liuriOutput');
-                    root.querySelectorAll('.lw-pt').forEach(g => g.classList.toggle('active', +g.dataset.i === idx));
-                    root.querySelectorAll('.lw-dot').forEach(d => d.classList.toggle('on', +d.dataset.i === idx));
+                    root.querySelectorAll('.lw-pane[data-v="d10"] .lw-pt').forEach(g => g.classList.toggle('active', +g.dataset.i === idx));
+                    const card = document.getElementById('liuriCard'); if (card) card.innerHTML = adviceCards[idx] || '';
+                    window.__lwIdx = idx;
                 };
-                const currentIdx = () => {
-                    const mid = scrollWrap.scrollLeft + scrollWrap.clientWidth / 2;
-                    let best = 0, bd = Infinity;
-                    [...scrollWrap.children].forEach((c, i) => { const dd = Math.abs(c.offsetLeft + c.offsetWidth / 2 - mid); if (dd < bd) { bd = dd; best = i; } });
-                    return best;
+                const centerChart = (idx, smoothScroll) => {
+                    const wrap = document.querySelector('#liuriOutput .lw-pane[data-v="d10"] .lw-scroll'), svgEl = wrap && wrap.querySelector('svg');
+                    if (!wrap || !svgEl || svgEl.getBoundingClientRect().width <= wrap.clientWidth + 1) return;
+                    const x = (padL + idx * groupW + groupW / 2) / w * svgEl.getBoundingClientRect().width;
+                    wrap.scrollTo({ left: x - wrap.clientWidth / 2, behavior: smoothScroll ? 'smooth' : 'auto' });
                 };
-                let lwT = null;
-                scrollWrap.addEventListener('scroll', () => { clearTimeout(lwT); lwT = setTimeout(() => setActive(currentIdx()), 60); }, { passive: true });
                 // ---- 月曆檢視 ----
                 window.__lwCalMonth = new Date(todayD.getFullYear(), todayD.getMonth(), 1);
                 window.__lwCalSel = null;
@@ -4019,11 +4030,21 @@
                     root.querySelectorAll('.lw-vbtn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
                     root.querySelectorAll('.lw-pane').forEach(pn => pn.style.display = pn.dataset.v === v ? '' : 'none');
                     if (v === 'cal') renderLwCalendar();
-                    if (v === 'zh') { const z = document.getElementById('lwZh'); if (z) { z.innerHTML = buildCareerView(); window.lwZhPick(window.__zhMonths.findIndex(m => m.k === 0)); } }
+                    if (v === 'zh') { const z = document.getElementById('lwZh'); if (z) { z.innerHTML = buildCareerView(); window.lwZhPick(window.__zhMonths.findIndex(m => m.k === 0));
+                        const step = d => { const sel = window.__zhSel || { t: 'm', i: 0 };
+                            if (sel.t === 'y') { const n = sel.i + d; if (n >= 0 && n < 6) window.lwZyPick(n); }
+                            else { const n = sel.i + d; if (n >= 0 && n < window.__zhMonths.length) window.lwZhPick(n); } };
+                        attachSwipe(document.getElementById('zhCard'), () => step(-1), () => step(1)); } }
                     const lg = document.querySelector('#liuriOutput .liuri-legend'); if (lg) lg.style.display = v === 'zh' ? 'none' : '';
                 };
                 window.lwCalShift = (k) => { const m = window.__lwCalMonth; window.__lwCalMonth = new Date(m.getFullYear(), m.getMonth() + k, 1); window.__lwCalSel = null; renderLwCalendar(); };
                 window.lwCalPick = (ds) => { window.__lwCalSel = ds; renderLwCalendar(); };
+                const calStep = (d) => {
+                    const m0 = window.__lwCalMonth, nD = new Date(m0.getFullYear(), m0.getMonth() + 1, 0).getDate();
+                    const cur = window.__lwCalSel ? +window.__lwCalSel.split('-')[2] : 0;
+                    const n = cur + d;
+                    if (n >= 1 && n <= nD) window.lwCalPick(`${m0.getFullYear()}-${m0.getMonth()}-${n}`);
+                };
                 const renderLwCalendar = () => {
                     const m0 = window.__lwCalMonth, Y = m0.getFullYear(), M = m0.getMonth();
                     const nDays = new Date(Y, M + 1, 0).getDate(), first = new Date(Y, M, 1).getDay();
@@ -4044,7 +4065,7 @@
                             <span class="lc-tags">${wang ? '<i class="lc-wang">旺</i>' : ''}${info.ju.some(j => j.type === 'boost') ? '<i class="lc-ju">局</i>' : ''}${info.career && info.career.ok ? '<i class="lc-zh">轉</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}</span>
                         </div>`;
                     }
-                    let detail = '<div class="lc-detail lc-hint">點選日期查看財星與破財細節</div>';
+                    let detail = `<div class="lc-detail lc-hint">${topic === 'work' ? '點選日期查看官殺星細節' : '點選日期查看財星與破財細節'}</div>`;
                     if (sel) {
                         const { d, info } = sel;
                         detail = `<div class="lc-detail">
@@ -4062,13 +4083,15 @@
                             <span class="lw-nav-btn" onclick="lwCalShift(1)">›</span>
                         </div>
                         <div class="lc-grid">${weekChar.map(w => `<div class="lc-wk">${w}</div>`).join('')}${cells}</div>
-                        ${detail}`;
+                        <div id="lcDetailWrap">${detail}</div>`;
+                    attachSwipe(document.getElementById('lcDetailWrap'), () => calStep(-1), () => calStep(1));
                 };
-                window.lwPick = (i) => { const c = scrollWrap.children[i]; if (c) scrollWrap.scrollTo({ left: c.offsetLeft - (scrollWrap.clientWidth - c.offsetWidth) / 2, behavior: 'smooth' }); setActive(i); };
+                window.lwPick = (i) => { setActive(i); centerChart(i, true); };
                 setActive(todayIdx);
-                const stepW = () => { const c = scrollWrap.children[0]; return c ? c.offsetWidth + (parseFloat(getComputedStyle(scrollWrap).columnGap) || 0) : scrollWrap.clientWidth; };
-                if (prevBtn) prevBtn.onclick = () => { scrollWrap.scrollBy({ left: -stepW(), behavior: 'smooth' }); };
-                if (nextBtn) nextBtn.onclick = () => { scrollWrap.scrollBy({ left: stepW(), behavior: 'smooth' }); };
+                requestAnimationFrame(() => requestAnimationFrame(() => centerChart(todayIdx, false)));
+                attachSwipe(document.getElementById('liuriCard'),
+                    () => { if (window.__lwIdx > 0) window.lwPick(window.__lwIdx - 1); },
+                    () => { if (window.__lwIdx < days.length - 1) window.lwPick(window.__lwIdx + 1); });
             } catch (e) {
                 console.warn('流日面板計算失敗:', e);
                 document.getElementById('liuriOutput').innerHTML = '';
