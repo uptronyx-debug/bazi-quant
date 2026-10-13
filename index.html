@@ -809,8 +809,13 @@
         .ia-arc.hl { stroke-width:3; opacity:1 !important; animation: iaFlow .6s linear infinite; }
         .ia-lbl.hl { opacity:1 !important; animation:none; }
         @media (prefers-reduced-motion: reduce) { .ia-arc { animation: iaIn .01s forwards; } }
-        .ia-pick { display:grid; grid-template-columns:34px minmax(0,1fr); gap:6px 8px; align-items:center; margin-top:12px; }
-        .ia-pl { font-size:12px; color:#888; }
+        .ia-pick { display:grid; grid-template-columns:40px minmax(0,1fr); gap:6px 8px; align-items:center; margin-top:12px; }
+        .ia-pl { width:auto; grid-column:auto; letter-spacing:normal; font-family:inherit; font-size:12px; font-weight:600; color:#00d2ff; background:transparent; border:1px solid rgba(0,210,255,.35); border-radius:6px; padding:4px 0; cursor:pointer; }
+        .ia-pl:hover { transform:none; box-shadow:none; background:rgba(0,210,255,.08); }
+        .ia-pl.off { color:#555; border-color:#333; text-decoration:line-through; }
+        .ia-col.ext { cursor:pointer; }
+        .ia-col.off { opacity:.22; background:repeating-linear-gradient(135deg, transparent 0 6px, rgba(255,255,255,.04) 6px 12px) !important; }
+        .ia-col.off .ia-lab { text-decoration:line-through; }
         .ia-strip { display:flex; gap:6px; overflow-x:auto; scroll-snap-type:x proximity; padding:2px 0 4px; scrollbar-width:thin; }
         .ia-chip { flex:0 0 auto; scroll-snap-align:center; display:flex; flex-direction:column; align-items:center; gap:1px; min-width:52px; padding:5px 6px; border-radius:8px; background:#1a1a1a; border:1px solid #2c2c2c; color:#ccc; cursor:pointer; font-family:inherit; }
         .ia-chip b { font-size:15px; }
@@ -826,6 +831,8 @@
         .ia-scope:hover { transform:none; box-shadow:none; background:#222; color:#ccc; }
         .ia-scope.on, .ia-scope.on:hover { background:#00d2ff; color:#000; }
         .ia-cat-sp { flex:1 1 auto; }
+        .ia-segrow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+        .ia-segrow .ia-scopes:last-child { align-items:center; padding-left:8px; font-size:12px; }
         .ia-cat.ia-act { color:#aaa; border-color:#444; }
         .ia-board.nat-only .ia-col.ext { opacity:.3; }
         .ia-cats { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
@@ -1792,8 +1799,9 @@
         const res = [];
         for (let k = 0; k < 12; k++) {
             const d = new Date(year, 1 + k, 20);
-            const bz = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 20).getLunar().getEightChar();
-            res.push({ k, gan: bz.getMonthGan(), zhi: bz.getMonthZhi(), m: d.getMonth() + 1 });
+            const lu = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 20).getLunar(), bz = lu.getEightChar();
+            let jd = ''; try { const js = lu.getPrevJie().getSolar(); jd = `${js.getMonth()}/${js.getDay()}`; } catch (e) {}
+            res.push({ k, gan: bz.getMonthGan(), zhi: bz.getMonthZhi(), m: d.getMonth() + 1, jd });
         }
         return res;
     }
@@ -1801,7 +1809,7 @@
 
     function renderInteractionPanel(ctx) {
         const S = window.__ia = window.__ia || { cats: { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1, gan: 0 }, scope: 'all' };
-        S.scope = S.scope || 'all';
+        S.scope = S.scope || 'all'; if (!['on', 'dim'].includes(S.bright)) S.bright = 'on'; S.hl = null; S.off = S.off || { dy: 0, ln: 0, lm: 0 };
         S.ctx = ctx;
         const dys = ctx.daYunData.filter(d => d.index > 0);
         const Y = ctx.currentYear;
@@ -1812,17 +1820,18 @@
         const catChips = [...IA_CAT_ORDER.map(c => `<button class="ia-cat ${S.cats[c] ? 'on' : ''}" data-cat="${c}" style="--c:${IA_CAT[c].color}" onclick="iaToggle('${c}')">${IA_CAT[c].name}</button>`),
             `<span class="ia-cat-sp"></span><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(1)">全開</button><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(0)">全關</button>`].join('');
         const scopeSeg = [['all', '全部'], ['ext', '只看歲運'], ['nat', '只看原局']].map(([k, t]) => `<button class="ia-scope ${S.scope === k ? 'on' : ''}" data-scope="${k}" onclick="iaScope('${k}')">${t}</button>`).join('');
+        const brightSeg = [['on', '全亮'], ['dim', '全暗'], ['focus', '聚焦']].map(([k, t]) => `<button class="ia-scope ia-bri ${iaBriMode() === k ? 'on' : ''}" data-bright="${k}" onclick="iaBright('${k}')">${t}</button>`).join('');
         const body = `<div class="ia-wrap">
             <div class="ia-left">
                 <div class="ia-board" id="iaBoard"></div>
                 <div class="ia-pick">
-                    <div class="ia-pl">大運</div><div class="ia-strip" id="iaDyStrip"></div>
-                    <div class="ia-pl">流年</div><div class="ia-strip" id="iaLnStrip"></div>
-                    <div class="ia-pl">流月</div><div class="ia-strip" id="iaLmStrip"></div>
+                    <button class="ia-pl" data-key="dy" onclick="iaOff('dy')">大運</button><div class="ia-strip" id="iaDyStrip"></div>
+                    <button class="ia-pl" data-key="ln" onclick="iaOff('ln')">流年</button><div class="ia-strip" id="iaLnStrip"></div>
+                    <button class="ia-pl" data-key="lm" onclick="iaOff('lm')">流月</button><div class="ia-strip" id="iaLmStrip"></div>
                 </div>
             </div>
             <div class="ia-right">
-                <div class="ia-scopes">${scopeSeg}</div>
+                <div class="ia-segrow"><div class="ia-scopes">${scopeSeg}</div><div class="ia-scopes" title="線條亮度">💡${brightSeg}</div></div>
                 <div class="ia-cats">${catChips}</div>
                 <div class="ia-list" id="iaList"></div>
             </div>
@@ -1849,7 +1858,7 @@
         const order = ['lm', 'ln', 'dy', 'n3', 'n2', 'n1', 'n0'];
         const cells = order.map((k, i) => {
             const p = byKey(k);
-            return `${i === 3 ? '<div class="ia-sep"></div>' : ''}<div class="ia-col ${p.natal ? '' : 'ext'}" data-key="${k}">
+            return `${i === 3 ? '<div class="ia-sep"></div>' : ''}<div class="ia-col ${p.natal ? '' : 'ext'} ${S.off[k] ? 'off' : ''}" data-key="${k}" ${p.natal ? '' : `onclick="iaOff('${k}')" title="點擊開／關${p.label}"`}>
                 <div class="ia-lab">${p.label}</div>
                 <div class="ia-ss">${ss(p.gan, k === 'n2')}</div>
                 <div class="ia-g" style="color:${col(p.gan)}">${p.gan}</div>
@@ -1862,9 +1871,10 @@
         document.getElementById('iaDyStrip').innerHTML = dys.map((d, i) => `<button class="ia-chip ${i === S.di ? 'on' : ''}" onclick="iaPickDy(${i})"><b><span style="color:${col(d.gan)}">${d.gan}</span><span style="color:${colz(d.zhi)}">${d.zhi}</span></b><small>${d.startAge}歲</small></button>`).join('');
         const d0 = dys[S.di];
         document.getElementById('iaLnStrip').innerHTML = Array.from({ length: 10 }, (_, k) => d0.startYear + k).map(y => { const g = iaYearGZ(y); return `<button class="ia-chip ${y === S.year ? 'on' : ''} ${y === c.currentYear ? 'now' : ''}" onclick="iaPickLn(${y})"><b><span style="color:${col(g.gan)}">${g.gan}</span><span style="color:${colz(g.zhi)}">${g.zhi}</span></b><small>${y}</small></button>`; }).join('');
-        document.getElementById('iaLmStrip').innerHTML = iaMonthsOf(S.year).map(m => `<button class="ia-chip ${m.k === S.mk ? 'on' : ''}" onclick="iaPickLm(${m.k})"><b><span style="color:${col(m.gan)}">${m.gan}</span><span style="color:${colz(m.zhi)}">${m.zhi}</span></b><small>${m.m}月</small></button>`).join('');
+        document.getElementById('iaLmStrip').innerHTML = iaMonthsOf(S.year).map(m => `<button class="ia-chip ${m.k === S.mk ? 'on' : ''}" onclick="iaPickLm(${m.k})"><b><span style="color:${col(m.gan)}">${m.gan}</span><span style="color:${colz(m.zhi)}">${m.zhi}</span></b><small>${m.jd ? m.jd + '起' : m.m + '月'}</small></button>`).join('');
         S.needCenter = true;
-        S.rels = iaScan(P);
+        S.rels = iaScan(P.filter(p => !S.off[p.key]));
+        document.querySelectorAll('.ia-pl[data-key]').forEach(b => b.classList.toggle('off', !!S.off[b.dataset.key]));
         iaRenderList();
         iaDrawArcs();
     }
@@ -1874,7 +1884,7 @@
         const ext = rels.filter(r => !r.natal), nat = rels.filter(r => r.natal);
         const cur = iaCurrent();
         document.getElementById('iaList').innerHTML =
-            (S.scope !== 'nat' ? `<div class="ia-gh">歲運引動<span>${cur.dy.gan}${cur.dy.zhi}運・${S.year}${cur.ln.gan}${cur.ln.zhi}・${cur.lm.m}月${cur.lm.gan}${cur.lm.zhi}</span></div>` +
+            (S.scope !== 'nat' ? `<div class="ia-gh">歲運引動<span>${[!S.off.dy && `${cur.dy.gan}${cur.dy.zhi}運`, !S.off.ln && `${S.year}${cur.ln.gan}${cur.ln.zhi}`, !S.off.lm && `${cur.lm.gan}${cur.lm.zhi}月${cur.lm.jd ? '（' + cur.lm.jd + '起）' : ''}`].filter(Boolean).join('・') || '大運、流年、流月皆已關閉'}</span></div>` +
             (ext.length ? iaListHtml(ext) : '<div class="ia-empty">無</div>') : '') +
             (S.scope !== 'ext' ? `<div class="ia-gh">原局</div>` + (nat.length ? iaListHtml(nat) : '<div class="ia-empty">無</div>') : '');
         document.querySelectorAll('#iaList .ia-li').forEach(el => el.addEventListener('click', () => iaHl(el.dataset.id)));
@@ -1930,7 +1940,7 @@
             const dpt = (up ? -1 : 1) * (13 + li * 13);
             const segs = [];
             for (let i = 0; i < xs.length - 1; i++) segs.push([xs[i], xs[i + 1]]);
-            const delay = (n * 0.06).toFixed(2), op = (r.natal && S.scope === 'all') ? 0.45 : 1;
+            const delay = (n * 0.06).toFixed(2), op = S.bright === 'on' ? 1 : 0.22;
             segs.forEach(([a, b]) => {
                 const ax = a, bx = b, cx = (ax + bx) / 2;
                 arcs += `<path class="ia-arc ${r.natal ? 'nat' : ''}" data-id="${r.id}" d="M${ax.toFixed(1)},${y0.toFixed(1)} Q${cx.toFixed(1)},${(y0 + dpt * 2).toFixed(1)} ${bx.toFixed(1)},${y0.toFixed(1)}" stroke="${col}" marker-start="url(#iaM-${r.cat})" marker-end="url(#iaM-${r.cat})" style="--d:${delay}s; --o:${op};"/>`;
@@ -1940,16 +1950,24 @@
             labels += `<g class="ia-lbl ${r.natal ? 'nat' : ''}" data-id="${r.id}" style="--d:${delay}s; --o:${op};" onclick="iaHl('${r.id}')"><rect x="${(lx - w / 2).toFixed(1)}" y="${(ly - 8).toFixed(1)}" width="${w}" height="16" rx="5" fill="#141414" stroke="${col}" stroke-width="1"/><text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${col}">${t}</text></g>`;
         });
         svg.innerHTML = defs + arcs + labels;
-        if (S.hl) iaHl(S.hl, true);
+        iaApplyHl();
     }
-    function iaHl(id, keep) {
-        const S = window.__ia, board = document.getElementById('iaBoard');
-        S.hl = (!keep && S.hl === id) ? null : id;
+    // 亮度模式：全亮／全暗為基本模式；點某條線＝聚焦（只亮那條），再點同一條或點全亮／全暗即離開
+    const iaBriMode = () => window.__ia.hl ? 'focus' : window.__ia.bright;
+    function iaSyncBri() { document.querySelectorAll('.ia-bri').forEach(b => b.classList.toggle('on', b.dataset.bright === iaBriMode())); }
+    function iaApplyHl() {
+        const S = window.__ia, board = document.getElementById('iaBoard'); if (!board) return;
         board.classList.toggle('has-hl', !!S.hl);
         board.querySelectorAll('.ia-arc, .ia-lbl').forEach(el => el.classList.toggle('hl', el.dataset.id === S.hl));
         document.querySelectorAll('#iaList .ia-li').forEach(el => el.classList.toggle('hl', el.dataset.id === S.hl));
         const r = S.hl && S.rels.find(x => x.id === S.hl);
         board.querySelectorAll('.ia-col').forEach(el => el.classList.toggle('hl', !!r && r.members.some(m => m.key === el.dataset.key)));
+        iaSyncBri();
+    }
+    function iaHl(id) {
+        const S = window.__ia;
+        S.hl = S.hl === id ? null : id;
+        iaApplyHl();
     }
     function iaToggle(c) {
         const S = window.__ia; S.cats[c] = S.cats[c] ? 0 : 1; S.hl = null;
@@ -1961,9 +1979,16 @@
         document.querySelectorAll('.ia-cat[data-cat]').forEach(b => b.classList.toggle('on', !!S.cats[b.dataset.cat]));
         iaRenderList(); iaDrawArcs();
     }
+    function iaOff(k) { const S = window.__ia; S.off[k] = S.off[k] ? 0 : 1; S.hl = null; iaRenderAll(); }
+    function iaBright(k) {
+        const S = window.__ia;
+        if (k === 'focus') { if (!S.hl) { const first = S.rels.find(iaVisible); if (first) S.hl = first.id; } }
+        else { S.bright = k; S.hl = null; }
+        iaDrawArcs();
+    }
     function iaScope(k) {
         const S = window.__ia; S.scope = k; S.hl = null;
-        document.querySelectorAll('.ia-scope').forEach(b => b.classList.toggle('on', b.dataset.scope === k));
+        document.querySelectorAll('.ia-scope[data-scope]').forEach(b => b.classList.toggle('on', b.dataset.scope === k));
         document.getElementById('iaBoard').classList.toggle('nat-only', k === 'nat');
         iaRenderList(); iaDrawArcs();
     }
