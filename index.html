@@ -790,7 +790,7 @@
         .tag-po { color:#f1c40f; background:rgba(241,196,15,0.14); }
         .ia-wrap { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
         @media (min-width: 900px) { .ia-wrap { grid-template-columns:minmax(380px, 1.1fr) minmax(0, 1fr); align-items:start; } .ia-left { position:sticky; top:10px; } }
-        .ia-board { position:relative; background:#121212; border:1px solid #2a2a2a; border-radius:12px; padding:6px 6px; }
+        .ia-board { position:relative; background:transparent; border:none; padding:6px 0; }
         .ia-grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)) 6px repeat(4, minmax(0,1fr)); position:relative; z-index:1; }
         .ia-sep { background:linear-gradient(180deg, transparent, #333, transparent); width:1px; justify-self:center; }
         .ia-col { text-align:center; padding:6px 0 4px; border-radius:8px; transition:background .2s; }
@@ -1915,6 +1915,18 @@
             pos[el.dataset.key] = { x: z.left + z.width / 2 - br.left, zb: z.bottom - br.top + 3, gt: el.getBoundingClientRect().top - br.top - 2 };
         });
         const rels = S.rels.filter(iaVisible);
+        // 預留高度：用「目前大運／流年／流月下的全部互動」計算層數，開關切換時命盤高度不變
+        const laneCount = (list) => {
+            const Ls = { zhi: [], gan: [] };
+            list.forEach(r => {
+                const xs = r.members.map(m => pos[m.key].x).sort((a, b) => a - b), lo = xs[0] - 22, hi = xs[xs.length - 1] + 22, L = Ls[r.row];
+                let li = L.findIndex(lane => lane.every(([a, b]) => hi < a || lo > b));
+                if (li < 0) { L.push([]); li = L.length - 1; }
+                L[li].push([lo, hi]);
+            });
+            return Ls;
+        };
+        const fullLanes = laneCount(S.rels);
         // 端點分散：同一柱有多條線時，依另一端方向左右錯開，避免全部擠在中心
         const ends = {};
         rels.forEach(r => r.members.forEach(m => {
@@ -1938,7 +1950,7 @@
             L[li].push([lo, hi]);
             return { r, xs, li };
         });
-        const nZ = lanes.zhi.length, nG = lanes.gan.length;
+        const nZ = Math.max(lanes.zhi.length, fullLanes.zhi.length), nG = Math.max(lanes.gan.length, fullLanes.gan.length);
         const padB = nZ ? 20 + nZ * 13 : 6, padT = nG ? 18 + nG * 13 : 0;
         board.style.paddingBottom = padB + 'px'; board.style.paddingTop = padT + 'px';
         // padding 改變後重新量位置
