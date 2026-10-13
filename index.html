@@ -2098,7 +2098,7 @@
         return [...new Set(alerts)];
     }
 
-    function calculateXuYulanScore(baziMap, dayElement) {
+    function calculateQuantStrengthScore(baziMap, dayElement) {
         const shengMap = { '木':'火', '火':'土', '土':'金', '金':'水', '水':'木' };
         const helpfulElements = [dayElement];
         for (let k in shengMap) if (shengMap[k] === dayElement) helpfulElements.push(k);
@@ -2125,44 +2125,36 @@
         if (shengMap[state[0].el] === state[2].el && shengMap[state[2].el] === dayElement) state[0].score = state[0].max;
         if (shengMap[state[1].el] === state[0].el && shengMap[state[0].el] === state[2].el && shengMap[state[2].el] === dayElement) state[1].score = state[1].max;
 
-        const hasElementAdjacent = (pillarIdx, targetEl) => {
-            if (state[pillarIdx*2].el === targetEl) return true; 
-            if (pillarIdx > 0 && (state[(pillarIdx-1)*2].el === targetEl || state[(pillarIdx-1)*2+1].el === targetEl)) return true;
-            if (pillarIdx < 3 && (state[(pillarIdx+1)*2].el === targetEl || state[(pillarIdx+1)*2+1].el === targetEl)) return true;
-            return false;
-        };
-
+        // 步驟 6｜四庫整合（依老師逐步解說）
+        //  「同柱／隔柱」＝本柱天干＋左右相鄰兩柱的天干（不看地支）
+        //  基礎判斷：辰＝同柱干為木／水／土時取該五行，否則土；丑＝同柱干為土／金時取該五行，否則土；
+        //            未、戌＝火土能量相當，以幫扶日主者視為火或土
+        //            基礎五行為加分五行 → 得位置分；否則沿用上一步分數
+        //  庫判斷：辰見水→水庫、丑見金→金庫、未見木→木庫、戌見土→土庫；
+        //          候選為加分五行 → 接受覆寫（滿分）；為扣分五行 → 不計，回到基礎判斷
+        //          辰的同柱干屬土／木／水時，禁止由隔柱觸發的水庫覆寫（維持基礎判斷）
+        const KU_TRIGGER = { '辰': '水', '丑': '金', '未': '木', '戌': '土' };
         for(let p = 0; p < 4; p++) {
-            let zhiChar = getChar(p).zhi;
-            if (!['辰', '戌', '丑', '未'].includes(zhiChar)) continue; 
-            
-            let zhiState = state[p*2+1];
-            let ganState = state[p*2];
-
-            if (zhiChar === '辰') {
-                if (ganState.el === '木') zhiState.el = '木';
-                else if (ganState.el === '水') zhiState.el = '水';
-                else zhiState.el = '土';
-                if (hasElementAdjacent(p, '水')) zhiState.el = '水';
-            } else if (zhiChar === '戌') { 
-                if (ganState.el === '火') zhiState.el = '火';
-                else zhiState.el = '土';
-                if (hasElementAdjacent(p, '火')) zhiState.el = '火';
-            } else if (zhiChar === '丑') {
-                if (ganState.el === '金') zhiState.el = '金';
-                else if (ganState.el === '水') zhiState.el = '水';
-                else zhiState.el = '土';
-                if (hasElementAdjacent(p, '金')) zhiState.el = '金';
-                if (hasElementAdjacent(p, '水')) zhiState.el = '水';
-            } else if (zhiChar === '未') {
-                if (ganState.el === '火') zhiState.el = '火';
-                else if (ganState.el === '木') zhiState.el = '木';
-                else zhiState.el = '土';
-                if (hasElementAdjacent(p, '火')) zhiState.el = '火';
-                if (hasElementAdjacent(p, '木')) zhiState.el = '木';
-            }
-
-            zhiState.score = isHelpful(zhiState.el) ? zhiState.max : 0;
+            const zhiChar = getChar(p).zhi;
+            if (!KU_TRIGGER[zhiChar]) continue;
+            const zhiState = state[p*2+1];
+            const G = state[p*2].el;
+            const adjGans = [];
+            if (p > 0) adjGans.push(state[(p-1)*2].el);
+            if (p < 3) adjGans.push(state[(p+1)*2].el);
+            // 基礎判斷
+            let base = '土';
+            if (zhiChar === '辰') base = ['木', '水', '土'].includes(G) ? G : '土';
+            else if (zhiChar === '丑') base = ['土', '金'].includes(G) ? G : '土';
+            else base = isHelpful('火') ? '火' : '土';
+            zhiState.el = base;
+            if (isHelpful(base)) zhiState.score = zhiState.max;
+            // 庫判斷
+            const T = KU_TRIGGER[zhiChar];
+            const seenSame = G === T, seenAdj = adjGans.includes(T);
+            if (!seenSame && !seenAdj) continue;
+            if (zhiChar === '辰' && !seenSame && ['土', '木', '水'].includes(G)) continue;
+            if (isHelpful(T)) { zhiState.el = T; zhiState.score = zhiState.max; }
         }
 
         const allZhis = [getChar(0).zhi, getChar(1).zhi, getChar(2).zhi, getChar(3).zhi];
@@ -4318,7 +4310,7 @@
         document.getElementById('baziGrid').innerHTML = solarInfoHtml + gridHtml;
 
         const baziMap = { year: { gan: yg, zhi: yz }, month: { gan: mg, zhi: mz }, day: { gan: dg, zhi: dz }, time: { gan: tg, zhi: tz } };
-        const totalScore = calculateXuYulanScore(baziMap, dayElement);
+        const totalScore = calculateQuantStrengthScore(baziMap, dayElement);
         let strengthLabel = '';
         if (totalScore > 80) strengthLabel = '從強格'; else if (totalScore >= 45) strengthLabel = '身強'; else if (totalScore >= 20) strengthLabel = '身弱'; else strengthLabel = '從弱格';
 
