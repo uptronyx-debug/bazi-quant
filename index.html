@@ -967,8 +967,6 @@
         </details>
         
         <div id="iaOutput"></div>
-        <div id="hebanOutput"></div>
-        <div id="chongxingOutput"></div>
         <div id="sikuOutput"></div>
         
         <!-- 5. 歲運交感與引動 (動態時間軸) -->
@@ -1753,7 +1751,7 @@
         const M = r.members, f = m => `${iaName(m, r.row)}「${iaCh(m, r.row)}」`;
         const ds = r.ds ? `（${r.ds}）` : '';
         if (M.length === 2 && r.type !== '半合') {
-            const verb = { '沖': '沖', '六合': '合', '害': '害', '破': '破', '刑': '刑', '干合': '合', '干沖': '沖' }[r.type];
+            const verb = { '沖': '沖', '六合': '合絆', '害': '害', '破': '破', '刑': '刑', '干合': '合絆', '干沖': '沖' }[r.type];
             if (r.type === '自刑') return `${f(M[0])}與${f(M[1])}自刑${ds}`;
             return `${f(M[0])}${verb}${f(M[1])}${r.kind ? '・' + r.kind : ''}${ds}`;
         }
@@ -5363,17 +5361,13 @@
             { key: 'dy', label: '大運', gan: dyGan, zhi: dyZhi }, { key: 'ln', label: '流年', gan: lnGan, zhi: lnZhi }, { key: 'lm', label: '流月', gan: lmGan, zhi: lmZhi }]);
         const nowRels = iaScan(nowP);
         const pick = (cats, natal, ganType) => nowRels.filter(r => r.natal === natal && (cats.includes(r.cat) || (r.cat === 'gan' && r.type === ganType)));
-        const secHtml = (natRels, extRels, emptyNat, emptyExt) => `
-            <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
-                <div class="ia-gh" style="margin-top:0;">原局內建</div>
-                ${natRels.length ? iaListHtml(natRels) : `<div class="ia-empty">${emptyNat}</div>`}
-                <div class="ia-gh">歲運引動<span>${dyGan}${dyZhi}運・${currentYear}${lnGan}${lnZhi}・${lmGan}${lmZhi}月</span></div>
-                ${extRels.length ? iaListHtml(extRels) : `<div class="ia-empty">${emptyExt}</div>`}
-            </div>`;
-        document.getElementById('hebanOutput').innerHTML = wrapAccordion('🔗 會合局偵測',
-            secHtml(pick(['he', 'ju'], true, '干合'), pick(['he', 'ju'], false, '干合'), '無合絆現象', '無合會引動'), false);
-        document.getElementById('chongxingOutput').innerHTML = wrapAccordion('⚔️ 刑沖害偵測',
-            secHtml(pick(['chong', 'xing', 'hai', 'po'], true, '干沖'), pick(['chong', 'xing', 'hai', 'po'], false, '干沖'), '原局無明顯刑沖害', '無刑沖害破引動'), false);
+        // 會合局／刑沖害改由「歲運互動盤」呈現；這裡只產生提詞用的文字快照（目前大運、流年、流月）
+        const txtList = (rels, empty) => rels.length ? rels.map(r => '• ' + iaText(r)).join('\n') : empty;
+        const extHead = `${dyGan}${dyZhi}運・${currentYear}${lnGan}${lnZhi}年・${lmGan}${lmZhi}月`;
+        window.__iaPromptText = {
+            heban: `【會合】原局內建：\n${txtList(pick(['he', 'ju'], true, '干合'), '無合絆')}\n歲運引動（${extHead}）：\n${txtList(pick(['he', 'ju'], false, '干合'), '無合會引動')}`,
+            chong: `【刑沖害破】原局內建：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], true, '干沖'), '原局無明顯刑沖害')}\n歲運引動（${extHead}）：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], false, '干沖'), '無刑沖害破引動')}`
+        };
         try { renderInteractionPanel({ baseGans, baseZhis, dg, daYunData, currentYear }); } catch (e) { console.warn('歲運互動盤失敗', e); }
 
         const checkLiunianChongXingHai = (tGan, tZhi, baseGans, baseZhis, pNamesList) => {
@@ -5554,8 +5548,8 @@
             baziData.pureTougan = cleanHtmlToPureText(document.getElementById('touganOutput').innerHTML);
             baziData.pureDynamic = cleanHtmlToPureText(document.getElementById('dynamicTonggenTouganOutput').innerHTML);
             baziData.pureSiku = cleanHtmlToPureText(document.getElementById('sikuOutput').innerHTML);
-            baziData.pureHeban = cleanHtmlToPureText(document.getElementById('hebanOutput').innerHTML);
-            baziData.pureChongxing = cleanHtmlToPureText(document.getElementById('chongxingOutput').innerHTML);
+            baziData.pureHeban = (window.__iaPromptText || {}).heban || '無明顯反應';
+            baziData.pureChongxing = (window.__iaPromptText || {}).chong || '無明顯反應';
             baziData.pure12Month = cleanHtmlToPureText(document.getElementById('monthlyTacticsOutput').innerHTML);
             baziData.pureLiuri = cleanHtmlToPureText(document.getElementById('liuriOutput').innerHTML);
         }
@@ -5607,7 +5601,8 @@ ${data.pureTonggen}
 ■ 藏干透干解析（潛能爆發排名與隱藏特質）：
 ${data.pureTougan}
 
-■ 原局內建會合絆局與刑沖克害狀態：
+■ 原局與歲運的會合、刑沖害破（標明互動柱位）：
+（判讀規則：天干五合、地支六合一律視為「合絆」——雙方互相牽制、各自作用減弱，不可當作合化；半合僅為局勢傾向、力量較弱；三合／三會須三字齊全才算成局。）
 ${data.pureHeban}
 ${data.pureChongxing}
 
