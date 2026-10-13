@@ -1755,8 +1755,8 @@
             cs.forEach(c => add({ cat: 'xing', type: '三刑', kind, members: c }));
             out.forEach(r => { if (r.xingPair && cs.some(c => r.members.every(m => c.includes(m)))) r.hidden = true; });
         });
-        // 歲運間：不牽動原局、且有流月參與（流月與大運／流年之間），屬間接、力道較輕
-        return out.filter(r => !r.hidden).map((r, i) => Object.assign(r, { id: 'ia' + i, members: [...r.members].sort((a, b) => a.ord - b.ord), between: !r.natal && !r.members.some(m => m.natal) && r.members.some(m => m.key === 'lm') }));
+        // 歲運間：大運、流年、流月彼此之間的互動，未牽動原局，屬間接、力道較輕
+        return out.filter(r => !r.hidden).map((r, i) => Object.assign(r, { id: 'ia' + i, members: [...r.members].sort((a, b) => a.ord - b.ord), between: !r.members.some(m => m.natal) }));
     }
     const iaName = (m, row) => m.natal ? m.short + (row === 'gan' ? '干' : '支') : m.short;
     const iaCh = (m, row) => row === 'gan' ? m.gan : m.zhi;
@@ -5382,7 +5382,7 @@
         const nowRels = iaScan(nowP);
         const pick = (cats, natal) => nowRels.filter(r => r.natal === natal && !r.between && cats.includes(r.cat));
         const pickBtw = (cats) => nowRels.filter(r => r.between && cats.includes(r.cat));
-        const btwTxt = (cats) => { const L = pickBtw(cats); return L.length ? `\n歲運間（流月與大運／流年之間，未牽動原局，間接、力道較輕）：\n${txtList(L, '')}` : ''; };
+        const btwTxt = (cats) => { const L = pickBtw(cats); return L.length ? `\n歲運間（大運、流年、流月彼此之間，未牽動原局，間接、力道較輕）：\n${txtList(L, '')}` : ''; };
         // 會合局／刑沖害改由「歲運互動盤」呈現；這裡只產生提詞用的文字快照（目前大運、流年、流月）
         const txtList = (rels, empty) => rels.length ? rels.map(r => '• ' + iaText(r)).join('\n') : empty;
         const extHead = `${dyGan}${dyZhi}運・${currentYear}${lnGan}${lnZhi}年・${lmGan}${lmZhi}月`;
