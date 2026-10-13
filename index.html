@@ -800,6 +800,9 @@
         .ia-col.ext .ia-lab { color:#00d2ff; }
         .ia-ss { font-size:10.5px; color:#777; min-height:14px; }
         .ia-g, .ia-z { font-size:24px; font-weight:800; line-height:1.25; }
+        .ia-zc { position:relative; }
+        .ia-zss { position:absolute; left:100%; top:50%; transform:translateY(-50%); margin-left:1px; display:flex; flex-direction:column; gap:0; font-size:8px; font-weight:700; line-height:1.05; text-align:left; }
+        .ia-zss i { font-style:normal; }
         .ia-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:2; }
         .ia-arc { fill:none; stroke-width:1.8; stroke-linecap:round; stroke-dasharray:6 4; opacity:0; animation: iaIn .45s ease-out forwards, iaFlow 1.1s linear infinite; animation-delay: var(--d), 0s; }
         .ia-lbl { opacity:0; animation: iaIn .45s ease-out forwards; animation-delay: var(--d); pointer-events:auto; cursor:pointer; }
@@ -835,7 +838,10 @@
         .ia-segrow .ia-scopes:last-child { align-items:center; padding-left:8px; font-size:12px; }
         .ia-cat.ia-act { color:#aaa; border-color:#444; }
         .ia-board.nat-only .ia-col.ext { opacity:.3; }
-        .ia-cats { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+        .ia-grp { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+        .ia-grp-t { font-size:11px; color:#777; min-width:28px; }
+        .ia-grp-act { margin-left:auto; }
+        .ia-cats { display:flex; flex-wrap:wrap; gap:8px 14px; margin-bottom:10px; align-items:center; }
         .ia-cat { font-family:inherit; font-size:12.5px; padding:4px 11px; border-radius:999px; background:transparent; border:1px solid #333; color:#666; cursor:pointer; }
         .ia-cat.on { border-color:var(--c); color:var(--c); background:color-mix(in srgb, var(--c) 12%, transparent); }
         .ia-gh { font-size:12.5px; color:#ccc; font-weight:700; margin:10px 0 6px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
@@ -843,6 +849,11 @@
         .ia-li { display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.6; color:#ddd; padding:4px 6px; border-radius:6px; cursor:pointer; }
         .ia-li:hover, .ia-li.hl { background:rgba(255,255,255,.06); }
         .ia-tag { flex:0 0 auto; min-width:30px; text-align:center; font-size:11px; font-weight:700; padding:1px 6px; border-radius:5px; color:var(--c); border:1px solid var(--c); background:color-mix(in srgb, var(--c) 12%, transparent); margin-top:2px; }
+        .ia-arc.btw { stroke-width:1.1; stroke-dasharray:3 4; }
+        .ia-arc.btw.hl { stroke-width:2.4; }
+        .ia-gh-btw { color:#999; }
+        .ia-btw .ia-li { color:#aaa; }
+        .ia-btw .ia-tag { opacity:.7; border-style:dashed; }
         .ia-empty { font-size:12.5px; color:#666; padding:2px 6px; }
     </style>
 </head>
@@ -1691,9 +1702,11 @@
     const IA_SANHUI = [[['寅','卯','辰'], '木'], [['巳','午','未'], '火'], [['申','酉','戌'], '金'], [['亥','子','丑'], '水']];
     const IA_CAT = {
         chong: { name: '沖', color: '#ff5252' }, xing: { name: '刑', color: '#ff4fa3' }, hai: { name: '害', color: '#ff9800' },
-        po: { name: '破', color: '#f1c40f' }, he: { name: '六合', color: '#00d2ff' }, ju: { name: '三合會', color: '#b388ff' }, gan: { name: '天干', color: '#2ed573' }
+        po: { name: '破', color: '#f1c40f' },
+        he: { name: '五合六合', color: '#00d2ff' }, ju: { name: '三合三會', color: '#b388ff' }
     };
-    const IA_CAT_ORDER = ['chong', 'xing', 'hai', 'po', 'he', 'ju', 'gan'];
+    const IA_CAT_ORDER = ['chong', 'xing', 'hai', 'po', 'he', 'ju'];
+    // 分組：刑沖（衝擊）／合絆（牽制、能量受影響）／成局（合出新能量）
     // 柱物件：{ key, label(柱名), short(年/月/日/時/大運/流年/流月), gan, zhi, natal, idx(原局序), ord(排序) }
     function iaPillars(baseGans, baseZhis, ext) {
         const NAT = ['年', '月', '日', '時'];
@@ -1719,8 +1732,7 @@
                 if (a.zhi === b.zhi && SELF_XING.includes(a.zhi) && !far) add({ cat: 'xing', type: '自刑', members: [a, b], ds });
             }
             if (a.gan && b.gan && a.gan !== '-' && b.gan !== '-') {
-                if (ganHeMap[a.gan] === b.gan && !far) add({ cat: 'gan', row: 'gan', type: '干合', members: [a, b], ds });
-                if (ganChongMap[a.gan] === b.gan) add({ cat: 'gan', row: 'gan', type: '干沖', members: [a, b], ds });
+                if (ganHeMap[a.gan] === b.gan && !far) add({ cat: 'he', row: 'gan', type: '干合', members: [a, b], ds });
             }
         }
         const combos = (zs) => {
@@ -1743,7 +1755,8 @@
             cs.forEach(c => add({ cat: 'xing', type: '三刑', kind, members: c }));
             out.forEach(r => { if (r.xingPair && cs.some(c => r.members.every(m => c.includes(m)))) r.hidden = true; });
         });
-        return out.filter(r => !r.hidden).map((r, i) => Object.assign(r, { id: 'ia' + i, members: [...r.members].sort((a, b) => a.ord - b.ord) }));
+        // 歲運間：不牽動原局、且有流月參與（流月與大運／流年之間），屬間接、力道較輕
+        return out.filter(r => !r.hidden).map((r, i) => Object.assign(r, { id: 'ia' + i, members: [...r.members].sort((a, b) => a.ord - b.ord), between: !r.natal && !r.members.some(m => m.natal) && r.members.some(m => m.key === 'lm') }));
     }
     const iaName = (m, row) => m.natal ? m.short + (row === 'gan' ? '干' : '支') : m.short;
     const iaCh = (m, row) => row === 'gan' ? m.gan : m.zhi;
@@ -1767,7 +1780,7 @@
         return r.type;
     }
     function iaTagClass(r) {
-        return { chong: 'tag-chong', xing: 'tag-xing', hai: 'tag-hai', po: 'tag-po', he: 'tag-liuhe', gan: r.type === '干沖' ? 'tag-chong' : 'tag-liuhe' }[r.cat]
+        return { chong: 'tag-chong', xing: 'tag-xing', hai: 'tag-hai', po: 'tag-po', he: 'tag-liuhe' }[r.cat]
             || (r.type === '三會' ? 'tag-sanhui' : r.type === '三合' ? 'tag-sanhe' : 'tag-banhe');
     }
     // 時間軸用的小標籤：focus＝要看的那一柱（大運或流年）
@@ -1803,10 +1816,13 @@
         }
         return res;
     }
+    // 地支藏干（依比重排序：本氣、中氣、餘氣）
+    function iaHidden(z) { const hw = zhiHiddenWeights[z] || {}; return Object.keys(hw).sort((a, b) => hw[b] - hw[a]); }
     function iaYearGZ(year) { const gz = Solar.fromYmd(year, 7, 1).getLunar().getEightChar().getYear(); return { gan: gz.charAt(0), zhi: gz.charAt(1) }; }
 
     function renderInteractionPanel(ctx) {
-        const S = window.__ia = window.__ia || { cats: { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1, gan: 0 }, scope: 'all' };
+        const S = window.__ia = window.__ia || { cats: { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1 }, scope: 'all' };
+        if (S.cats.ju === undefined || S.cats.wuhe !== undefined) { S.cats = { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1 }; }
         S.scope = S.scope || 'all'; if (!['on', 'dim'].includes(S.bright)) S.bright = 'on'; S.hl = null; S.off = S.off || { dy: 0, ln: 0, lm: 0 };
         S.ctx = ctx;
         const dys = ctx.daYunData.filter(d => d.index > 0);
@@ -1815,8 +1831,8 @@
         S.di = di; S.year = (Y >= dys[di].startYear && Y < dys[di].startYear + 10) ? Y : dys[di].startYear;
         const nowMz = Solar.fromDate(new Date()).getLunar().getEightChar().getMonthZhi();
         S.mk = Math.max(0, iaMonthsOf(S.year).findIndex(x => x.zhi === nowMz));
-        const catChips = [...IA_CAT_ORDER.map(c => `<button class="ia-cat ${S.cats[c] ? 'on' : ''}" data-cat="${c}" style="--c:${IA_CAT[c].color}" onclick="iaToggle('${c}')">${IA_CAT[c].name}</button>`),
-            `<span class="ia-cat-sp"></span><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(1)">全開</button><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(0)">全關</button>`].join('');
+        const catChips = IA_CAT_ORDER.map(c => `<button class="ia-cat ${S.cats[c] ? 'on' : ''}" data-cat="${c}" style="--c:${IA_CAT[c].color}" onclick="iaToggle('${c}')">${IA_CAT[c].name}</button>`).join('')
+            + `<div class="ia-grp ia-grp-act"><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(1)">全開</button><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(0)">全關</button></div>`;
         const scopeSeg = [['all', '全部'], ['ext', '只看歲運'], ['nat', '只看原局']].map(([k, t]) => `<button class="ia-scope ${S.scope === k ? 'on' : ''}" data-scope="${k}" onclick="iaScope('${k}')">${t}</button>`).join('');
         const brightSeg = [['on', '全亮'], ['dim', '全暗'], ['focus', '聚焦']].map(([k, t]) => `<button class="ia-scope ia-bri ${iaBriMode() === k ? 'on' : ''}" data-bright="${k}" onclick="iaBright('${k}')">${t}</button>`).join('');
         const body = `<div class="ia-wrap">
@@ -1858,9 +1874,9 @@
             const p = byKey(k);
             return `${i === 3 ? '<div class="ia-sep"></div>' : ''}<div class="ia-col ${p.natal ? '' : 'ext'} ${S.off[k] ? 'off' : ''}" data-key="${k}" ${p.natal ? '' : `onclick="iaOff('${k}')" title="點擊開／關${p.label}"`}>
                 <div class="ia-lab">${p.label}</div>
-                <div class="ia-ss">${ss(p.gan, k === 'n2')}</div>
+                <div class="ia-ss" style="color:${k === 'n2' ? '#888' : col(p.gan)}">${ss(p.gan, k === 'n2')}</div>
                 <div class="ia-g" style="color:${col(p.gan)}">${p.gan}</div>
-                <div class="ia-z" style="color:${colz(p.zhi)}">${p.zhi}</div>
+                <div class="ia-z" style="color:${colz(p.zhi)}"><span class="ia-zc">${p.zhi}<span class="ia-zss">${iaHidden(p.zhi).map(hg => `<i style="color:${col(hg)}">${ss(hg, false)}</i>`).join('')}</span></span></div>
             </div>`;
         }).join('');
         const board = document.getElementById('iaBoard');
@@ -1878,12 +1894,13 @@
     }
     function iaVisible(r) { const S = window.__ia; return S.cats[r.cat] && (S.scope === 'all' || (S.scope === 'nat') === r.natal); }
     function iaRenderList() {
-        const S = window.__ia, rels = S.rels.filter(iaVisible);
-        const ext = rels.filter(r => !r.natal), nat = rels.filter(r => r.natal);
+        const S = window.__ia, rels = S.rels.filter(iaVisible).slice().sort((x, y) => IA_CAT_ORDER.indexOf(x.cat) - IA_CAT_ORDER.indexOf(y.cat));
+        const ext = rels.filter(r => !r.natal && !r.between), btw = rels.filter(r => r.between), nat = rels.filter(r => r.natal);
         const cur = iaCurrent();
         document.getElementById('iaList').innerHTML =
             (S.scope !== 'nat' ? `<div class="ia-gh">歲運引動<span>${[!S.off.dy && `${cur.dy.gan}${cur.dy.zhi}運`, !S.off.ln && `${S.year}${cur.ln.gan}${cur.ln.zhi}`, !S.off.lm && `${cur.lm.gan}${cur.lm.zhi}月${cur.lm.jd ? '（' + cur.lm.jd + '起）' : ''}`].filter(Boolean).join('・') || '大運、流年、流月皆已關閉'}</span></div>` +
-            (ext.length ? iaListHtml(ext) : '<div class="ia-empty">無</div>') : '') +
+            (ext.length ? iaListHtml(ext) : '<div class="ia-empty">無</div>') +
+            (btw.length ? `<div class="ia-gh ia-gh-btw">歲運間<span>間接・力道較輕</span></div><div class="ia-btw">${iaListHtml(btw)}</div>` : '') : '') +
             (S.scope !== 'ext' ? `<div class="ia-gh">原局</div>` + (nat.length ? iaListHtml(nat) : '<div class="ia-empty">無</div>') : '');
         document.querySelectorAll('#iaList .ia-li').forEach(el => el.addEventListener('click', () => iaHl(el.dataset.id)));
     }
@@ -1895,7 +1912,7 @@
         const pos = {};
         board.querySelectorAll('.ia-col').forEach(el => {
             const z = el.querySelector('.ia-z').getBoundingClientRect(), g = el.querySelector('.ia-g').getBoundingClientRect();
-            pos[el.dataset.key] = { x: z.left + z.width / 2 - br.left, zb: z.bottom - br.top + 3, gt: g.top - br.top - 3 };
+            pos[el.dataset.key] = { x: z.left + z.width / 2 - br.left, zb: z.bottom - br.top + 3, gt: el.getBoundingClientRect().top - br.top - 2 };
         });
         const rels = S.rels.filter(iaVisible);
         // 端點分散：同一柱有多條線時，依另一端方向左右錯開，避免全部擠在中心
@@ -1928,7 +1945,7 @@
         const br2 = board.getBoundingClientRect();
         board.querySelectorAll('.ia-col').forEach(el => {
             const z = el.querySelector('.ia-z').getBoundingClientRect(), g = el.querySelector('.ia-g').getBoundingClientRect();
-            Object.assign(pos[el.dataset.key], { zb: z.bottom - br2.top + 3, gt: g.top - br2.top - 3 });
+            Object.assign(pos[el.dataset.key], { zb: z.bottom - br2.top + 3, gt: el.getBoundingClientRect().top - br2.top - 2 });
         });
         let defs = '<defs>' + IA_CAT_ORDER.map(c => `<marker id="iaM-${c}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="${IA_CAT[c].color}"/></marker>`).join('') + '</defs>';
         let arcs = '', labels = '';
@@ -1938,14 +1955,14 @@
             const dpt = (up ? -1 : 1) * (13 + li * 13);
             const segs = [];
             for (let i = 0; i < xs.length - 1; i++) segs.push([xs[i], xs[i + 1]]);
-            const delay = (n * 0.06).toFixed(2), op = S.bright === 'on' ? 1 : 0.22;
+            const delay = (n * 0.06).toFixed(2), op = (S.bright === 'on' ? 1 : 0.22) * (r.between ? 0.5 : 1);
             segs.forEach(([a, b]) => {
                 const ax = a, bx = b, cx = (ax + bx) / 2;
-                arcs += `<path class="ia-arc ${r.natal ? 'nat' : ''}" data-id="${r.id}" d="M${ax.toFixed(1)},${y0.toFixed(1)} Q${cx.toFixed(1)},${(y0 + dpt * 2).toFixed(1)} ${bx.toFixed(1)},${y0.toFixed(1)}" stroke="${col}" marker-start="url(#iaM-${r.cat})" marker-end="url(#iaM-${r.cat})" style="--d:${delay}s; --o:${op};"/>`;
+                arcs += `<path class="ia-arc ${r.natal ? 'nat' : ''} ${r.between ? 'btw' : ''}" data-id="${r.id}" d="M${ax.toFixed(1)},${y0.toFixed(1)} Q${cx.toFixed(1)},${(y0 + dpt * 2).toFixed(1)} ${bx.toFixed(1)},${y0.toFixed(1)}" stroke="${col}" marker-start="url(#iaM-${r.cat})" marker-end="url(#iaM-${r.cat})" style="--d:${delay}s; --o:${op};"/>`;
             });
             const lx = xs.length === 3 ? xs[1] : (xs[0] + xs[1]) / 2, ly = y0 + dpt;
             const t = iaShort(r), w = t.length * 11 + 8;
-            labels += `<g class="ia-lbl ${r.natal ? 'nat' : ''}" data-id="${r.id}" style="--d:${delay}s; --o:${op};" onclick="iaHl('${r.id}')"><rect x="${(lx - w / 2).toFixed(1)}" y="${(ly - 8).toFixed(1)}" width="${w}" height="16" rx="5" fill="#141414" stroke="${col}" stroke-width="1"/><text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${col}">${t}</text></g>`;
+            labels += `<g class="ia-lbl ${r.natal ? 'nat' : ''} ${r.between ? 'btw' : ''}" data-id="${r.id}" style="--d:${delay}s; --o:${op};" onclick="iaHl('${r.id}')"><rect x="${(lx - w / 2).toFixed(1)}" y="${(ly - 8).toFixed(1)}" width="${w}" height="16" rx="5" fill="#141414" stroke="${col}" stroke-width="1"/><text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${col}">${t}</text></g>`;
         });
         svg.innerHTML = defs + arcs + labels;
         iaApplyHl();
@@ -2313,7 +2330,6 @@
         }
 
         for(let i=0; i<4; i++) {
-            if(ganChongMap[tGan] === baseGans[i]) alerts.push(`<span class="tag tag-chong">沖${pNames[i]}干</span>`);
         }
 
         for(let i=0; i<4; i++) {
@@ -5360,13 +5376,15 @@
         const nowP = iaPillars(baseGans, baseZhis, [
             { key: 'dy', label: '大運', gan: dyGan, zhi: dyZhi }, { key: 'ln', label: '流年', gan: lnGan, zhi: lnZhi }, { key: 'lm', label: '流月', gan: lmGan, zhi: lmZhi }]);
         const nowRels = iaScan(nowP);
-        const pick = (cats, natal, ganType) => nowRels.filter(r => r.natal === natal && (cats.includes(r.cat) || (r.cat === 'gan' && r.type === ganType)));
+        const pick = (cats, natal) => nowRels.filter(r => r.natal === natal && !r.between && cats.includes(r.cat));
+        const pickBtw = (cats) => nowRels.filter(r => r.between && cats.includes(r.cat));
+        const btwTxt = (cats) => { const L = pickBtw(cats); return L.length ? `\n歲運間（流月與大運／流年之間，未牽動原局，間接、力道較輕）：\n${txtList(L, '')}` : ''; };
         // 會合局／刑沖害改由「歲運互動盤」呈現；這裡只產生提詞用的文字快照（目前大運、流年、流月）
         const txtList = (rels, empty) => rels.length ? rels.map(r => '• ' + iaText(r)).join('\n') : empty;
         const extHead = `${dyGan}${dyZhi}運・${currentYear}${lnGan}${lnZhi}年・${lmGan}${lmZhi}月`;
         window.__iaPromptText = {
-            heban: `【會合】原局內建：\n${txtList(pick(['he', 'ju'], true, '干合'), '無合絆')}\n歲運引動（${extHead}）：\n${txtList(pick(['he', 'ju'], false, '干合'), '無合會引動')}`,
-            chong: `【刑沖害破】原局內建：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], true, '干沖'), '原局無明顯刑沖害')}\n歲運引動（${extHead}）：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], false, '干沖'), '無刑沖害破引動')}`
+            heban: `【合絆】（天干五合、地支六合）原局內建：\n${txtList(pick(['he'], true), '無')}\n歲運引動（${extHead}）：\n${txtList(pick(['he'], false), '無')}${btwTxt(['he'])}\n\n【三合／三會／半合】原局內建：\n${txtList(pick(['ju'], true), '無')}\n歲運引動（${extHead}）：\n${txtList(pick(['ju'], false), '無')}${btwTxt(['ju'])}`,
+            chong: `【刑沖害破】原局內建：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], true), '原局無明顯刑沖害')}\n歲運引動（${extHead}）：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], false), '無刑沖害破引動')}${btwTxt(['chong', 'xing', 'hai', 'po'])}`
         };
         try { renderInteractionPanel({ baseGans, baseZhis, dg, daYunData, currentYear }); } catch (e) { console.warn('歲運互動盤失敗', e); }
 
@@ -5423,7 +5441,7 @@
                         <div style="font-size: 11px; color: #aaa;">${dy.startAge}歲</div>
                         <div style="font-size: 18px; font-weight: bold; margin-top: 5px;"><span style="color:${cGan}">${dy.gan}</span><span style="color:${cZhi}">${dy.zhi}</span></div>
                         <div style="min-height: 20px; margin-top: 6px; display:flex; flex-direction:column; gap:3px;">
-                            ${(() => { const R = iaScan(iaPillars(baseGans, baseZhis, [{ key: 'dy', label: '大運', gan: dy.gan, zhi: dy.zhi }])); return iaTagsFor(R, 'dy', ['chong', 'xing', 'hai', 'po', 'he', 'ju', 'gan']); })()}
+                            ${(() => { const R = iaScan(iaPillars(baseGans, baseZhis, [{ key: 'dy', label: '大運', gan: dy.gan, zhi: dy.zhi }])); return iaTagsFor(R, 'dy', IA_CAT_ORDER); })()}
                         </div>
                     </div>`;
             }
@@ -5453,8 +5471,8 @@
                     <td>${i}${currMarker}<br><span style="font-size:11px; color:#888;">${age}歲</span></td>
                     <td style="font-weight: bold; font-size: 16px;"><span style="color:${cGan}">${tempGan}</span><span style="color:${cZhi}">${tempZhi}</span></td>
                     <td style="color:${cGan}">${tgGan}</td><td style="color:${cZhi}">${tgZhi}</td>
-                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${iaTagsFor(rowRels, 'ln', ['chong', 'xing', 'hai', 'po']) + ' ' + iaTagsFor(rowRels.filter(r => r.type === '干沖'), 'ln', ['gan'])}</div></td>
-                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${iaTagsFor(rowRels, 'ln', ['he', 'ju']) + ' ' + iaTagsFor(rowRels.filter(r => r.type === '干合'), 'ln', ['gan'])}</div></td>
+                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${iaTagsFor(rowRels, 'ln', ['chong', 'xing', 'hai', 'po'])}</div></td>
+                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${iaTagsFor(rowRels, 'ln', ['he', 'ju'])}</div></td>
                 </tr>
             `;
         };
@@ -5602,7 +5620,7 @@ ${data.pureTonggen}
 ${data.pureTougan}
 
 ■ 原局與歲運的會合、刑沖害破（標明互動柱位）：
-（判讀規則：天干五合、地支六合一律視為「合絆」——雙方互相牽制、各自作用減弱，不可當作合化；半合僅為局勢傾向、力量較弱；三合／三會須三字齊全才算成局。）
+（判讀規則：天干五合、地支六合一律視為「合絆」——雙方互相牽制、各自作用減弱，不可當作合化；三合、三會須三字齊全才算三合局、三會局，會合出新的五行能量；未齊者為半合，僅為局勢傾向、力量較弱。）
 ${data.pureHeban}
 ${data.pureChongxing}
 
