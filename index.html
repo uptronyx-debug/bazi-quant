@@ -768,6 +768,75 @@
             .rel-ev-row { grid-template-columns: 1fr 36px; }
             .rel-ev-tags { grid-column: 1 / -1; }
         }
+        .loc-row { display:flex; flex-wrap:wrap; gap:8px; align-items:stretch; }
+        .loc-f { display:flex; align-items:center; gap:6px; background:#1c1c1c; border:1px solid #333; border-radius:8px; padding:0 0 0 10px; }
+        .loc-f > span { font-size:12px; color:#888; white-space:nowrap; }
+        .loc-f input, .loc-f select { border:none !important; background:transparent !important; padding:10px 8px !important; font-size:14px; min-width:0; width:100%; color:#fff; }
+        .loc-f select option { background:#1c1c1c; }
+        .loc-city { flex:1 1 0; min-width:0; } .loc-gender { flex:0 0 auto; } .loc-gender select { width:auto; padding-right:28px !important; }
+        #genderSlotBazi .loc-gender { flex:1 1 100%; } #genderSlotBazi .loc-gender select { width:100%; } .loc-lon { flex:1 1 110px; } .loc-tz { flex:1 1 120px; }
+        .loc-dst { display:flex; align-items:center; gap:6px; font-size:13px; color:#ddd; padding:0 10px; background:#1c1c1c; border:1px solid #333; border-radius:8px; cursor:pointer; white-space:nowrap; }
+        .loc-dst input { width:16px; height:16px; }
+        .loc-dst.on { border-color:#ffb347; color:#ffb347; }
+        .loc-info { font-size:12px; color:#7f8c8d; min-height:16px; padding:2px 2px; cursor:pointer; user-select:none; }
+        .loc-info .loc-edit { color:#00d2ff; margin-left:6px; white-space:nowrap; }
+        .loc-info.warn .loc-warn { color:#ffb347; margin-top:2px; }
+        .loc-f.need, .loc-dst.need { border-color:#ffb347 !important; box-shadow:0 0 0 1px rgba(255,179,71,.35); position:relative; }
+        .loc-f.need::after, .loc-dst.need::after { content:'請確認'; position:absolute; top:-8px; right:8px; font-size:10px; line-height:1; padding:2px 5px; border-radius:4px; background:#ffb347; color:#000; font-weight:700; }
+        .loc-adv { display:none; }
+        .loc-adv.open { display:flex; animation: peFade .25s ease-out both; }
+        .loc-info b { color:#00d2ff; font-weight:600; }
+        /* ===== 歲運互動盤 ===== */
+        .tag-po { color:#f1c40f; background:rgba(241,196,15,0.14); }
+        .ia-wrap { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; }
+        @media (min-width: 900px) { .ia-wrap { grid-template-columns:minmax(380px, 1.1fr) minmax(0, 1fr); align-items:start; } .ia-left { position:sticky; top:10px; } }
+        .ia-board { position:relative; background:#121212; border:1px solid #2a2a2a; border-radius:12px; padding:6px 6px; }
+        .ia-grid { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)) 6px repeat(4, minmax(0,1fr)); position:relative; z-index:1; }
+        .ia-sep { background:linear-gradient(180deg, transparent, #333, transparent); width:1px; justify-self:center; }
+        .ia-col { text-align:center; padding:6px 0 4px; border-radius:8px; transition:background .2s; }
+        .ia-col.ext { background:rgba(0,210,255,.05); }
+        .ia-col.hl { background:rgba(255,255,255,.08); }
+        .ia-lab { font-size:11px; color:#888; }
+        .ia-col.ext .ia-lab { color:#00d2ff; }
+        .ia-ss { font-size:10.5px; color:#777; min-height:14px; }
+        .ia-g, .ia-z { font-size:24px; font-weight:800; line-height:1.25; }
+        .ia-svg { position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:2; }
+        .ia-arc { fill:none; stroke-width:1.8; stroke-linecap:round; stroke-dasharray:6 4; opacity:0; animation: iaIn .45s ease-out forwards, iaFlow 1.1s linear infinite; animation-delay: var(--d), 0s; }
+        .ia-lbl { opacity:0; animation: iaIn .45s ease-out forwards; animation-delay: var(--d); pointer-events:auto; cursor:pointer; }
+        @keyframes iaIn { to { opacity: var(--o, 1); } }
+        @keyframes iaFlow { to { stroke-dashoffset: -20; } }
+        .ia-board.has-hl .ia-arc:not(.hl), .ia-board.has-hl .ia-lbl:not(.hl) { opacity:.12 !important; animation:none; }
+        .ia-arc.hl { stroke-width:3; opacity:1 !important; animation: iaFlow .6s linear infinite; }
+        .ia-lbl.hl { opacity:1 !important; animation:none; }
+        @media (prefers-reduced-motion: reduce) { .ia-arc { animation: iaIn .01s forwards; } }
+        .ia-pick { display:grid; grid-template-columns:34px minmax(0,1fr); gap:6px 8px; align-items:center; margin-top:12px; }
+        .ia-pl { font-size:12px; color:#888; }
+        .ia-strip { display:flex; gap:6px; overflow-x:auto; scroll-snap-type:x proximity; padding:2px 0 4px; scrollbar-width:thin; }
+        .ia-chip { flex:0 0 auto; scroll-snap-align:center; display:flex; flex-direction:column; align-items:center; gap:1px; min-width:52px; padding:5px 6px; border-radius:8px; background:#1a1a1a; border:1px solid #2c2c2c; color:#ccc; cursor:pointer; font-family:inherit; }
+        .ia-chip b { font-size:15px; }
+        .ia-chip small { font-size:10.5px; color:#777; }
+        .ia-chip.now small { color:#00d2ff; }
+        .ia-chip.on { border-color:#00d2ff; box-shadow:0 0 0 1px rgba(0,210,255,.4), 0 0 10px rgba(0,210,255,.2); background:#0f1d22; }
+        .ia-chip, .ia-cat { width:auto; letter-spacing:normal; grid-column:auto; transition:border-color .2s, background .2s; }
+        .ia-chip:hover, .ia-cat:hover { transform:none; box-shadow:none; background:#222; }
+        .ia-cat.on:hover { background:color-mix(in srgb, var(--c) 18%, transparent); }
+        .ia-chip.on:hover { background:#0f1d22; }
+        .ia-scopes { display:inline-flex; background:#151515; border:1px solid #2c2c2c; border-radius:999px; padding:3px; margin-bottom:10px; gap:2px; }
+        .ia-scope { width:auto; grid-column:auto; letter-spacing:normal; font-family:inherit; font-size:12.5px; font-weight:600; padding:5px 13px; border-radius:999px; border:none; background:transparent; color:#888; cursor:pointer; }
+        .ia-scope:hover { transform:none; box-shadow:none; background:#222; color:#ccc; }
+        .ia-scope.on, .ia-scope.on:hover { background:#00d2ff; color:#000; }
+        .ia-cat-sp { flex:1 1 auto; }
+        .ia-cat.ia-act { color:#aaa; border-color:#444; }
+        .ia-board.nat-only .ia-col.ext { opacity:.3; }
+        .ia-cats { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+        .ia-cat { font-family:inherit; font-size:12.5px; padding:4px 11px; border-radius:999px; background:transparent; border:1px solid #333; color:#666; cursor:pointer; }
+        .ia-cat.on { border-color:var(--c); color:var(--c); background:color-mix(in srgb, var(--c) 12%, transparent); }
+        .ia-gh { font-size:12.5px; color:#ccc; font-weight:700; margin:10px 0 6px; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+        .ia-gh span { font-weight:400; color:#888; }
+        .ia-li { display:flex; align-items:flex-start; gap:8px; font-size:13px; line-height:1.6; color:#ddd; padding:4px 6px; border-radius:6px; cursor:pointer; }
+        .ia-li:hover, .ia-li.hl { background:rgba(255,255,255,.06); }
+        .ia-tag { flex:0 0 auto; min-width:30px; text-align:center; font-size:11px; font-weight:700; padding:1px 6px; border-radius:5px; color:var(--c); border:1px solid var(--c); background:color-mix(in srgb, var(--c) 12%, transparent); margin-top:2px; }
+        .ia-empty { font-size:12.5px; color:#666; padding:2px 6px; }
     </style>
 </head>
 <body>
@@ -797,6 +866,18 @@
             <select id="birthHour" style="padding: 12px; font-size: 15px; flex: 1;"></select>
             <select id="birthMinute" style="padding: 12px; font-size: 15px; flex: 1;"></select>
         </div>
+        <div class="loc-row">
+            <div class="loc-f loc-gender" id="genderBox"><span>性別</span><select id="gender"><option value="1">男生</option><option value="0">女生</option></select></div>
+            <div class="loc-f loc-city"><span>出生地</span><input id="birthPlace" list="cityList" value="台北" autocomplete="off" placeholder="輸入城市，例如 巴黎" oninput="onPlaceInput()" onchange="onPlaceInput()"></div>
+        </div>
+        <div id="locInfo" class="loc-info" onclick="toggleLocAdv()"></div>
+        <div id="locAdv" class="loc-row loc-adv">
+            <div class="loc-f loc-tz"><span>時區</span><select id="birthTzOff" onchange="onTzManual()"></select></div>
+            <label class="loc-dst"><input type="checkbox" id="useDst" onchange="onDstManual()"><span>夏令時間</span></label>
+            <div class="loc-f loc-lon"><span>經度</span><input type="number" id="longitude" value="121.5" step="0.01" oninput="onLonManual()"></div>
+            <input type="hidden" id="birthTz" value="Asia/Taipei">
+        </div>
+        <datalist id="cityList"></datalist>
         <details class="acc-section" style="margin-bottom: 0; margin-top: 6px;">
             <summary class="acc-summary" style="font-size: 13px; padding: 10px 12px;">⚙️ 進階設定（早晚子時／真太陽時）<span class="acc-chevron">▾</span></summary>
             <div class="acc-body" style="display: flex; flex-direction: column; gap: 12px; padding-top: 10px;">
@@ -808,13 +889,9 @@
                 <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 10px;">
                     <label style="display: flex; align-items: center; cursor: pointer; color: #fff; font-size: 14px; min-width: 120px;">
                         <input type="checkbox" id="useTrueSolar" style="width: 18px; height: 18px; margin-right: 8px;" onchange="toggleTrueSolar()">
-                        啟用真太陽時
+                        <span>啟用真太陽時 <span style="font-size:12px; color:#aaa;">(依出生地經度，換算太陽實際位置的時間)</span></span>
                     </label>
-                    <div id="solarTimeSettings" style="display: none; flex: 1; align-items: center; gap: 8px; min-width: 150px;">
-                        <span style="color: #aaa; font-size: 13px; white-space: nowrap;">經度:</span>
-                        <input type="number" id="longitude" value="121.5" step="0.1" style="padding: 8px; font-size: 14px; flex: 1; min-width: 60px;">
-                        <span style="font-size: 12px; color: #888; white-space: nowrap;">(台灣 121.5)</span>
-                    </div>
+                    <div id="solarTimeSettings" style="display:none;"></div>
                 </div>
             </div>
         </details>
@@ -822,6 +899,7 @@
 
     <!-- 手動八字輸入介面 -->
     <div class="form-group" id="baziInputGroup" style="display: none; flex-direction: column; gap: 15px; margin-bottom: 20px;">
+        <div class="loc-row" id="genderSlotBazi"></div>
         <div style="background-color: #2a2a2a; padding: 15px; border-radius: 6px; border: 1px solid var(--border);">
             <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px;">
                 <span style="color:#aaa; font-size:14px; font-weight:bold; text-align:center;">年柱</span>
@@ -856,12 +934,6 @@
         </div>
     </div>
 
-    <div class="form-group" style="margin-bottom: 0;">
-        <select id="gender" style="grid-column: span 2;">
-            <option value="1">男性</option>
-            <option value="0">女性</option>
-        </select>
-    </div>
     <div class="form-group" style="grid-template-columns: 2fr 1fr; margin-top: 15px; display: grid; gap: 10px;">
         <button onclick="calculateBazi()">執行運算</button>
         <button onclick="saveCurrentChartPrompt()" style="background: #333; color: var(--accent); border: 1px solid var(--accent);">💾 儲存</button>
@@ -887,6 +959,7 @@
             </div>
         </details>
         
+        <div id="iaOutput"></div>
         <div id="hebanOutput"></div>
         <div id="chongxingOutput"></div>
         <div id="sikuOutput"></div>
@@ -918,6 +991,139 @@
 
     // 頁面初始化：DOM 解析完成就執行，不等待外部圖片（訪客徽章等）載入完成，
     // 避免外部圖片伺服器緩慢時，下拉選單遲遲沒有選項
+
+    // ===== 出生地／時區／夏令時間 =====
+    const CITY_DB = [
+        ['台北',121.52,'Asia/Taipei'],['新北',121.47,'Asia/Taipei'],['桃園',121.30,'Asia/Taipei'],['新竹',120.97,'Asia/Taipei'],['台中',120.68,'Asia/Taipei'],['彰化',120.54,'Asia/Taipei'],['嘉義',120.45,'Asia/Taipei'],['台南',120.21,'Asia/Taipei'],['高雄',120.30,'Asia/Taipei'],['屏東',120.49,'Asia/Taipei'],['宜蘭',121.75,'Asia/Taipei'],['花蓮',121.60,'Asia/Taipei'],['台東',121.15,'Asia/Taipei'],['基隆',121.74,'Asia/Taipei'],['澎湖',119.57,'Asia/Taipei'],['金門',118.32,'Asia/Taipei'],['馬祖',119.95,'Asia/Taipei'],
+        ['香港',114.17,'Asia/Hong_Kong'],['澳門',113.54,'Asia/Macau'],
+        ['北京',116.40,'Asia/Shanghai'],['上海',121.47,'Asia/Shanghai'],['廣州',113.26,'Asia/Shanghai'],['深圳',114.06,'Asia/Shanghai'],['廈門',118.09,'Asia/Shanghai'],['福州',119.30,'Asia/Shanghai'],['杭州',120.15,'Asia/Shanghai'],['南京',118.80,'Asia/Shanghai'],['蘇州',120.59,'Asia/Shanghai'],['天津',117.20,'Asia/Shanghai'],['青島',120.38,'Asia/Shanghai'],['武漢',114.31,'Asia/Shanghai'],['長沙',112.94,'Asia/Shanghai'],['成都',104.07,'Asia/Shanghai'],['重慶',106.55,'Asia/Shanghai'],['西安',108.94,'Asia/Shanghai'],['昆明',102.83,'Asia/Shanghai'],['瀋陽',123.43,'Asia/Shanghai'],['哈爾濱',126.64,'Asia/Shanghai'],['烏魯木齊',87.62,'Asia/Shanghai'],['拉薩',91.13,'Asia/Shanghai'],
+        ['東京',139.69,'Asia/Tokyo'],['大阪',135.50,'Asia/Tokyo'],['福岡',130.40,'Asia/Tokyo'],['札幌',141.35,'Asia/Tokyo'],['首爾',126.98,'Asia/Seoul'],['釜山',129.08,'Asia/Seoul'],
+        ['新加坡',103.82,'Asia/Singapore'],['吉隆坡',101.69,'Asia/Kuala_Lumpur'],['檳城',100.33,'Asia/Kuala_Lumpur'],['曼谷',100.50,'Asia/Bangkok'],['雅加達',106.85,'Asia/Jakarta'],['峇里島',115.22,'Asia/Makassar'],['馬尼拉',120.98,'Asia/Manila'],['河內',105.85,'Asia/Ho_Chi_Minh'],['胡志明市',106.70,'Asia/Ho_Chi_Minh'],['仰光',96.16,'Asia/Yangon'],['金邊',104.92,'Asia/Phnom_Penh'],
+        ['新德里',77.21,'Asia/Kolkata'],['孟買',72.88,'Asia/Kolkata'],['杜拜',55.27,'Asia/Dubai'],['伊斯坦堡',28.98,'Europe/Istanbul'],['莫斯科',37.62,'Europe/Moscow'],
+        ['倫敦',-0.13,'Europe/London'],['曼徹斯特',-2.24,'Europe/London'],['愛丁堡',-3.19,'Europe/London'],['都柏林',-6.26,'Europe/Dublin'],['巴黎',2.35,'Europe/Paris'],['里昂',4.84,'Europe/Paris'],['柏林',13.40,'Europe/Berlin'],['慕尼黑',11.58,'Europe/Berlin'],['法蘭克福',8.68,'Europe/Berlin'],['漢堡',9.99,'Europe/Berlin'],['阿姆斯特丹',4.90,'Europe/Amsterdam'],['布魯塞爾',4.35,'Europe/Brussels'],['盧森堡',6.13,'Europe/Luxembourg'],['蘇黎世',8.54,'Europe/Zurich'],['日內瓦',6.14,'Europe/Zurich'],['維也納',16.37,'Europe/Vienna'],['布拉格',14.42,'Europe/Prague'],['華沙',21.01,'Europe/Warsaw'],['布達佩斯',19.04,'Europe/Budapest'],['羅馬',12.50,'Europe/Rome'],['米蘭',9.19,'Europe/Rome'],['馬德里',-3.70,'Europe/Madrid'],['巴塞隆納',2.17,'Europe/Madrid'],['里斯本',-9.14,'Europe/Lisbon'],['雅典',23.73,'Europe/Athens'],['斯德哥爾摩',18.07,'Europe/Stockholm'],['哥本哈根',12.57,'Europe/Copenhagen'],['奧斯陸',10.75,'Europe/Oslo'],['赫爾辛基',24.94,'Europe/Helsinki'],
+        ['紐約',-74.01,'America/New_York'],['波士頓',-71.06,'America/New_York'],['華盛頓',-77.04,'America/New_York'],['費城',-75.17,'America/New_York'],['邁阿密',-80.19,'America/New_York'],['亞特蘭大',-84.39,'America/New_York'],['芝加哥',-87.63,'America/Chicago'],['休士頓',-95.37,'America/Chicago'],['達拉斯',-96.80,'America/Chicago'],['丹佛',-104.99,'America/Denver'],['鳳凰城',-112.07,'America/Phoenix'],['拉斯維加斯',-115.14,'America/Los_Angeles'],['洛杉磯',-118.24,'America/Los_Angeles'],['舊金山',-122.42,'America/Los_Angeles'],['聖荷西',-121.89,'America/Los_Angeles'],['西雅圖',-122.33,'America/Los_Angeles'],['檀香山',-157.86,'Pacific/Honolulu'],['安克拉治',-149.90,'America/Anchorage'],
+        ['溫哥華',-123.12,'America/Vancouver'],['卡加利',-114.07,'America/Edmonton'],['多倫多',-79.38,'America/Toronto'],['蒙特婁',-73.57,'America/Toronto'],['墨西哥城',-99.13,'America/Mexico_City'],['聖保羅',-46.63,'America/Sao_Paulo'],['布宜諾斯艾利斯',-58.38,'America/Argentina/Buenos_Aires'],
+        ['雪梨',151.21,'Australia/Sydney'],['墨爾本',144.96,'Australia/Melbourne'],['布里斯本',153.03,'Australia/Brisbane'],['伯斯',115.86,'Australia/Perth'],['阿德雷德',138.60,'Australia/Adelaide'],['奧克蘭',174.76,'Pacific/Auckland'],
+        ['約翰尼斯堡',28.05,'Africa/Johannesburg'],['開羅',31.24,'Africa/Cairo']
+    ];
+    const CITY_MAP = Object.fromEntries(CITY_DB.map(c => [c[0], c]));
+    // 指定時區在某 UTC 時刻的偏移（分鐘），含歷史夏令資料
+    function tzOffsetAt(tz, utcMs) {
+        try {
+            const f = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+            const o = {}; f.formatToParts(new Date(utcMs)).forEach(x => o[x.type] = x.value);
+            return Math.round((Date.UTC(+o.year, o.month - 1, +o.day, +o.hour % 24, +o.minute) - Math.floor(utcMs / 60000) * 60000) / 60000);
+        } catch (e) { return null; }
+    }
+    // 依當地鐘錶時間判斷：標準時區偏移、夏令時間加了幾分鐘
+    function tzInfoForLocal(tz, y, m, d, h, mi) {
+        const a = tzOffsetAt(tz, Date.UTC(y, 0, 15)), b = tzOffsetAt(tz, Date.UTC(y, 6, 15));
+        if (a === null || b === null) return null;
+        const std = Math.min(a, b);
+        const wall = Date.UTC(y, m - 1, d, h, mi);
+        let off = tzOffsetAt(tz, wall - std * 60000);
+        off = tzOffsetAt(tz, wall - off * 60000);
+        return { std, dst: Math.max(0, off - std) };
+    }
+    const fmtOff = (min) => { const sg = min < 0 ? '−' : '+', a = Math.abs(min); return `UTC${sg}${Math.floor(a / 60)}${a % 60 ? ':' + String(a % 60).padStart(2, '0') : ''}`; };
+    function readBirthWall() {
+        const v = document.getElementById('birthDate').value; if (!v) return null;
+        const [y, m, d] = v.split('-').map(Number);
+        return { y, m, d, h: parseInt(document.getElementById('birthHour').value) || 0, mi: parseInt(document.getElementById('birthMinute').value) || 0 };
+    }
+    // 標記需要使用者確認的欄位（橘框＋「請確認」）
+    function setNeed(id, on) {
+        const el = document.getElementById(id); if (!el) return;
+        const box = el.closest('.loc-f, .loc-dst'); if (box) box.classList.toggle('need', !!on);
+    }
+    const clearNeeds = () => ['birthPlace', 'birthTzOff', 'useDst', 'longitude'].forEach(id => setNeed(id, false));
+    // 城市對應斷開時（未知城市／手動改時區）：經度改用時區中央估計值、夏令先關閉，並提醒確認
+    function detachCity() {
+        const std = parseInt(document.getElementById('birthTzOff').value);
+        document.getElementById('birthTz').value = '';
+        if (!isNaN(std)) document.getElementById('longitude').value = (std / 4).toFixed(1);
+        const dEl = document.getElementById('useDst'); dEl.checked = false; delete dEl.dataset.manual;
+        setNeed('longitude', true); setNeed('useDst', true);
+        document.getElementById('locAdv').classList.add('open');
+    }
+    function onPlaceInput() {
+        const v = document.getElementById('birthPlace').value.trim();
+        const c = CITY_MAP[v];
+        if (c) {
+            document.getElementById('longitude').value = c[1];
+            document.getElementById('birthTz').value = c[2];
+            delete document.getElementById('useDst').dataset.manual;
+            delete document.getElementById('birthTzOff').dataset.manual;
+            clearNeeds();
+        } else if (v) {
+            // 清單外的城市：時區、夏令、經度都要自己確認
+            delete document.getElementById('birthTzOff').dataset.manual;
+            detachCity();
+            setNeed('birthTzOff', true);
+        }
+        autoTz();
+    }
+    function onTzManual() {
+        const tzSel = document.getElementById('birthTzOff');
+        tzSel.dataset.manual = '1';
+        setNeed('birthTzOff', false);
+        // 手動選時區：原本的城市不再適用，出生地改為自訂
+        const pl = document.getElementById('birthPlace');
+        if (CITY_MAP[pl.value.trim()]) { pl.value = ''; pl.placeholder = '自訂時區（可輸入地名）'; }
+        detachCity();
+        updateLocInfo();
+    }
+    function onLonManual() { setNeed('longitude', false); updateLocInfo(); }
+    function onDstManual() { const d = document.getElementById('useDst'); d.dataset.manual = '1'; setNeed('useDst', false); updateLocInfo(); }
+    // 城市已知時：自動帶入當年標準時區與夏令時間
+    function autoTz() {
+        const tz = document.getElementById('birthTz').value, w = readBirthWall();
+        const dstEl = document.getElementById('useDst');
+        if (tz && w) {
+            const inf = tzInfoForLocal(tz, w.y, w.m, w.d, w.h, w.mi);
+            if (inf) {
+                document.getElementById('birthTzOff').value = String(inf.std);
+                if (!dstEl.dataset.manual) dstEl.checked = inf.dst > 0;
+                dstEl.dataset.auto = String(inf.dst || 60);
+            }
+        }
+        updateLocInfo();
+    }
+    function getBirthLoc() {
+        const lonRaw = parseFloat(document.getElementById('longitude').value);
+        const dstEl = document.getElementById('useDst');
+        const tz = document.getElementById('birthTz').value;
+        return {
+            place: document.getElementById('birthPlace').value.trim(),
+            lon: isNaN(lonRaw) ? 120 : lonRaw,
+            std: parseInt(document.getElementById('birthTzOff').value),
+            dst: dstEl.checked ? (tz ? parseInt(dstEl.dataset.auto || '60') : 60) : 0
+        };
+    }
+    function toggleLocAdv(force) {
+        const el = document.getElementById('locAdv');
+        el.classList.toggle('open', force === undefined ? !el.classList.contains('open') : force);
+        updateLocInfo();
+    }
+    function updateLocInfo() {
+        const L = getBirthLoc(), w = readBirthWall(), el = document.getElementById('locInfo');
+        const tz = document.getElementById('birthTz').value;
+        const open = document.getElementById('locAdv').classList.contains('open');
+        document.querySelector('.loc-dst').classList.toggle('on', L.dst > 0);
+        const tzManual = !!document.getElementById('birthTzOff').dataset.manual;
+        const needs = document.querySelectorAll('#dateInputGroup .need').length;
+        el.classList.toggle('warn', needs > 0);
+        if (!w || isNaN(L.std)) { el.innerHTML = ''; return; }
+        const utc = Date.UTC(w.y, w.m - 1, w.d, w.h, w.mi) - (L.std + L.dst) * 60000;
+        const tw = new Date(utc + 480 * 60000), p2 = n => String(n).padStart(2, '0');
+        const solarOn = document.getElementById('useTrueSolar').checked;
+        const src = CITY_MAP[L.place] && tz ? L.place : (tzManual || !L.place ? '自訂時區' : L.place);
+        const parts = [src, fmtOff(L.std), L.dst ? `夏令 +${L.dst / 60}h` : '無夏令', solarOn ? `真太陽時・經度 ${L.lon}` : '鐘錶時間'];
+        const twTxt = '';
+        const warnTxt = needs ? `<div class="loc-warn">⚠ 橘色欄位是估計值，請確認${!solarOn && document.querySelector('.loc-lon.need') ? '（經度只在開啟真太陽時使用）' : ''}</div>` : '';
+        el.innerHTML = `排盤採用：${parts.join('・')}${twTxt}<span class="loc-edit">${open ? '收合 ▴' : '調整 ▾'}</span>${warnTxt}`;
+    }
+
     function initPage() {
         if (typeof Solar === 'undefined') {
             document.querySelector('.container').innerHTML =
@@ -972,18 +1178,27 @@
             document.getElementById('dg').value = '丁'; document.getElementById('dz').value = '丑';
             document.getElementById('tg').value = '乙'; document.getElementById('tz').value = '巳';
         }
+        const tzSel = document.getElementById('birthTzOff');
+        const offs = []; for (let x = -12 * 60; x <= 14 * 60; x += 30) offs.push(x); offs.push(345, 525, 765);
+        offs.sort((a, b) => a - b).forEach(x => tzSel.appendChild(new Option(fmtOff(x), x)));
+        tzSel.value = '480';
+        document.getElementById('cityList').innerHTML = CITY_DB.map(c => `<option value="${c[0]}"></option>`).join('');
+        ['birthDate', 'birthHour', 'birthMinute'].forEach(id => document.getElementById(id).addEventListener('change', autoTz));
+        autoTz();
         renderSavedChartsList();
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initPage);
     else initPage();
 
     function toggleTrueSolar() {
-        const isChecked = document.getElementById('useTrueSolar').checked;
-        document.getElementById('solarTimeSettings').style.display = isChecked ? 'flex' : 'none';
+        if (typeof updateLocInfo === 'function') updateLocInfo();
     }
 
     function toggleInputMode() {
         const mode = document.querySelector('input[name="inputMode"]:checked').value;
+        const gb = document.getElementById('genderBox');
+        if (mode === 'date') document.querySelector('#dateInputGroup .loc-row').prepend(gb);
+        else document.getElementById('genderSlotBazi').appendChild(gb);
         if (mode === 'date') {
             document.getElementById('dateInputGroup').style.display = 'flex';
             document.getElementById('baziInputGroup').style.display = 'none';
@@ -1202,7 +1417,8 @@
             birthDate: getVal('birthDate'), birthHour: getVal('birthHour'), birthMinute: getVal('birthMinute'),
             useSplitZi: document.getElementById('useSplitZi').checked,
             useTrueSolar: document.getElementById('useTrueSolar').checked,
-            longitude: getVal('longitude'),
+            longitude: getVal('longitude'), birthPlace: getVal('birthPlace'), birthTz: getVal('birthTz'), birthTzOff: getVal('birthTzOff'),
+            useDst: document.getElementById('useDst').checked, dstManual: !!document.getElementById('useDst').dataset.manual,
             yg: getVal('yg'), yz: getVal('yz'), mg: getVal('mg'), mz: getVal('mz'),
             dg: getVal('dg'), dz: getVal('dz'), tg: getVal('tg'), tz: getVal('tz'),
             baziYear: getVal('baziYear'), baziStartAge: getVal('baziStartAge'),
@@ -1236,7 +1452,14 @@
         document.getElementById('useSplitZi').checked = !!inputs.useSplitZi;
         document.getElementById('useTrueSolar').checked = !!inputs.useTrueSolar;
         toggleTrueSolar();
+        // 出生地：舊存檔沒有這些欄位時，預設台北，夏令時間自動判斷
+        document.getElementById('birthPlace').value = inputs.birthPlace || '台北';
+        document.getElementById('birthTz').value = inputs.birthPlace ? (inputs.birthTz || '') : 'Asia/Taipei';
+        if (inputs.birthTzOff !== undefined && inputs.birthTzOff !== '') document.getElementById('birthTzOff').value = inputs.birthTzOff; else document.getElementById('birthTzOff').value = '480';
+        const dEl = document.getElementById('useDst');
+        if (inputs.dstManual) { dEl.dataset.manual = '1'; dEl.checked = !!inputs.useDst; } else delete dEl.dataset.manual;
         setVal('longitude', inputs.longitude);
+        autoTz();
         setVal('yg', inputs.yg); setVal('yz', inputs.yz); setVal('mg', inputs.mg); setVal('mz', inputs.mz);
         setVal('dg', inputs.dg); setVal('dz', inputs.dz); setVal('tg', inputs.tg); setVal('tz', inputs.tz);
         setVal('baziYear', inputs.baziYear); setVal('baziStartAge', inputs.baziStartAge);
@@ -1452,6 +1675,306 @@
             </details>
         `;
     }
+
+
+    // ===== 干支互動掃描引擎（原局／大運／流年／流月共用） =====
+    const ZHI_PO = { '子':'酉', '酉':'子', '午':'卯', '卯':'午', '寅':'亥', '亥':'寅', '巳':'申', '申':'巳', '辰':'丑', '丑':'辰', '戌':'未', '未':'戌' };
+    const XING_PAIR = [['寅','巳','無恩之刑'], ['巳','申','無恩之刑'], ['申','寅','無恩之刑'], ['丑','戌','恃勢之刑'], ['戌','未','恃勢之刑'], ['未','丑','恃勢之刑'], ['子','卯','恩愛之刑']];
+    const XING_TRIO = [[['寅','巳','申'], '無恩之刑'], [['丑','戌','未'], '恃勢之刑']];
+    const SELF_XING = ['辰', '午', '酉', '亥'];
+    const IA_SANHE = [[['申','子','辰'], '水'], [['亥','卯','未'], '木'], [['寅','午','戌'], '火'], [['巳','酉','丑'], '金']];
+    const IA_SANHUI = [[['寅','卯','辰'], '木'], [['巳','午','未'], '火'], [['申','酉','戌'], '金'], [['亥','子','丑'], '水']];
+    const IA_CAT = {
+        chong: { name: '沖', color: '#ff5252' }, xing: { name: '刑', color: '#ff4fa3' }, hai: { name: '害', color: '#ff9800' },
+        po: { name: '破', color: '#f1c40f' }, he: { name: '六合', color: '#00d2ff' }, ju: { name: '三合會', color: '#b388ff' }, gan: { name: '天干', color: '#2ed573' }
+    };
+    const IA_CAT_ORDER = ['chong', 'xing', 'hai', 'po', 'he', 'ju', 'gan'];
+    // 柱物件：{ key, label(柱名), short(年/月/日/時/大運/流年/流月), gan, zhi, natal, idx(原局序), ord(排序) }
+    function iaPillars(baseGans, baseZhis, ext) {
+        const NAT = ['年', '月', '日', '時'];
+        const P = baseGans.map((g, i) => ({ key: 'n' + i, label: NAT[i] + '柱', short: NAT[i], gan: g, zhi: baseZhis[i], natal: true, idx: i, ord: 3 + i }));
+        (ext || []).forEach((e, k) => { if (e && e.zhi && e.zhi !== '-') P.push({ key: e.key, label: e.label, short: e.label, gan: e.gan, zhi: e.zhi, natal: false, idx: -1, ord: k }); });
+        return P;
+    }
+    function iaScan(P) {
+        const out = [];
+        const dist = (a, b) => { const d = Math.abs(a.idx - b.idx); return d === 1 ? '相鄰' : (d === 2 ? '隔柱' : '遙隔'); };
+        const add = (r) => { r.row = r.row || 'zhi'; r.natal = r.members.every(m => m.natal); out.push(r); };
+        for (let i = 0; i < P.length; i++) for (let j = i + 1; j < P.length; j++) {
+            const a = P[i], b = P[j];
+            const bothNat = a.natal && b.natal, ds = bothNat ? dist(a, b) : '';
+            const far = bothNat && ds === '遙隔';
+            if (a.zhi && b.zhi) {
+                if (zhiChongMap[a.zhi] === b.zhi) add({ cat: 'chong', type: '沖', members: [a, b], ds });
+                if (zhiHeMap[a.zhi] === b.zhi && !far) add({ cat: 'he', type: '六合', members: [a, b], ds });
+                if (zhiHaiMap[a.zhi] === b.zhi) add({ cat: 'hai', type: '害', members: [a, b], ds });
+                if (ZHI_PO[a.zhi] === b.zhi) add({ cat: 'po', type: '破', members: [a, b], ds });
+                const xp = XING_PAIR.find(([x, y]) => (a.zhi === x && b.zhi === y) || (a.zhi === y && b.zhi === x));
+                if (xp) add({ cat: 'xing', type: '刑', kind: xp[2], members: [a, b], ds, xingPair: true });
+                if (a.zhi === b.zhi && SELF_XING.includes(a.zhi) && !far) add({ cat: 'xing', type: '自刑', members: [a, b], ds });
+            }
+            if (a.gan && b.gan && a.gan !== '-' && b.gan !== '-') {
+                if (ganHeMap[a.gan] === b.gan && !far) add({ cat: 'gan', row: 'gan', type: '干合', members: [a, b], ds });
+                if (ganChongMap[a.gan] === b.gan) add({ cat: 'gan', row: 'gan', type: '干沖', members: [a, b], ds });
+            }
+        }
+        const combos = (zs) => {
+            const L = zs.map(z => P.filter(p => p.zhi === z));
+            if (L.some(l => !l.length)) return [];
+            const res = []; L[0].forEach(x => L[1].forEach(y => L[2].forEach(w => res.push([x, y, w])))); return res;
+        };
+        IA_SANHE.forEach(([zs, el]) => {
+            const full = combos(zs);
+            full.forEach(c => add({ cat: 'ju', type: '三合', el, members: c }));
+            // 半合：生＋旺、旺＋墓（需有帝旺）
+            [[0, 1], [1, 2]].forEach(([u, v]) => P.filter(p => p.zhi === zs[u]).forEach(x => P.filter(p => p.zhi === zs[v]).forEach(y => {
+                if (full.some(c => c.includes(x) && c.includes(y))) return;
+                add({ cat: 'ju', type: '半合', el, members: [x, y], ds: x.natal && y.natal ? dist(x, y) : '' });
+            })));
+        });
+        IA_SANHUI.forEach(([zs, el]) => combos(zs).forEach(c => add({ cat: 'ju', type: '三會', el, members: c })));
+        XING_TRIO.forEach(([zs, kind]) => {
+            const cs = combos(zs);
+            cs.forEach(c => add({ cat: 'xing', type: '三刑', kind, members: c }));
+            out.forEach(r => { if (r.xingPair && cs.some(c => r.members.every(m => c.includes(m)))) r.hidden = true; });
+        });
+        return out.filter(r => !r.hidden).map((r, i) => Object.assign(r, { id: 'ia' + i, members: [...r.members].sort((a, b) => a.ord - b.ord) }));
+    }
+    const iaName = (m, row) => m.natal ? m.short + (row === 'gan' ? '干' : '支') : m.short;
+    const iaCh = (m, row) => row === 'gan' ? m.gan : m.zhi;
+    function iaText(r) {
+        const M = r.members, f = m => `${iaName(m, r.row)}「${iaCh(m, r.row)}」`;
+        const ds = r.ds ? `（${r.ds}）` : '';
+        if (M.length === 2 && r.type !== '半合') {
+            const verb = { '沖': '沖', '六合': '合', '害': '害', '破': '破', '刑': '刑', '干合': '合', '干沖': '沖' }[r.type];
+            if (r.type === '自刑') return `${f(M[0])}與${f(M[1])}自刑${ds}`;
+            return `${f(M[0])}${verb}${f(M[1])}${r.kind ? '・' + r.kind : ''}${ds}`;
+        }
+        if (r.type === '三刑') return `${M.map(f).join('＋')} 三刑・${r.kind}`;
+        return `${M.map(f).join('＋')} ${r.type}${r.el}局${ds}`;
+    }
+    // 箭頭上的短標籤
+    function iaShort(r) {
+        if (r.cat === 'ju') return (r.type === '三會' ? '會' : r.type === '三合' ? '合' : '半') + r.el;
+        if (r.type === '三刑') return '三刑';
+        if (r.type === '自刑') return '自刑';
+        if (r.type === '六合') return '合';
+        return r.type;
+    }
+    function iaTagClass(r) {
+        return { chong: 'tag-chong', xing: 'tag-xing', hai: 'tag-hai', po: 'tag-po', he: 'tag-liuhe', gan: r.type === '干沖' ? 'tag-chong' : 'tag-liuhe' }[r.cat]
+            || (r.type === '三會' ? 'tag-sanhui' : r.type === '三合' ? 'tag-sanhe' : 'tag-banhe');
+    }
+    // 時間軸用的小標籤：focus＝要看的那一柱（大運或流年）
+    function iaTagsFor(rels, focusKey, cats) {
+        const tags = [];
+        rels.filter(r => cats.includes(r.cat) && r.members.some(m => m.key === focusKey)).forEach(r => {
+            const others = r.members.filter(m => m.key !== focusKey);
+            let txt;
+            if (r.members.length === 3 || r.type === '半合') {
+                const pre = others.some(m => !m.natal) ? '運年' : '';
+                txt = r.type === '三刑' ? `${pre}三刑` : `${pre}${r.type}${r.el}`;
+            } else {
+                const o = others[0];
+                const verb = { '沖': '沖', '六合': '合', '害': '害', '破': '破', '刑': '刑', '自刑': '自刑', '干合': '合', '干沖': '沖' }[r.type];
+                txt = `${verb}${o.natal ? o.short + (r.row === 'gan' ? '干' : '支') : o.short}`;
+            }
+            tags.push(`<span class="tag ${iaTagClass(r)}" title="${iaText(r)}">${txt}</span>`);
+        });
+        return [...new Set(tags)].join(' ');
+    }
+    function iaListHtml(rels) {
+        return rels.map(r => `<div class="ia-li" data-id="${r.id}"><span class="ia-tag" style="--c:${IA_CAT[r.cat].color}">${iaShort(r)}</span><span>${iaText(r)}</span></div>`).join('\n');
+    }
+
+    // ===== 歲運互動盤：小命盤＋大運／流年／流月滑動＋地支箭頭動畫 =====
+    function iaMonthsOf(year) {
+        const res = [];
+        for (let k = 0; k < 12; k++) {
+            const d = new Date(year, 1 + k, 20);
+            const bz = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 20).getLunar().getEightChar();
+            res.push({ k, gan: bz.getMonthGan(), zhi: bz.getMonthZhi(), m: d.getMonth() + 1 });
+        }
+        return res;
+    }
+    function iaYearGZ(year) { const gz = Solar.fromYmd(year, 7, 1).getLunar().getEightChar().getYear(); return { gan: gz.charAt(0), zhi: gz.charAt(1) }; }
+
+    function renderInteractionPanel(ctx) {
+        const S = window.__ia = window.__ia || { cats: { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1, gan: 0 }, scope: 'all' };
+        S.scope = S.scope || 'all';
+        S.ctx = ctx;
+        const dys = ctx.daYunData.filter(d => d.index > 0);
+        const Y = ctx.currentYear;
+        let di = dys.findIndex(d => Y >= d.startYear && Y < d.startYear + 10); if (di < 0) di = 0;
+        S.di = di; S.year = (Y >= dys[di].startYear && Y < dys[di].startYear + 10) ? Y : dys[di].startYear;
+        const nowMz = Solar.fromDate(new Date()).getLunar().getEightChar().getMonthZhi();
+        S.mk = Math.max(0, iaMonthsOf(S.year).findIndex(x => x.zhi === nowMz));
+        const catChips = [...IA_CAT_ORDER.map(c => `<button class="ia-cat ${S.cats[c] ? 'on' : ''}" data-cat="${c}" style="--c:${IA_CAT[c].color}" onclick="iaToggle('${c}')">${IA_CAT[c].name}</button>`),
+            `<span class="ia-cat-sp"></span><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(1)">全開</button><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(0)">全關</button>`].join('');
+        const scopeSeg = [['all', '全部'], ['ext', '只看歲運'], ['nat', '只看原局']].map(([k, t]) => `<button class="ia-scope ${S.scope === k ? 'on' : ''}" data-scope="${k}" onclick="iaScope('${k}')">${t}</button>`).join('');
+        const body = `<div class="ia-wrap">
+            <div class="ia-left">
+                <div class="ia-board" id="iaBoard"></div>
+                <div class="ia-pick">
+                    <div class="ia-pl">大運</div><div class="ia-strip" id="iaDyStrip"></div>
+                    <div class="ia-pl">流年</div><div class="ia-strip" id="iaLnStrip"></div>
+                    <div class="ia-pl">流月</div><div class="ia-strip" id="iaLmStrip"></div>
+                </div>
+            </div>
+            <div class="ia-right">
+                <div class="ia-scopes">${scopeSeg}</div>
+                <div class="ia-cats">${catChips}</div>
+                <div class="ia-list" id="iaList"></div>
+            </div>
+        </div>`;
+        document.getElementById('iaOutput').innerHTML = wrapAccordion('🧭 歲運互動盤', body, true);
+        const board = document.getElementById('iaBoard');
+        board.classList.toggle('nat-only', S.scope === 'nat');
+        iaRenderAll(true);
+        if (window.ResizeObserver) { if (S.ro) S.ro.disconnect(); S.ro = new ResizeObserver(() => iaDrawArcs()); S.ro.observe(board); }
+    }
+    function iaCurrent() {
+        const S = window.__ia, c = S.ctx, dy = c.daYunData.filter(d => d.index > 0)[S.di];
+        const ln = iaYearGZ(S.year), lm = iaMonthsOf(S.year)[S.mk];
+        return { dy, ln, lm, P: iaPillars(c.baseGans, c.baseZhis, [
+            { key: 'dy', label: '大運', gan: dy.gan, zhi: dy.zhi }, { key: 'ln', label: '流年', gan: ln.gan, zhi: ln.zhi }, { key: 'lm', label: '流月', gan: lm.gan, zhi: lm.zhi }]) };
+    }
+    function iaRenderAll(scrollStrips) {
+        const S = window.__ia, c = S.ctx, cur = iaCurrent();
+        const dys = c.daYunData.filter(d => d.index > 0);
+        const col = (g) => elementColors[ganElementMap[g]], colz = (z) => elementColors[zhiElementMap[z]];
+        const ss = (g, isDm) => isDm ? '日主' : (SS_SHORT[getPreciseTenGod(g, c.dg)] || '');
+        // 小命盤：流月 流年 大運 ｜ 時 日 月 年
+        const P = cur.P, byKey = k => P.find(p => p.key === k);
+        const order = ['lm', 'ln', 'dy', 'n3', 'n2', 'n1', 'n0'];
+        const cells = order.map((k, i) => {
+            const p = byKey(k);
+            return `${i === 3 ? '<div class="ia-sep"></div>' : ''}<div class="ia-col ${p.natal ? '' : 'ext'}" data-key="${k}">
+                <div class="ia-lab">${p.label}</div>
+                <div class="ia-ss">${ss(p.gan, k === 'n2')}</div>
+                <div class="ia-g" style="color:${col(p.gan)}">${p.gan}</div>
+                <div class="ia-z" style="color:${colz(p.zhi)}">${p.zhi}</div>
+            </div>`;
+        }).join('');
+        const board = document.getElementById('iaBoard');
+        board.innerHTML = `<div class="ia-grid">${cells}</div><svg class="ia-svg" id="iaSvg"></svg>`;
+        // 滑動選擇條
+        document.getElementById('iaDyStrip').innerHTML = dys.map((d, i) => `<button class="ia-chip ${i === S.di ? 'on' : ''}" onclick="iaPickDy(${i})"><b><span style="color:${col(d.gan)}">${d.gan}</span><span style="color:${colz(d.zhi)}">${d.zhi}</span></b><small>${d.startAge}歲</small></button>`).join('');
+        const d0 = dys[S.di];
+        document.getElementById('iaLnStrip').innerHTML = Array.from({ length: 10 }, (_, k) => d0.startYear + k).map(y => { const g = iaYearGZ(y); return `<button class="ia-chip ${y === S.year ? 'on' : ''} ${y === c.currentYear ? 'now' : ''}" onclick="iaPickLn(${y})"><b><span style="color:${col(g.gan)}">${g.gan}</span><span style="color:${colz(g.zhi)}">${g.zhi}</span></b><small>${y}</small></button>`; }).join('');
+        document.getElementById('iaLmStrip').innerHTML = iaMonthsOf(S.year).map(m => `<button class="ia-chip ${m.k === S.mk ? 'on' : ''}" onclick="iaPickLm(${m.k})"><b><span style="color:${col(m.gan)}">${m.gan}</span><span style="color:${colz(m.zhi)}">${m.zhi}</span></b><small>${m.m}月</small></button>`).join('');
+        S.needCenter = true;
+        S.rels = iaScan(P);
+        iaRenderList();
+        iaDrawArcs();
+    }
+    function iaVisible(r) { const S = window.__ia; return S.cats[r.cat] && (S.scope === 'all' || (S.scope === 'nat') === r.natal); }
+    function iaRenderList() {
+        const S = window.__ia, rels = S.rels.filter(iaVisible);
+        const ext = rels.filter(r => !r.natal), nat = rels.filter(r => r.natal);
+        const cur = iaCurrent();
+        document.getElementById('iaList').innerHTML =
+            (S.scope !== 'nat' ? `<div class="ia-gh">歲運引動<span>${cur.dy.gan}${cur.dy.zhi}運・${S.year}${cur.ln.gan}${cur.ln.zhi}・${cur.lm.m}月${cur.lm.gan}${cur.lm.zhi}</span></div>` +
+            (ext.length ? iaListHtml(ext) : '<div class="ia-empty">無</div>') : '') +
+            (S.scope !== 'ext' ? `<div class="ia-gh">原局</div>` + (nat.length ? iaListHtml(nat) : '<div class="ia-empty">無</div>') : '');
+        document.querySelectorAll('#iaList .ia-li').forEach(el => el.addEventListener('click', () => iaHl(el.dataset.id)));
+    }
+    function iaDrawArcs() {
+        const S = window.__ia, board = document.getElementById('iaBoard'), svg = document.getElementById('iaSvg');
+        if (!board || !svg || !S.rels) return;
+        const br = board.getBoundingClientRect(); if (!br.width) return;
+        if (S.needCenter) { S.needCenter = false; ['iaDyStrip', 'iaLnStrip', 'iaLmStrip'].forEach(id => { const st = document.getElementById(id), on = st && st.querySelector('.on'); if (on) st.scrollLeft = on.offsetLeft - st.offsetLeft - st.clientWidth / 2 + on.clientWidth / 2; }); }
+        const pos = {};
+        board.querySelectorAll('.ia-col').forEach(el => {
+            const z = el.querySelector('.ia-z').getBoundingClientRect(), g = el.querySelector('.ia-g').getBoundingClientRect();
+            pos[el.dataset.key] = { x: z.left + z.width / 2 - br.left, zb: z.bottom - br.top + 3, gt: g.top - br.top - 3 };
+        });
+        const rels = S.rels.filter(iaVisible);
+        // 端點分散：同一柱有多條線時，依另一端方向左右錯開，避免全部擠在中心
+        const ends = {};
+        rels.forEach(r => r.members.forEach(m => {
+            const others = r.members.filter(o => o !== m), dir = others.reduce((t, o) => t + pos[o.key].x, 0) / others.length - pos[m.key].x;
+            const k = m.key + '|' + r.row; (ends[k] = ends[k] || []).push({ r, m, dir });
+        }));
+        const off = {};
+        Object.values(ends).forEach(list => {
+            list.sort((a, b) => a.dir - b.dir);
+            const n = list.length, step = Math.min(7, 28 / Math.max(1, n - 1));
+            list.forEach((e, i) => { off[e.r.id + '|' + e.m.key] = n > 1 ? (i - (n - 1) / 2) * step : 0; });
+        });
+        const X = (r, m) => pos[m.key].x + (off[r.id + '|' + m.key] || 0);
+        // 分道：區間不重疊的放同一層
+        const lanes = { zhi: [], gan: [] };
+        const placed = rels.map(r => {
+            const xs = r.members.map(m => X(r, m)).sort((a, b) => a - b);
+            const lo = xs[0] - 8, hi = xs[xs.length - 1] + 8, L = lanes[r.row];
+            let li = L.findIndex(lane => lane.every(([a, b]) => hi < a || lo > b));
+            if (li < 0) { L.push([]); li = L.length - 1; }
+            L[li].push([lo, hi]);
+            return { r, xs, li };
+        });
+        const nZ = lanes.zhi.length, nG = lanes.gan.length;
+        const padB = nZ ? 20 + nZ * 13 : 6, padT = nG ? 18 + nG * 13 : 0;
+        board.style.paddingBottom = padB + 'px'; board.style.paddingTop = padT + 'px';
+        // padding 改變後重新量位置
+        const br2 = board.getBoundingClientRect();
+        board.querySelectorAll('.ia-col').forEach(el => {
+            const z = el.querySelector('.ia-z').getBoundingClientRect(), g = el.querySelector('.ia-g').getBoundingClientRect();
+            Object.assign(pos[el.dataset.key], { zb: z.bottom - br2.top + 3, gt: g.top - br2.top - 3 });
+        });
+        let defs = '<defs>' + IA_CAT_ORDER.map(c => `<marker id="iaM-${c}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5.5" markerHeight="5.5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="${IA_CAT[c].color}"/></marker>`).join('') + '</defs>';
+        let arcs = '', labels = '';
+        placed.forEach(({ r, xs, li }, n) => {
+            const col = IA_CAT[r.cat].color, up = r.row === 'gan';
+            const y0 = up ? Math.min(...r.members.map(m => pos[m.key].gt)) : Math.max(...r.members.map(m => pos[m.key].zb));
+            const dpt = (up ? -1 : 1) * (13 + li * 13);
+            const segs = [];
+            for (let i = 0; i < xs.length - 1; i++) segs.push([xs[i], xs[i + 1]]);
+            const delay = (n * 0.06).toFixed(2), op = (r.natal && S.scope === 'all') ? 0.45 : 1;
+            segs.forEach(([a, b]) => {
+                const ax = a, bx = b, cx = (ax + bx) / 2;
+                arcs += `<path class="ia-arc ${r.natal ? 'nat' : ''}" data-id="${r.id}" d="M${ax.toFixed(1)},${y0.toFixed(1)} Q${cx.toFixed(1)},${(y0 + dpt * 2).toFixed(1)} ${bx.toFixed(1)},${y0.toFixed(1)}" stroke="${col}" marker-start="url(#iaM-${r.cat})" marker-end="url(#iaM-${r.cat})" style="--d:${delay}s; --o:${op};"/>`;
+            });
+            const lx = xs.length === 3 ? xs[1] : (xs[0] + xs[1]) / 2, ly = y0 + dpt;
+            const t = iaShort(r), w = t.length * 11 + 8;
+            labels += `<g class="ia-lbl ${r.natal ? 'nat' : ''}" data-id="${r.id}" style="--d:${delay}s; --o:${op};" onclick="iaHl('${r.id}')"><rect x="${(lx - w / 2).toFixed(1)}" y="${(ly - 8).toFixed(1)}" width="${w}" height="16" rx="5" fill="#141414" stroke="${col}" stroke-width="1"/><text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${col}">${t}</text></g>`;
+        });
+        svg.innerHTML = defs + arcs + labels;
+        if (S.hl) iaHl(S.hl, true);
+    }
+    function iaHl(id, keep) {
+        const S = window.__ia, board = document.getElementById('iaBoard');
+        S.hl = (!keep && S.hl === id) ? null : id;
+        board.classList.toggle('has-hl', !!S.hl);
+        board.querySelectorAll('.ia-arc, .ia-lbl').forEach(el => el.classList.toggle('hl', el.dataset.id === S.hl));
+        document.querySelectorAll('#iaList .ia-li').forEach(el => el.classList.toggle('hl', el.dataset.id === S.hl));
+        const r = S.hl && S.rels.find(x => x.id === S.hl);
+        board.querySelectorAll('.ia-col').forEach(el => el.classList.toggle('hl', !!r && r.members.some(m => m.key === el.dataset.key)));
+    }
+    function iaToggle(c) {
+        const S = window.__ia; S.cats[c] = S.cats[c] ? 0 : 1; S.hl = null;
+        document.querySelectorAll('.ia-cat').forEach(b => b.classList.toggle('on', !!S.cats[b.dataset.cat]));
+        iaRenderList(); iaDrawArcs();
+    }
+    function iaAll(on) {
+        const S = window.__ia; IA_CAT_ORDER.forEach(c => S.cats[c] = on ? 1 : 0); S.hl = null;
+        document.querySelectorAll('.ia-cat[data-cat]').forEach(b => b.classList.toggle('on', !!S.cats[b.dataset.cat]));
+        iaRenderList(); iaDrawArcs();
+    }
+    function iaScope(k) {
+        const S = window.__ia; S.scope = k; S.hl = null;
+        document.querySelectorAll('.ia-scope').forEach(b => b.classList.toggle('on', b.dataset.scope === k));
+        document.getElementById('iaBoard').classList.toggle('nat-only', k === 'nat');
+        iaRenderList(); iaDrawArcs();
+    }
+    function iaPickDy(i) {
+        const S = window.__ia, dys = S.ctx.daYunData.filter(d => d.index > 0), Y = S.ctx.currentYear;
+        S.di = i; S.hl = null;
+        S.year = (Y >= dys[i].startYear && Y < dys[i].startYear + 10) ? Y : dys[i].startYear;
+        iaRenderAll();
+    }
+    function iaPickLn(y) { const S = window.__ia; S.year = y; S.hl = null; iaRenderAll(); }
+    function iaPickLm(k) { const S = window.__ia; S.mk = k; S.hl = null; iaRenderAll(); }
 
     function getOriginalChongXingHai(pillars) {
         let alerts = [];
@@ -1669,7 +2192,25 @@
         return [...new Set(alerts)];
     }
 
-    function checkLiunianHeju(tGan, tZhi, baseGans, baseZhis, pillarNames) {
+    // 大運＋流年＋原局 三方湊成三合／三會（需大運、流年各補一字，原局提供其餘）
+    function getYunNianTriJu(dyZhi, lnZhi, baseZhis) {
+        if (!dyZhi || !lnZhi || dyZhi === '-' || lnZhi === '-' || dyZhi === lnZhi) return [];
+        const list = [
+            ['三合', ['申','子','辰'], '水'], ['三合', ['亥','卯','未'], '木'], ['三合', ['寅','午','戌'], '火'], ['三合', ['巳','酉','丑'], '金'],
+            ['三會', ['寅','卯','辰'], '木'], ['三會', ['巳','午','未'], '火'], ['三會', ['申','酉','戌'], '金'], ['三會', ['亥','子','丑'], '水']
+        ];
+        const out = [];
+        list.forEach(([kind, zs, el]) => {
+            if (!zs.includes(dyZhi) || !zs.includes(lnZhi)) return;
+            if (baseZhis.includes(dyZhi) || baseZhis.includes(lnZhi)) return; // 其中一方原局已有，屬單方引動，已另外偵測
+            const rest = zs.find(z => z !== dyZhi && z !== lnZhi);
+            if (!baseZhis.includes(rest)) return;
+            out.push({ kind, el, zs, dy: dyZhi, ln: lnZhi, base: rest });
+        });
+        return out;
+    }
+
+    function checkLiunianHeju(tGan, tZhi, baseGans, baseZhis, pillarNames, dyZhi) {
         let alerts = [];
         for(let i=0; i<4; i++) {
             if(ganHeMap[tGan] === baseGans[i]) alerts.push(`<span class="tag tag-liuhe">合${pillarNames[i]}干</span>`);
@@ -1699,6 +2240,7 @@
                 }
             }
         });
+        getYunNianTriJu(dyZhi, tZhi, baseZhis).forEach(j => alerts.push(`<span class="tag tag-${j.kind === '三會' ? 'sanhui' : 'sanhe'}" title="大運${j.dy}＋流年${j.ln}＋原局${j.base}">運年${j.kind}${j.el}</span>`));
         return [...new Set(alerts)].join(' ');
     }
     
@@ -3532,30 +4074,43 @@
             let useTrueSolar = document.getElementById('useTrueSolar').checked;
             let useSplitZi = document.getElementById('useSplitZi').checked;
 
-            let dateObj = new Date(y, m - 1, d, h, min, 0);
+            // 出生地換算：當地鐘錶時間 → 扣夏令 → UTC
+            const L = getBirthLoc();
+            const stdOff = isNaN(L.std) ? 480 : L.std;
+            const wallMs = Date.UTC(y, m - 1, d, h, min);
+            const utcMs = wallMs - (stdOff + L.dst) * 60000;
+            // 年、月柱（節氣交接）與大運：用絕對時刻，換成東八區時間對照節氣表
+            const absD = new Date(utcMs + 480 * 60000);
+            const solarAbs = Solar.fromYmdHms(absD.getUTCFullYear(), absD.getUTCMonth() + 1, absD.getUTCDate(), absD.getUTCHours(), absD.getUTCMinutes(), 0);
+            const baZiAbs = solarAbs.getLunar().getEightChar();
+            // 日、時柱：用出生地的當地時間（標準時間，或真太陽時）
+            let localMs = wallMs - L.dst * 60000;
+            const p2 = (n) => String(n).padStart(2, '0');
+            const locNote = (stdOff !== 480 || L.dst) ? `出生地 ${L.place || ''}（${fmtOff(stdOff)}${L.dst ? `，夏令 +${L.dst / 60}h` : ''}）${L.dst ? ` → 當地標準時間 ${p2(new Date(localMs).getUTCHours())}:${p2(new Date(localMs).getUTCMinutes())}` : ''}` : '';
 
             if (useTrueSolar) {
-                let lon = parseFloat(document.getElementById('longitude').value) || 120;
-                let lonDiff = (lon - 120) * 4; 
-                
-                let isLeap = (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
-                let daysInMonth = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                const lon = L.lon;
+                const lonDiff = lon * 4 - stdOff;
+                const isLeap = (y % 4 === 0 && y % 100 !== 0) || (y % 400 === 0);
+                const daysInMonth = [0, 31, isLeap ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
                 let dayOfYear = d;
-                for(let i=1; i<m; i++) dayOfYear += daysInMonth[i];
-                
-                let B = (360 / 365.24) * (dayOfYear - 81) * (Math.PI / 180);
-                let eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
-                
-                let totalOffset = lonDiff + eot;
-                
-                dateObj.setMinutes(dateObj.getMinutes() + totalOffset);
-                
-                let sign = totalOffset >= 0 ? '+' : '';
+                for (let i = 1; i < m; i++) dayOfYear += daysInMonth[i];
+                const B = (360 / 365.24) * (dayOfYear - 81) * (Math.PI / 180);
+                const eot = 9.87 * Math.sin(2 * B) - 7.53 * Math.cos(B) - 1.5 * Math.sin(B);
+                const totalOffset = lonDiff + eot;
+                localMs += totalOffset * 60000;
+                const t = new Date(localMs);
+                const sign = totalOffset >= 0 ? '+' : '';
                 solarInfoHtml = `<div style="text-align:center; margin-bottom:15px; font-size:13px; color:#aaa; background:#1a1a1a; padding:8px 12px; border-radius:6px; border:1px solid #333;">
+                    ${locNote ? `<span style="color:#ccc;">${locNote}</span><br>` : ''}
                     <b style="color:#00d2ff;">☀️ 真太陽時校正：</b> 經度 ${lon}° (時差 ${sign}${totalOffset.toFixed(1)} 分鐘)<br>
-                    <span style="color:#e0e0e0; margin-top: 4px; display: inline-block;">實際出生時間換算：${dateObj.getFullYear()}年${dateObj.getMonth() + 1}月${dateObj.getDate()}日 ${dateObj.getHours()}時${dateObj.getMinutes()}分</span>
+                    <span style="color:#e0e0e0; margin-top: 4px; display: inline-block;">當地真太陽時：${t.getUTCFullYear()}年${t.getUTCMonth() + 1}月${t.getUTCDate()}日 ${t.getUTCHours()}時${t.getUTCMinutes()}分</span>
                 </div>`;
+            } else if (locNote) {
+                solarInfoHtml = `<div style="text-align:center; margin-bottom:15px; font-size:13px; color:#ccc; background:#1a1a1a; padding:8px 12px; border-radius:6px; border:1px solid #333;">${locNote}</div>`;
             }
+            const lt = new Date(localMs);
+            let dateObj = new Date(lt.getUTCFullYear(), lt.getUTCMonth(), lt.getUTCDate(), lt.getUTCHours(), lt.getUTCMinutes(), 0);
 
             y = dateObj.getFullYear();
             m = dateObj.getMonth() + 1;
@@ -3564,14 +4119,13 @@
             let finalMin = dateObj.getMinutes();
 
             const solar = Solar.fromYmdHms(y, m, d, h, finalMin, 0);
-            birthSolarForJieQi = solar;
-            const lunar = solar.getLunar();
-            const baZi = lunar.getEightChar();
-            
-            yg = baZi.getYearGan(); yz = baZi.getYearZhi();
-            mg = baZi.getMonthGan(); mz = baZi.getMonthZhi();
+            birthSolarForJieQi = solarAbs;
+            const baZi = solar.getLunar().getEightChar();
+
+            yg = baZiAbs.getYearGan(); yz = baZiAbs.getYearZhi();
+            mg = baZiAbs.getMonthGan(); mz = baZiAbs.getMonthZhi();
             tg = baZi.getTimeGan(); tz = baZi.getTimeZhi();
-            
+
             // 【早晚子時 絕對控制邏輯】
             if (h === 23) {
                 if (useSplitZi) {
@@ -3593,9 +4147,9 @@
                 dz = baZi.getDayZhi();
             }
 
-            startYearOfLife = y;
+            startYearOfLife = absD.getUTCFullYear();
 
-            const yun = baZi.getYun(gender);
+            const yun = baZiAbs.getYun(gender);
             yun.getDaYun().forEach(dy => {
                 if (dy.getIndex() > 0 && dy.getIndex() <= 10) {
                     const gz = dy.getGanZhi();
@@ -3859,7 +4413,7 @@
                 };
                 const linePath = smooth(pts);
                 const areaPath = `${linePath} L${pts[pts.length - 1].x.toFixed(1)},${baseY} L${pts[0].x.toFixed(1)},${baseY} Z`;
-                let svg = `<svg class="lw-svg" viewBox="0 0 ${w} ${h}" width="100%" height="auto" style="display:block; max-width:100%; overflow:visible;">`;
+                let svg = `<svg class="lw-svg" viewBox="0 0 ${w} ${h}" width="100%" style="display:block; max-width:100%; overflow:visible;">`;
                 svg += `<defs>
                         <linearGradient id="lwArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${T.c}" stop-opacity="0.35"/><stop offset="100%" stop-color="${T.c}" stop-opacity="0"/></linearGradient>
                         <linearGradient id="lwLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="${T.c2}"/><stop offset="50%" stop-color="${T.c3}"/><stop offset="100%" stop-color="${T.c2}"/></linearGradient>
@@ -4777,58 +5331,25 @@
             </div>
         `, false);
 
-        let hebanAlerts = [];
-        for(let i=0; i<3; i++) {
-            for(let j=i+1; j<4; j++) {
-                if(ganHeMap[originalPillars[i].gan] === originalPillars[j].gan) {
-                    let dist = (j - i === 1) ? '相鄰' : (j - i === 2 ? '隔柱' : '遙隔');
-                    if (dist !== '遙隔') hebanAlerts.push(`<span style="color:#00d2ff;">• 原局天干：${originalPillars[i].name}「${originalPillars[i].gan}」與 ${originalPillars[j].name}「${originalPillars[j].gan}」合絆 (${dist})</span>`);
-                }
-                if(zhiHeMap[originalPillars[i].zhi] === originalPillars[j].zhi) {
-                    let dist = (j - i === 1) ? '相鄰' : (j - i === 2 ? '隔柱' : '遙隔');
-                    if (dist !== '遙隔') hebanAlerts.push(`<span style="color:#00d2ff;">• 原局地支：${originalPillars[i].name}「${originalPillars[i].zhi}」與 ${originalPillars[j].name}「${originalPillars[j].zhi}」合絆 (${dist})</span>`);
-                }
-            }
-        }
-        hebanAlerts.push(...getOriginalHeju(baseZhis));
-
-        let yunHebanAlerts = []; 
-        originalPillars.forEach(p => {
-            if (dyGan !== '-' && ganHeMap[dyGan] === p.gan) yunHebanAlerts.push(`<span style="color:#f39c12;">• 大運天干「${dyGan}」合絆 ${p.name}「${p.gan}」 (${p.ganShiShen})</span>`);
-            if (dyZhi !== '-' && zhiHeMap[dyZhi] === p.zhi) yunHebanAlerts.push(`<span style="color:#f39c12;">• 大運地支「${dyZhi}」合絆 ${p.name}「${p.zhi}」</span>`);
-            if (lnGan !== '-' && ganHeMap[lnGan] === p.gan) yunHebanAlerts.push(`<span style="color:#2ed573;">• 本年天干「${lnGan}」合絆 ${p.name}「${p.gan}」 (${p.ganShiShen})</span>`);
-            if (lnZhi !== '-' && zhiHeMap[lnZhi] === p.zhi) yunHebanAlerts.push(`<span style="color:#2ed573;">• 本年地支「${lnZhi}」合絆 ${p.name}「${p.zhi}」</span>`);
-        });
-        
-        if (dyZhi !== '-') yunHebanAlerts.push(...getExternalHeju(dyZhi, baseZhis, '大運地支'));
-        if (lnZhi !== '-') yunHebanAlerts.push(...getExternalHeju(lnZhi, baseZhis, '本年地支'));
-
-        document.getElementById('hebanOutput').innerHTML = wrapAccordion('🔗 會合局偵測', `
+        // ===== 會合局／刑沖害：原局＋目前大運、流年、流月，一起掃描並標出互動柱 =====
+        const nowBz = Solar.fromDate(new Date()).getLunar().getEightChar();
+        const lmGan = nowBz.getMonthGan(), lmZhi = nowBz.getMonthZhi();
+        const nowP = iaPillars(baseGans, baseZhis, [
+            { key: 'dy', label: '大運', gan: dyGan, zhi: dyZhi }, { key: 'ln', label: '流年', gan: lnGan, zhi: lnZhi }, { key: 'lm', label: '流月', gan: lmGan, zhi: lmZhi }]);
+        const nowRels = iaScan(nowP);
+        const pick = (cats, natal, ganType) => nowRels.filter(r => r.natal === natal && (cats.includes(r.cat) || (r.cat === 'gan' && r.type === ganType)));
+        const secHtml = (natRels, extRels, emptyNat, emptyExt) => `
             <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
-                <div style="font-size: 13px; line-height: 1.8;">
-                    <b style="color:#ccc;">【原局內建】</b><br>
-                    ${hebanAlerts.length > 0 ? hebanAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">無合絆現象</span>'}<br><br>
-                    <b style="color:#ccc;">【本年引動 ( ${currentYear}年)】</b><br>
-                    ${yunHebanAlerts.length > 0 ? yunHebanAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">本年無合絆現象</span>'}
-                </div>
-            </div>
-        `, false);
-        
-        let originalChongXingAlerts = getOriginalChongXingHai(originalPillars);
-        let yunChongXingAlerts = []; 
-        if (dyZhi !== '-') yunChongXingAlerts.push(...getExternalChongXingHai(dyZhi, originalPillars, '大運地支'));
-        if (lnZhi !== '-') yunChongXingAlerts.push(...getExternalChongXingHai(lnZhi, originalPillars, '本年地支'));
-
-        document.getElementById('chongxingOutput').innerHTML = wrapAccordion('⚔️ 刑沖害偵測', `
-            <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
-                <div style="font-size: 13px; line-height: 1.8;">
-                    <b style="color:#ccc;">【原局內建】</b><br>
-                    ${originalChongXingAlerts.length > 0 ? originalChongXingAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">原局無明顯刑沖害</span>'}<br><br>
-                    <b style="color:#ccc;">【本年引動 ( ${currentYear}年)】</b><br>
-                    ${yunChongXingAlerts.length > 0 ? yunChongXingAlerts.join('<br>') : '<span style="color:#888; padding-left: 10px;">本年無重大刑沖害</span>'}
-                </div>
-            </div>
-        `, false);
+                <div class="ia-gh" style="margin-top:0;">原局內建</div>
+                ${natRels.length ? iaListHtml(natRels) : `<div class="ia-empty">${emptyNat}</div>`}
+                <div class="ia-gh">歲運引動<span>${dyGan}${dyZhi}運・${currentYear}${lnGan}${lnZhi}・${lmGan}${lmZhi}月</span></div>
+                ${extRels.length ? iaListHtml(extRels) : `<div class="ia-empty">${emptyExt}</div>`}
+            </div>`;
+        document.getElementById('hebanOutput').innerHTML = wrapAccordion('🔗 會合局偵測',
+            secHtml(pick(['he', 'ju'], true, '干合'), pick(['he', 'ju'], false, '干合'), '無合絆現象', '無合會引動'), false);
+        document.getElementById('chongxingOutput').innerHTML = wrapAccordion('⚔️ 刑沖害偵測',
+            secHtml(pick(['chong', 'xing', 'hai', 'po'], true, '干沖'), pick(['chong', 'xing', 'hai', 'po'], false, '干沖'), '原局無明顯刑沖害', '無刑沖害破引動'), false);
+        try { renderInteractionPanel({ baseGans, baseZhis, dg, daYunData, currentYear }); } catch (e) { console.warn('歲運互動盤失敗', e); }
 
         const checkLiunianChongXingHai = (tGan, tZhi, baseGans, baseZhis, pNamesList) => {
             let alerts = [];
@@ -4883,8 +5404,7 @@
                         <div style="font-size: 11px; color: #aaa;">${dy.startAge}歲</div>
                         <div style="font-size: 18px; font-weight: bold; margin-top: 5px;"><span style="color:${cGan}">${dy.gan}</span><span style="color:${cZhi}">${dy.zhi}</span></div>
                         <div style="min-height: 20px; margin-top: 6px; display:flex; flex-direction:column; gap:3px;">
-                            ${checkDayunChongXing(dy.gan, dy.zhi, baseGans, baseZhis, pNames)}
-                            ${checkDayunHeju(dy.zhi, baseZhis)}
+                            ${(() => { const R = iaScan(iaPillars(baseGans, baseZhis, [{ key: 'dy', label: '大運', gan: dy.gan, zhi: dy.zhi }])); return iaTagsFor(R, 'dy', ['chong', 'xing', 'hai', 'po', 'he', 'ju', 'gan']); })()}
                         </div>
                     </div>`;
             }
@@ -4897,7 +5417,7 @@
         dlHtml += `<div class="chart-title" style="margin-top: 30px;">流年運勢 (${daYunData.length > 0 ? '起運 ' + daYunData[0].startAge + '歲' : '0歲'} 起推演，依大運分段，點擊展開查看該 10 年)</div>`;
 
         // 產生單一年份的 <tr>（欄位維持原本 6 欄，資料完全不刪減）
-        const buildLiunianRow = (i) => {
+        const buildLiunianRow = (i, dyZhi, dyGanRow) => {
             const tempSolar = Solar.fromYmd(i, 7, 1);
             const tempBaZi = tempSolar.getLunar().getEightChar();
             const tempGanZhi = tempBaZi.getYear();
@@ -4907,14 +5427,15 @@
             const tgGan = getTenGodForElement(elGan, dayElement).split(' ')[0], tgZhi = getTenGodForElement(elZhi, dayElement).split(' ')[0];
             const age = i - startYearOfLife;
             const highlightStyle = (i === currentYear) ? 'background-color: rgba(0, 210, 255, 0.15); border-left: 3px solid var(--accent);' : '';
+            const rowRels = iaScan(iaPillars(baseGans, baseZhis, [{ key: 'dy', label: '大運', gan: dyGanRow || '', zhi: dyZhi || '' }, { key: 'ln', label: '流年', gan: tempGan, zhi: tempZhi }]));
             const currMarker = (i === currentYear) ? ' <span style="font-size:10px; background:var(--accent); color:#000; padding:1px 4px; border-radius:3px;">今年</span>' : '';
             return `
                 <tr style="${highlightStyle}" id="year-${i}">
                     <td>${i}${currMarker}<br><span style="font-size:11px; color:#888;">${age}歲</span></td>
                     <td style="font-weight: bold; font-size: 16px;"><span style="color:${cGan}">${tempGan}</span><span style="color:${cZhi}">${tempZhi}</span></td>
                     <td style="color:${cGan}">${tgGan}</td><td style="color:${cZhi}">${tgZhi}</td>
-                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${checkLiunianChongXingHai(tempGan, tempZhi, baseGans, baseZhis, pNames)}</div></td>
-                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${checkLiunianHeju(tempGan, tempZhi, baseGans, baseZhis, pNames)}</div></td>
+                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${iaTagsFor(rowRels, 'ln', ['chong', 'xing', 'hai', 'po']) + ' ' + iaTagsFor(rowRels.filter(r => r.type === '干沖'), 'ln', ['gan'])}</div></td>
+                    <td><div style="display:flex; flex-direction:column; gap:3px; align-items:center;">${iaTagsFor(rowRels, 'ln', ['he', 'ju']) + ' ' + iaTagsFor(rowRels.filter(r => r.type === '干合'), 'ln', ['gan'])}</div></td>
                 </tr>
             `;
         };
@@ -4938,7 +5459,7 @@
                 : `${startAge}~${endAge}歲　${segStart}–${segEnd}`;
 
             let rowsHtml = '';
-            for (let i = segStart; i <= segEnd; i++) rowsHtml += buildLiunianRow(i);
+            for (let i = segStart; i <= segEnd; i++) rowsHtml += buildLiunianRow(i, dyInfo ? dyInfo.zhi : '', dyInfo ? dyInfo.gan : '');
 
             dlHtml += `
                 <details class="acc-section" style="margin-top: 8px;" ${containsCurrentYear ? 'open' : ''}>
