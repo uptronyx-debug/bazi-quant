@@ -854,6 +854,21 @@
         .ia-gh-btw { color:#999; }
         .ia-btw .ia-li { color:#aaa; }
         .ia-btw .ia-tag { opacity:.7; border-style:dashed; }
+        .ia-board.tt .ia-g { margin-bottom:56px; }
+        .ia-arc.tt-arc { stroke-dasharray:5 4; pointer-events:stroke; cursor:pointer; }
+        .ia-arc.tt-arc.q2 { stroke-dasharray:2 4; }
+        .ia-modes .ia-scope { font-size:13px; padding:6px 16px; }
+        .ia-tthint { font-size:12px; color:#9aa4ad; background:rgba(255,255,255,.04); border-radius:6px; padding:6px 8px; margin:2px 0 6px; }
+        .tt-sum { display:flex; flex-wrap:wrap; gap:6px; margin:2px 0 8px; }
+        .tt-sc { display:inline-flex; align-items:baseline; gap:4px; padding:4px 9px; border-radius:8px; background:#1a1a1a; border:1px solid color-mix(in srgb, var(--c) 45%, transparent); }
+        .tt-sc b { color:var(--c); font-size:14px; }
+        .tt-sc i { font-style:normal; font-size:11.5px; font-weight:800; }
+        .tt-sc small { color:#777; font-size:10.5px; }
+        .ia-arc.tt-arc.up { animation-direction: normal, reverse; }
+        .ia-cat-br { flex-basis:100%; height:0; }
+        .tt-dirh { font-size:12px; color:#00d2ff; font-weight:700; margin:6px 0 2px 2px; }
+        .tt-sc i.nil { color:#555; }
+        .tt-li b { font-weight:700; }
         .ia-empty { font-size:12.5px; color:#666; padding:2px 6px; }
     </style>
 </head>
@@ -1802,7 +1817,9 @@
         return [...new Set(tags)].join(' ');
     }
     function iaListHtml(rels) {
-        return rels.map(r => `<div class="ia-li" data-id="${r.id}"><span class="ia-tag" style="--c:${IA_CAT[r.cat].color}">${iaShort(r)}</span><span>${iaText(r)}</span></div>`).join('\n');
+        return rels.map(r => r.row === 'tt'
+            ? `<div class="ia-li tt-li" data-id="${r.id}"><span>${ttText(r, r._dir)}</span></div>`
+            : `<div class="ia-li" data-id="${r.id}"><span class="ia-tag" style="--c:${IA_CAT[r.cat].color}">${iaShort(r)}</span><span>${iaText(r)}</span></div>`).join('\n');
     }
 
     // ===== 歲運互動盤：小命盤＋大運／流年／流月滑動＋地支箭頭動畫 =====
@@ -1820,10 +1837,95 @@
     function iaHidden(z) { const hw = zhiHiddenWeights[z] || {}; return Object.keys(hw).sort((a, b) => hw[b] - hw[a]); }
     function iaYearGZ(year) { const gz = Solar.fromYmd(year, 7, 1).getLunar().getEightChar().getYear(); return { gan: gz.charAt(0), zhi: gz.charAt(1) }; }
 
+
+    // ===== 通根透干：天干 ⇄ 地支藏干（同五行）=====
+    const TT_CAT = { q0: { name: '本氣', color: '#ffd166' }, q1: { name: '中氣', color: '#8ecae6' }, q2: { name: '餘氣', color: '#b8b8b8' } };
+    const TT_ORDER = ['q0', 'q1', 'q2'];
+    function ttScan(P) {
+        const out = [];
+        P.forEach(a => { if (!a.gan || a.gan === '-') return; const ea = ganElementMap[a.gan];
+            P.forEach(b => { if (!b.zhi || b.zhi === '-') return;
+                iaHidden(b.zhi).forEach((hg, qi) => {
+                    if (ganElementMap[hg] !== ea) return;
+                    let pos = '';
+                    if (a.natal && b.natal) pos = b.idx === 1 ? '月令' : (a === b ? '自坐' : (Math.abs(a.idx - b.idx) === 1 ? '鄰柱' : (Math.abs(a.idx - b.idx) === 2 ? '隔柱' : '遙隔')));
+                    else if (a === b) pos = '自坐';
+                    out.push({ id: 'tt' + out.length, cat: 'q' + qi, row: 'tt', type: ['本氣', '中氣', '餘氣'][qi], ga: a, zb: b, hg, qi, pos,
+                        members: a === b ? [a] : [a, b], natal: a.natal && b.natal, between: !a.natal && !b.natal });
+                });
+            });
+        });
+        return out;
+    }
+    // 十神短名：日干＝日主
+    function ttSS(g, isDay) { const c = window.__ia && window.__ia.ctx; if (isDay) return '日主'; return c ? (getPreciseTenGod(g, c.dg) || g) : g; }
+    const ttSSc = (g) => `<b style="color:${elementColors[ganElementMap[g]]}">${ttSS(g)}</b>`;
+    function ttText(r, dir) {
+        const a = r.ga, b = r.zb, isDay = a.key === 'n2';
+        const gName = isDay ? '日主' : (a.natal ? a.short + '干' : a.short);
+        const zn = b.natal ? b.short + '支' : b.short;
+        const pos = r.pos ? '・' + r.pos : '';
+        if (dir === 'tou') {
+            // 透干：地支藏干 → 透出到哪一柱天干
+            return `${zn}「${b.zhi}」${r.type}「${ttSSc(r.hg)}」透出 ${gName}${pos}`;
+        }
+        // 通根：天干十神 → 扎根到哪一柱地支
+        return `${isDay ? '<b>日主</b>' : `${gName}「${ttSSc(a.gan)}」`} 通根 ${zn}「${b.zhi}」・${r.type}${r.hg !== a.gan ? `（藏${ttSSc(r.hg)}）` : ''}${pos}`;
+    }
+    // 強度評級（沿用天地通透、通透雷達的分級）
+    const TT_GRADE = [[100, 'SSS', '#ff5252'], [80, 'S', '#ff9800'], [70, 'A', '#2ed573'], [50, 'B', '#00d2ff'], [20, 'C', '#a29bfe']];
+    const ttGradeOf = (sc) => TT_GRADE.find(g => sc >= g[0]) || TT_GRADE[TT_GRADE.length - 1];
+    function ttScore(r, mode) {
+        const a = r.ga, b = r.zb, q = r.qi;
+        if (a.natal && b.natal) {
+            if (mode === 'tou') { // 藏干透干排名
+                if (b.idx === 1) return q === 0 ? 100 : 80;
+                if (q === 0) return a === b ? 70 : 50;
+                return 20;
+            }
+            // 天干通根：月令強根／自坐強根／有根／弱根
+            const dist = Math.abs(a.idx - b.idx);
+            if (b.idx === 1 && q === 0) return 100;
+            if (dist === 0 && q === 0) return 80;
+            if ((dist === 0 && q === 1) || (dist === 1 && q === 0)) return 70;
+            if (q === 0) return 50;
+            return 20;
+        }
+        if (!a.natal && b.natal) return b.idx === 1 ? (q === 0 ? 100 : 80) : (q === 0 ? 70 : 20); // 歲運天干引透原局
+        return q === 0 ? 70 : (q === 1 ? 50 : 20); // 原局天干於歲運地支得根（或歲運間）
+    }
+    const iaMode = () => (window.__ia && window.__ia.mode) || 'rel';
+    const iaCatDict = () => iaMode() !== 'rel' ? TT_CAT : IA_CAT;
+    const iaCatOrder = () => iaMode() !== 'rel' ? TT_ORDER : IA_CAT_ORDER;
+    const iaCatState = () => iaMode() !== 'rel' ? window.__ia.ttCats : window.__ia.cats;
+    function iaCatChipsHtml() {
+        const D = iaCatDict(), C = iaCatState();
+        return iaCatOrder().map(c => `<button class="ia-cat ${C[c] ? 'on' : ''}" data-cat="${c}" style="--c:${D[c].color}" onclick="iaToggle('${c}')">${D[c].name}</button>`).join('')
+            + `<div class="ia-grp ia-grp-act"><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(1)">全開</button><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(0)">全關</button></div>`;
+    }
+    function iaTtDir(k) {
+        const S = window.__ia; S.ttDir[k] = S.ttDir[k] ? 0 : 1; S.hl = null;
+        document.querySelectorAll('.ia-dir').forEach(b => b.classList.toggle('on', !!S.ttDir[b.dataset.dir]));
+        iaRenderList(); iaDrawArcs();
+    }
+    // 模式鈕：刑沖合會為單選；通根、透干可單亮或雙亮（兩個都關掉時回到刑沖合會）
+    function iaModeOn(k) { const S = window.__ia; return k === 'rel' ? S.mode === 'rel' : (S.mode === 'tt' && !!S.ttDir[k]); }
+    function iaSetMode(k) {
+        const S = window.__ia, prev = S.mode;
+        if (k === 'rel') { if (prev === 'rel') return; S.mode = 'rel'; }
+        else if (prev === 'rel') { S.mode = 'tt'; S.ttDir = { tg: 0, tou: 0 }; S.ttDir[k] = 1; }
+        else { S.ttDir[k] = S.ttDir[k] ? 0 : 1; if (!S.ttDir.tg && !S.ttDir.tou) S.mode = 'rel'; }
+        S.hl = null;
+        document.querySelectorAll('.ia-mode').forEach(b => b.classList.toggle('on', iaModeOn(b.dataset.mode)));
+        if (prev === S.mode && S.mode === 'tt') { iaRenderList(); iaDrawArcs(); return; }
+        document.querySelector('.ia-cats').innerHTML = iaCatChipsHtml();
+        iaRenderAll();
+    }
+
     function renderInteractionPanel(ctx) {
         const S = window.__ia = window.__ia || { cats: { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1 }, scope: 'all' };
         if (S.cats.ju === undefined || S.cats.wuhe !== undefined) { S.cats = { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1 }; }
-        S.scope = S.scope || 'all'; if (!['on', 'dim'].includes(S.bright)) S.bright = 'on'; S.hl = null; S.off = S.off || { dy: 0, ln: 0, lm: 0 };
+        S.scope = S.scope || 'all'; S.mode = (S.mode === 'tg' || S.mode === 'tou') ? 'tt' : (S.mode || 'rel'); S.ttDir = S.ttDir || { tg: 1, tou: 1 }; S.ttCats = S.ttCats || { q0: 1, q1: 1, q2: 1 }; if (!['on', 'dim'].includes(S.bright)) S.bright = 'on'; S.hl = null; S.off = S.off || { dy: 0, ln: 0, lm: 0 };
         S.ctx = ctx;
         const dys = ctx.daYunData.filter(d => d.index > 0);
         const Y = ctx.currentYear;
@@ -1831,8 +1933,8 @@
         S.di = di; S.year = (Y >= dys[di].startYear && Y < dys[di].startYear + 10) ? Y : dys[di].startYear;
         const nowMz = Solar.fromDate(new Date()).getLunar().getEightChar().getMonthZhi();
         S.mk = Math.max(0, iaMonthsOf(S.year).findIndex(x => x.zhi === nowMz));
-        const catChips = IA_CAT_ORDER.map(c => `<button class="ia-cat ${S.cats[c] ? 'on' : ''}" data-cat="${c}" style="--c:${IA_CAT[c].color}" onclick="iaToggle('${c}')">${IA_CAT[c].name}</button>`).join('')
-            + `<div class="ia-grp ia-grp-act"><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(1)">全開</button><button class="ia-cat ia-act" style="--c:#9aa4ad" onclick="iaAll(0)">全關</button></div>`;
+        const catChips = iaCatChipsHtml();
+        const modeSeg = [['rel', '刑沖合會'], ['tg', '⬇ 通根'], ['tou', '⬆ 透干']].map(([k, t]) => `<button class="ia-scope ia-mode ${iaModeOn(k) ? 'on' : ''}" data-mode="${k}" onclick="iaSetMode('${k}')">${t}</button>`).join('');
         const scopeSeg = [['all', '全部'], ['ext', '只看歲運'], ['nat', '只看原局']].map(([k, t]) => `<button class="ia-scope ${S.scope === k ? 'on' : ''}" data-scope="${k}" onclick="iaScope('${k}')">${t}</button>`).join('');
         const brightSeg = [['on', '全亮'], ['dim', '全暗'], ['focus', '聚焦']].map(([k, t]) => `<button class="ia-scope ia-bri ${iaBriMode() === k ? 'on' : ''}" data-bright="${k}" onclick="iaBright('${k}')">${t}</button>`).join('');
         const body = `<div class="ia-wrap">
@@ -1845,6 +1947,7 @@
                 </div>
             </div>
             <div class="ia-right">
+                <div class="ia-segrow"><div class="ia-scopes ia-modes">${modeSeg}</div></div>
                 <div class="ia-segrow"><div class="ia-scopes">${scopeSeg}</div><div class="ia-scopes" title="線條亮度">💡${brightSeg}</div></div>
                 <div class="ia-cats">${catChips}</div>
                 <div class="ia-list" id="iaList"></div>
@@ -1887,21 +1990,44 @@
         document.getElementById('iaLnStrip').innerHTML = Array.from({ length: 10 }, (_, k) => d0.startYear + k).map(y => { const g = iaYearGZ(y); return `<button class="ia-chip ${y === S.year ? 'on' : ''} ${y === c.currentYear ? 'now' : ''}" onclick="iaPickLn(${y})"><b><span style="color:${col(g.gan)}">${g.gan}</span><span style="color:${colz(g.zhi)}">${g.zhi}</span></b><small>${y}</small></button>`; }).join('');
         document.getElementById('iaLmStrip').innerHTML = iaMonthsOf(S.year).map(m => `<button class="ia-chip ${m.k === S.mk ? 'on' : ''}" onclick="iaPickLm(${m.k})"><b><span style="color:${col(m.gan)}">${m.gan}</span><span style="color:${colz(m.zhi)}">${m.zhi}</span></b><small>${m.jd ? m.jd + '起' : m.m + '月'}</small></button>`).join('');
         S.needCenter = true;
-        S.rels = iaScan(P.filter(p => !S.off[p.key]));
+        S.rels = S.mode !== 'rel' ? ttScan(P.filter(p => !S.off[p.key])) : iaScan(P.filter(p => !S.off[p.key]));
+        board.classList.toggle('tt', S.mode !== 'rel');
         document.querySelectorAll('.ia-pl[data-key]').forEach(b => b.classList.toggle('off', !!S.off[b.dataset.key]));
         iaRenderList();
         iaDrawArcs();
     }
-    function iaVisible(r) { const S = window.__ia; return S.cats[r.cat] && (S.scope === 'all' || (S.scope === 'nat') === r.natal); }
+    function iaVisible(r) { const S = window.__ia; return iaCatState()[r.cat] && (S.scope === 'all' || (S.scope === 'nat') === r.natal); }
     function iaRenderList() {
-        const S = window.__ia, rels = S.rels.filter(iaVisible).slice().sort((x, y) => IA_CAT_ORDER.indexOf(x.cat) - IA_CAT_ORDER.indexOf(y.cat));
-        const ext = rels.filter(r => !r.natal && !r.between), btw = rels.filter(r => r.between), nat = rels.filter(r => r.natal);
+        const S = window.__ia, isTT = S.mode !== 'rel';
+        const vis = S.rels.filter(iaVisible);
+        const dirs = isTT ? ['tg', 'tou'].filter(d => S.ttDir[d]) : [];
+        const mon = r => (r.zb.natal && r.zb.idx === 1) ? 0 : 1;
+        const sortTT = (list, d) => list.map(r => Object.assign(Object.create(r), { _dir: d })).sort((x, y) => mon(x) - mon(y) || x.qi - y.qi || (d === 'tg' ? x.ga.ord - y.ga.ord : x.zb.ord - y.zb.ord));
+        const sec = (list) => {
+            if (!isTT) return list.length ? iaListHtml(list.slice().sort((x, y) => iaCatOrder().indexOf(x.cat) - iaCatOrder().indexOf(y.cat))) : '<div class="ia-empty">無</div>';
+            if (!list.length || !dirs.length) return '<div class="ia-empty">無</div>';
+            return dirs.map(d => (dirs.length > 1 ? `<div class="tt-dirh">${d === 'tg' ? '⬇ 通根' : '⬆ 透干'}</div>` : '') + iaListHtml(sortTT(list, d))).join('');
+        };
+        const ext = vis.filter(r => !r.natal && !r.between), btw = vis.filter(r => r.between), nat = vis.filter(r => r.natal);
         const cur = iaCurrent();
-        document.getElementById('iaList').innerHTML =
+        let ttSum = '';
+        if (isTT && vis.length && dirs.length) {
+            // 十神強度：同一十神分別統計「通根（天干有根）」與「透干（藏干外顯）」
+            const agg = {};
+            const add = (name, el, d, sc) => { const a = agg[name] = agg[name] || { name, el, tg: 0, tou: 0, n: 0 }; a[d] = Math.max(a[d], sc); a.n++; };
+            vis.forEach(r => {
+                if (S.ttDir.tg) add(r.ga.key === 'n2' ? '日主' : ttSS(r.ga.gan), ganElementMap[r.ga.gan], 'tg', ttScore(r, 'tg'));
+                if (S.ttDir.tou) add(ttSS(r.hg), ganElementMap[r.hg], 'tou', ttScore(r, 'tou'));
+            });
+            ttSum = `<div class="tt-sum">${Object.values(agg).sort((a, b) => Math.max(b.tg, b.tou) - Math.max(a.tg, a.tou) || (b.tg + b.tou) - (a.tg + a.tou) || b.n - a.n).map(x => {
+                const part = (d, sym) => { if (!S.ttDir[d]) return ''; if (!x[d]) return `<i class="nil">${sym}—</i>`; const gr = ttGradeOf(x[d]); return `<i style="color:${gr[2]}">${sym}${gr[1]}</i>`; };
+                return `<span class="tt-sc" style="--c:${elementColors[x.el]}"><b>${x.name}</b>${part('tg', '⬇')}${part('tou', '⬆')}</span>`; }).join('')}</div>`;
+        }
+        document.getElementById('iaList').innerHTML = ttSum +
             (S.scope !== 'nat' ? `<div class="ia-gh">歲運引動<span>${[!S.off.dy && `${cur.dy.gan}${cur.dy.zhi}運`, !S.off.ln && `${S.year}${cur.ln.gan}${cur.ln.zhi}`, !S.off.lm && `${cur.lm.gan}${cur.lm.zhi}月${cur.lm.jd ? '（' + cur.lm.jd + '起）' : ''}`].filter(Boolean).join('・') || '大運、流年、流月皆已關閉'}</span></div>` +
-            (ext.length ? iaListHtml(ext) : '<div class="ia-empty">無</div>') +
-            (btw.length ? `<div class="ia-gh ia-gh-btw">歲運間<span>間接・力道較輕</span></div><div class="ia-btw">${iaListHtml(btw)}</div>` : '') : '') +
-            (S.scope !== 'ext' ? `<div class="ia-gh">原局</div>` + (nat.length ? iaListHtml(nat) : '<div class="ia-empty">無</div>') : '');
+            sec(ext) +
+            (btw.length ? `<div class="ia-gh ia-gh-btw">歲運間<span>間接・力道較輕</span></div><div class="ia-btw">${sec(btw)}</div>` : '') : '') +
+            (S.scope !== 'ext' ? `<div class="ia-gh">原局</div>` + sec(nat) : '');
         document.querySelectorAll('#iaList .ia-li').forEach(el => el.addEventListener('click', () => iaHl(el.dataset.id)));
     }
     function iaDrawArcs() {
@@ -1914,6 +2040,7 @@
             const z = el.querySelector('.ia-z').getBoundingClientRect(), g = el.querySelector('.ia-g').getBoundingClientRect();
             pos[el.dataset.key] = { x: z.left + z.width / 2 - br.left, zb: z.bottom - br.top + 3, gt: el.getBoundingClientRect().top - br.top - 2 };
         });
+        if (S.mode !== 'rel') { ttDraw(board, svg, pos); return; }
         const rels = S.rels.filter(iaVisible);
         // 預留高度：用「目前大運／流年／流月下的全部互動」計算層數，開關切換時命盤高度不變
         const laneCount = (list) => {
@@ -1979,6 +2106,48 @@
         svg.innerHTML = defs + arcs + labels;
         iaApplyHl();
     }
+
+    function ttDraw(board, svg, pos) {
+        const S = window.__ia;
+        board.style.paddingBottom = '8px'; board.style.paddingTop = '6px';
+        const br = board.getBoundingClientRect();
+        board.querySelectorAll('.ia-col').forEach(el => {
+            const z = el.querySelector('.ia-z').getBoundingClientRect(), g = el.querySelector('.ia-g').getBoundingClientRect();
+            Object.assign(pos[el.dataset.key], { gb: g.bottom - br.top + 1, zt: z.top - br.top - 1 });
+        });
+        const rels = S.rels.filter(iaVisible);
+        // 端點分散：同一個干（或支）有多條線時依另一端方向左右錯開
+        const ends = {};
+        rels.forEach(r => {
+            const gx = pos[r.ga.key].x, zx = pos[r.zb.key].x;
+            (ends['g' + r.ga.key] = ends['g' + r.ga.key] || []).push({ r, end: 'g', dir: zx - gx });
+            (ends['z' + r.zb.key] = ends['z' + r.zb.key] || []).push({ r, end: 'z', dir: gx - zx });
+        });
+        const off = {};
+        Object.values(ends).forEach(list => {
+            list.sort((a, b) => a.dir - b.dir);
+            const n = list.length, step = Math.min(6, 24 / Math.max(1, n - 1));
+            list.forEach((e, i) => { off[e.r.id + e.end] = n > 1 ? (i - (n - 1) / 2) * step : 0; });
+        });
+        const W = [2.6, 1.7, 1.1];
+        let defs = '<defs>' + ['木', '火', '土', '金', '水'].map(el => `<marker id="ttM-${el}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="${elementColors[el]}"/></marker>`).join('') + '</defs>';
+        if (!S.ttDir.tg && !S.ttDir.tou) { svg.innerHTML = ''; iaApplyHl(); return; }
+        let arcs = '';
+        rels.forEach((r, n) => {
+            const el = ganElementMap[r.ga.gan], col = elementColors[el];
+            const x1 = pos[r.ga.key].x + off[r.id + 'g'], y1 = pos[r.ga.key].gb;
+            const x2 = pos[r.zb.key].x + off[r.id + 'z'], y2 = pos[r.zb.key].zt;
+            const h = y2 - y1;
+            // 路徑由天干畫到地支：通根＝箭頭指向地支（往下），透干＝箭頭指向天干（往上），兩者皆開＝雙向
+            const d = `M${x1.toFixed(1)},${y1.toFixed(1)} C${x1.toFixed(1)},${(y1 + h * 0.55).toFixed(1)} ${x2.toFixed(1)},${(y2 - h * 0.55).toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}`;
+            const mk = `${S.ttDir.tg ? `marker-end="url(#ttM-${el})"` : ''} ${S.ttDir.tou ? `marker-start="url(#ttM-${el})"` : ''}`;
+            const flowUp = S.ttDir.tou && !S.ttDir.tg;
+            const op = (S.bright === 'on' ? 1 : 0.22) * (r.between ? 0.5 : 1) * (r.qi === 2 ? 0.6 : 1);
+            arcs += `<path class="ia-arc tt-arc q${r.qi} ${r.between ? 'btw' : ''} ${flowUp ? 'up' : ''}" data-id="${r.id}" d="${d}" stroke="${col}" stroke-width="${W[r.qi]}" ${mk} style="--d:${(n * 0.04).toFixed(2)}s; --o:${op};" onclick="iaHl('${r.id}')"/>`;
+        });
+        svg.innerHTML = defs + arcs;
+        iaApplyHl();
+    }
     // 亮度模式：全亮／全暗為基本模式；點某條線＝聚焦（只亮那條），再點同一條或點全亮／全暗即離開
     const iaBriMode = () => window.__ia.hl ? 'focus' : window.__ia.bright;
     function iaSyncBri() { document.querySelectorAll('.ia-bri').forEach(b => b.classList.toggle('on', b.dataset.bright === iaBriMode())); }
@@ -1997,13 +2166,13 @@
         iaApplyHl();
     }
     function iaToggle(c) {
-        const S = window.__ia; S.cats[c] = S.cats[c] ? 0 : 1; S.hl = null;
-        document.querySelectorAll('.ia-cat').forEach(b => b.classList.toggle('on', !!S.cats[b.dataset.cat]));
+        const S = window.__ia, C = iaCatState(); C[c] = C[c] ? 0 : 1; S.hl = null;
+        document.querySelectorAll('.ia-cat').forEach(b => b.classList.toggle('on', !!C[b.dataset.cat]));
         iaRenderList(); iaDrawArcs();
     }
     function iaAll(on) {
-        const S = window.__ia; IA_CAT_ORDER.forEach(c => S.cats[c] = on ? 1 : 0); S.hl = null;
-        document.querySelectorAll('.ia-cat[data-cat]').forEach(b => b.classList.toggle('on', !!S.cats[b.dataset.cat]));
+        const S = window.__ia, C = iaCatState(); iaCatOrder().forEach(c => C[c] = on ? 1 : 0); S.hl = null;
+        document.querySelectorAll('.ia-cat[data-cat]').forEach(b => b.classList.toggle('on', !!C[b.dataset.cat]));
         iaRenderList(); iaDrawArcs();
     }
     function iaOff(k) { const S = window.__ia; S.off[k] = S.off[k] ? 0 : 1; S.hl = null; iaRenderAll(); }
