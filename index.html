@@ -1722,9 +1722,10 @@
     const IA_CAT = {
         chong: { name: '沖', color: '#ff5252' }, xing: { name: '刑', color: '#ff4fa3' }, hai: { name: '害', color: '#ff9800' },
         po: { name: '破', color: '#f1c40f' },
-        he: { name: '五合六合', color: '#00d2ff' }, ju: { name: '三合三會', color: '#b388ff' }
+        he: { name: '五合六合', color: '#00d2ff' }, ju: { name: '三合三會', color: '#b388ff' }, gong: { name: '暗拱', color: '#8c7ae6' }
     };
-    const IA_CAT_ORDER = ['chong', 'xing', 'hai', 'po', 'he', 'ju'];
+    const IA_CAT_ORDER = ['chong', 'xing', 'hai', 'po', 'he', 'ju', 'gong'];
+    const IA_CAT_DEFAULT = { chong: 1, xing: 0, hai: 0, po: 0, he: 0, ju: 1, gong: 0 };
     // 分組：刑沖（衝擊）／合絆（牽制、能量受影響）／成局（合出新能量）
     // 柱物件：{ key, label(柱名), short(年/月/日/時/大運/流年/流月), gan, zhi, natal, idx(原局序), ord(排序) }
     function iaPillars(baseGans, baseZhis, ext) {
@@ -1767,6 +1768,11 @@
                 if (full.some(c => c.includes(x) && c.includes(y))) return;
                 add({ cat: 'ju', type: '半合', el, members: [x, y], ds: x.natal && y.natal ? dist(x, y) : '' });
             })));
+            // 暗拱：生＋墓（缺中間帝旺），三合只剩兩字、力道較弱
+            P.filter(p => p.zhi === zs[0]).forEach(x => P.filter(p => p.zhi === zs[2]).forEach(y => {
+                if (full.some(c => c.includes(x) && c.includes(y))) return;
+                add({ cat: 'gong', type: '暗拱', el, mid: zs[1], members: [x, y], ds: x.natal && y.natal ? dist(x, y) : '' });
+            }));
         });
         IA_SANHUI.forEach(([zs, el]) => combos(zs).forEach(c => add({ cat: 'ju', type: '三會', el, members: c })));
         XING_TRIO.forEach(([zs, kind]) => {
@@ -1782,16 +1788,18 @@
     function iaText(r) {
         const M = r.members, f = m => `${iaName(m, r.row)}「${iaCh(m, r.row)}」`;
         const ds = r.ds ? `（${r.ds}）` : '';
-        if (M.length === 2 && r.type !== '半合') {
+        if (M.length === 2 && r.type !== '半合' && r.type !== '暗拱') {
             const verb = { '沖': '沖', '六合': '合絆', '害': '害', '破': '破', '刑': '刑', '干合': '合絆', '干沖': '沖' }[r.type];
             if (r.type === '自刑') return `${f(M[0])}與${f(M[1])}自刑${ds}`;
             return `${f(M[0])}${verb}${f(M[1])}${r.kind ? '・' + r.kind : ''}${ds}`;
         }
         if (r.type === '三刑') return `${M.map(f).join('＋')} 三刑・${r.kind}`;
+        if (r.type === '暗拱') return `${M.map(f).join('＋')} 暗拱${r.el}局（拱${r.mid}）${ds}`;
         return `${M.map(f).join('＋')} ${r.type}${r.el}局${ds}`;
     }
     // 箭頭上的短標籤
     function iaShort(r) {
+        if (r.cat === 'gong') return '拱' + r.el;
         if (r.cat === 'ju') return (r.type === '三會' ? '會' : r.type === '三合' ? '合' : '半') + r.el;
         if (r.type === '三刑') return '三刑';
         if (r.type === '自刑') return '自刑';
@@ -1808,7 +1816,7 @@
         rels.filter(r => cats.includes(r.cat) && r.members.some(m => m.key === focusKey)).forEach(r => {
             const others = r.members.filter(m => m.key !== focusKey);
             let txt;
-            if (r.members.length === 3 || r.type === '半合') {
+            if (r.members.length === 3 || r.type === '半合' || r.type === '暗拱') {
                 const pre = others.some(m => !m.natal) ? '運年' : '';
                 txt = r.type === '三刑' ? `${pre}三刑` : `${pre}${r.type}${r.el}`;
             } else {
@@ -1927,8 +1935,8 @@
     }
 
     function renderInteractionPanel(ctx) {
-        const S = window.__ia = window.__ia || { cats: { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1 }, scope: 'all' };
-        if (S.cats.ju === undefined || S.cats.wuhe !== undefined) { S.cats = { chong: 1, xing: 1, hai: 1, po: 1, he: 1, ju: 1 }; }
+        const S = window.__ia = window.__ia || { cats: { ...IA_CAT_DEFAULT }, scope: 'all' };
+        if (S.cats.gong === undefined || S.cats.wuhe !== undefined) { S.cats = { ...IA_CAT_DEFAULT }; }
         S.scope = S.scope || 'all'; S.mode = (S.mode === 'tg' || S.mode === 'tou') ? 'tt' : (S.mode || 'rel'); S.ttDir = S.ttDir || { tg: 1, tou: 1 }; S.ttCats = S.ttCats || { q0: 1, q1: 1, q2: 1 }; if (!['on', 'dim'].includes(S.bright)) S.bright = 'on'; S.hl = null; S.off = S.off || { dy: 0, ln: 0, lm: 0 };
         S.ctx = ctx;
         const dys = ctx.daYunData.filter(d => d.index > 0);
@@ -3184,36 +3192,44 @@
         const late = dy && year != null && year >= dy.startYear + 5;
         const wG = late ? 0 : 0.3, wZ = late ? 1 : 0.7;
         const phase = dy ? (late ? '後五年・地支主導' : '前五年・干3支7') : '';
-        let asStrong, basis;
+        let asStrong, basis, primaryEl = null;
+        // 大運干支相生：地支本氣生天干，而天干屬削弱五行 → 地支的幫扶力轉去生天干（如金生水），整步運視為削弱
+        const zhuanSheng = (helpG) => !!dy && wuxingRel[dyEls[1]] && wuxingRel[dyEls[1]].sheng === dyEls[0] && !helpG;
+        const zsNote = '・地支生天干削弱五行（轉生）';
+        const weigh = (isHelpEl) => {
+            const hG = isHelpEl(dyEls[0]); let hZ = isHelpEl(dyEls[1]);
+            const zs = hZ && zhuanSheng(hG); if (zs) hZ = false;
+            return { ok: dy ? ((hG ? wG : 0) + (hZ ? wZ : 0)) >= 0.5 : false, zs };
+        };
         if (strengthLabel === '從強格' || strengthLabel === '從弱格') {
             let geEls;
             if (strengthLabel === '從強格') geEls = [dayElement, Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement)];
             else {
-                // 從弱：以原局（含藏干）最旺的財／官殺／食傷五行為格局五行
+                // 從弱：財、官殺、食傷皆為順勢（幫扶）五行；以原局（含藏干）最旺者為主要補充五行
                 const cnt = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
                 gans.forEach(g => { if (g && g !== '-') cnt[ganElementMap[g]] += 1; });
                 zhis.forEach(z => { const hw = zhiHiddenWeights[z] || {}; Object.keys(hw).forEach(hg => cnt[ganElementMap[hg]] += hw[hg]); });
-                const cands = Object.keys(cnt).filter(e => !['比劫', '印'].includes(careerCatOf(e, dayElement)));
-                geEls = [cands.sort((a, b) => cnt[b] - cnt[a])[0]];
+                geEls = Object.keys(cnt).filter(e => !['比劫', '印'].includes(careerCatOf(e, dayElement)));
+                primaryEl = geEls.slice().sort((a, b) => cnt[b] - cnt[a])[0];
             }
-            const hit = dy ? ((geEls.includes(dyEls[0]) ? wG : 0) + (geEls.includes(dyEls[1]) ? wZ : 0)) >= 0.5 : false;
-            asStrong = hit;
-            basis = `${strengthLabel}（格局五行${geEls.join('、')}）・${dy ? dy.ganZhi + '運（' + phase + '）' : '未起運'}${hit ? '與格局相符＝成格，以身強論' : '不符格局＝破格，以身弱論'}`;
+            const w = weigh(e => geEls.includes(e));
+            asStrong = w.ok;
+            basis = `${strengthLabel}（${strengthLabel === '從弱格' ? '順勢五行' + geEls.join('、') + '・主' + primaryEl : '格局五行' + geEls.join('、')}）・${dy ? dy.ganZhi + '運（' + phase + '）' : '未起運'}${w.zs ? zsNote : ''}${w.ok ? '與格局相符＝成格，以身強論' : '不符格局＝破格，以身弱論'}`;
         } else if (strengthLabel === '身強') {
             asStrong = true;
             basis = `身強（${totalScore}分）`;
         } else {
             const isHelp = c => c === '比劫' || c === '印';
-            const helpful = dy ? ((isHelp(dyCats[0]) ? wG : 0) + (isHelp(dyCats[1]) ? wZ : 0)) >= 0.5 : false;
-            asStrong = helpful;
-            basis = `身弱（${totalScore}分）・${dy ? dy.ganZhi + '運（' + phase + '）' : '未起運'}${helpful ? '印比幫扶，以身強論' : '財官食傷削弱，以身弱論'}`;
+            const w = weigh(e => isHelp(careerCatOf(e, dayElement)));
+            asStrong = w.ok;
+            basis = `身弱（${totalScore}分）・${dy ? dy.ganZhi + '運（' + phase + '）' : '未起運'}${w.zs ? zsNote : ''}${w.ok ? '印比幫扶，以身強論' : '財官食傷削弱，以身弱論'}`;
         }
         const targets = asStrong ? ['財', '官殺'] : ['比劫', '印'];
-        return { asStrong, basis, targets, targetTxt: targets.join('、') };
+        return { asStrong, basis, targets, targetTxt: targets.join('、'), primaryEl };
     }
     /**
      * 充能顏色（教材整理）：決定該補的五行
-     *  從強格 → 繼續補幫扶（比劫、印）；從弱格 → 繼續補耗洩（以格局五行為主）
+     *  從強格 → 繼續補幫扶（比劫、印）；從弱格 → 繼續補耗洩（財官食傷皆順勢，以原局最旺者為主）
      *  身強 → 補財；身弱＋大運幫扶 → 補財；身弱＋大運耗洩 → 補比劫、印
      */
     const CHARGE_COLORS = {
@@ -3229,8 +3245,8 @@
         if (strengthLabel === '從強格') return { els: [dayElement, yinEl], basis: '從強格・繼續補幫扶（比劫、印）' };
         if (strengthLabel === '從弱格') {
             const ctx = computeCareerContext(strengthLabel, totalScore, dayElement, dy, gans, zhis, dy ? dy.startYear : null);
-            const ge = (ctx.basis.match(/格局五行(.)/) || [])[1];
-            return { els: ge ? [ge] : [caiEl], basis: `從弱格・繼續補耗洩（格局五行${ge || caiEl}）` };
+            const ge = ctx.primaryEl;
+            return { els: ge ? [ge] : [caiEl], basis: `從弱格・繼續補耗洩（以最旺的${ge || caiEl}為主）` };
         }
         if (strengthLabel === '身強') return { els: [caiEl], basis: `身強（${totalScore}分）・補財` };
         const ctx = computeCareerContext(strengthLabel, totalScore, dayElement, dy, gans, zhis, dy ? dy.startYear : null);
@@ -5560,7 +5576,7 @@
         const txtList = (rels, empty) => rels.length ? rels.map(r => '• ' + iaText(r)).join('\n') : empty;
         const extHead = `${dyGan}${dyZhi}運・${currentYear}${lnGan}${lnZhi}年・${lmGan}${lmZhi}月`;
         window.__iaPromptText = {
-            heban: `【合絆】（天干五合、地支六合）原局內建：\n${txtList(pick(['he'], true), '無')}\n歲運引動（${extHead}）：\n${txtList(pick(['he'], false), '無')}${btwTxt(['he'])}\n\n【三合／三會／半合】原局內建：\n${txtList(pick(['ju'], true), '無')}\n歲運引動（${extHead}）：\n${txtList(pick(['ju'], false), '無')}${btwTxt(['ju'])}`,
+            heban: `【合絆】（天干五合、地支六合）原局內建：\n${txtList(pick(['he'], true), '無')}\n歲運引動（${extHead}）：\n${txtList(pick(['he'], false), '無')}${btwTxt(['he'])}\n\n【三合／三會／半合／暗拱】原局內建：\n${txtList(pick(['ju', 'gong'], true), '無')}\n歲運引動（${extHead}）：\n${txtList(pick(['ju', 'gong'], false), '無')}${btwTxt(['ju', 'gong'])}`,
             chong: `【刑沖害破】原局內建：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], true), '原局無明顯刑沖害')}\n歲運引動（${extHead}）：\n${txtList(pick(['chong', 'xing', 'hai', 'po'], false), '無刑沖害破引動')}${btwTxt(['chong', 'xing', 'hai', 'po'])}`
         };
         try { renderInteractionPanel({ baseGans, baseZhis, dg, daYunData, currentYear }); } catch (e) { console.warn('歲運互動盤失敗', e); }
@@ -5797,12 +5813,12 @@ ${data.pureTonggen}
 ${data.pureTougan}
 
 ■ 原局與歲運的會合、刑沖害破（標明互動柱位）：
-（判讀規則：天干五合、地支六合一律視為「合絆」——雙方互相牽制、各自作用減弱，不可當作合化；三合、三會須三字齊全才算三合局、三會局，會合出新的五行能量；未齊者為半合，僅為局勢傾向、力量較弱。）
+（判讀規則：天干五合、地支六合一律視為「合絆」——雙方互相牽制、各自作用減弱，不可當作合化；三合、三會須三字齊全才算三合局、三會局，會合出新的五行能量；未齊者為半合，僅為局勢傾向、力量較弱；三合首尾兩字（生＋墓，缺中間帝旺）為暗拱，力道又更弱，計算身強身弱仍有納入，但判讀上較少討論。）
 ${data.pureHeban}
 ${data.pureChongxing}
 
 【3. 歲運交感與動態變數引動雷達】
-（大運判讀規則：前五年天干、地支並看（地支為主），後五年以地支為主；地支是整個十年的底色。地支若屬削弱命主的五行，即使能生天干，也視為拖累，不可用相生抵銷。）
+（大運判讀規則：前五年天干、地支並看（地支為主），後五年以地支為主；地支是整個十年的底色。地支若屬削弱命主的五行，即使能生天干，也視為拖累，不可用相生抵銷；地支雖屬幫扶五行，但若生助天干的削弱五行（如金生水），喜神轉生忌神，整步運視為削弱。）
 ■ 大運/流年天干「引透」與地支「得根」動態監測：
 ${data.pureDynamic}
 
