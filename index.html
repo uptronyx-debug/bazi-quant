@@ -504,6 +504,13 @@
         /* ===== 十神星圖（儀表風）＋大運捲軸 ===== */
         .st-panel { width:100%; flex:1; display:flex; flex-direction:column; }
         .st-head-r { display:flex; align-items:center; gap:8px; }
+        .st-badge.ov { color:#ffa94d; border-color:rgba(255,169,77,.5); background:rgba(255,169,77,.1); }
+        button.st-badge { width:auto; cursor:pointer; font-family:inherit; grid-column:auto; margin:0; }
+        .st-ov { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:4px 0 8px; }
+        .st-ov[hidden] { display:none; }
+        .st-ov-lbl { font-size:11px; color:#7f95a3; margin-right:4px; }
+        .st-ov-btn { width:auto; grid-column:auto; margin:0; font-family:inherit; font-size:12px; padding:3px 11px; border-radius:999px; background:transparent; border:1px solid #333; color:#888; cursor:pointer; }
+        .st-ov-btn.on { color:#00d2ff; border-color:#00d2ff; background:rgba(0,210,255,.1); }
         .st-badge { font-size:10px; color:#00d2ff; border:1px solid rgba(0,210,255,.35); background:rgba(0,210,255,.08); padding:1px 7px; border-radius:999px; letter-spacing:0; }
         .st-switch { display:inline-flex; align-items:center; gap:5px; cursor:pointer; color:#888; font-size:10px; letter-spacing:1px; user-select:none; }
         .st-switch input { display:none; }
@@ -700,6 +707,34 @@
         .mode-toggle-btn.active { background: var(--accent); color: #0a0a0a; font-weight: bold; }
 
         /* ===== 近月動態流月掃描：真表格對齊（badge 欄自動依內容最寬對齊，不再跑版） ===== */
+        .lm-tabs { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; margin-bottom:12px; padding-bottom:2px; }
+        .lm-tabs::-webkit-scrollbar { display:none; }
+        .lm-tab { flex:0 0 auto; width:auto; grid-column:auto; margin:0; font-family:inherit; font-size:13px; padding:5px 13px; border-radius:999px; background:transparent; border:1px solid #333; color:#888; cursor:pointer; }
+        .lm-tab sup { font-size:9px; margin-left:2px; color:var(--c, #00d2ff); }
+        .lm-tab.on { color:#000; background:var(--c, #00d2ff); border-color:var(--c, #00d2ff); font-weight:bold; }
+        .lm-tab.on sup { color:#000; }
+        .lm-tab:hover { transform:none; box-shadow:none; }
+        .lm-tab:not(.on):hover, .st-ov-btn:not(.on):hover, button.st-badge:hover { background:#222; color:#ccc; transform:none; box-shadow:none; }
+        .lm-tab.on:hover { background:var(--c, #00d2ff); }
+        .lm-grid-wrap { overflow-x:auto; scrollbar-width:thin; }
+        table.lm-grid { border-collapse:separate; border-spacing:0; width:100%; font-size:11px; }
+        .lm-grid th, .lm-grid td { text-align:center; padding:5px 0; min-width:20px; border-bottom:1px solid #1d2329; }
+        .lm-grid th { font-weight:bold; font-size:11px; line-height:1.15; padding-bottom:6px; writing-mode:horizontal-tb; }
+        .lm-grid th span { display:block; }
+        .lm-grid th small { display:block; font-size:8.5px; color:#667; font-weight:normal; margin-top:2px; white-space:nowrap; }
+        .lm-grid .past { opacity:.4; }
+        .lm-grid th.now, .lm-grid td.now { background:rgba(0,210,255,.1); box-shadow:inset 1px 0 0 rgba(0,210,255,.55), inset -1px 0 0 rgba(0,210,255,.55); }
+        .lm-rl { text-align:left !important; font-size:11.5px; font-weight:bold; white-space:nowrap; padding-right:8px !important; cursor:pointer; position:sticky; left:0; background:#1a1d21; z-index:1; }
+        .lm-mk { font-size:12px; position:relative; cursor:pointer; }
+        .lm-mk sup { font-size:7.5px; position:absolute; top:-5px; right:-6px; }
+        .lm-dot0 { display:inline-block; width:3px; height:3px; border-radius:50%; background:#2a3038; }
+        .lm-sum td { border-bottom:none; vertical-align:bottom; height:22px; }
+        .lm-bar { display:inline-block; width:8px; border-radius:2px 2px 0 0; background:linear-gradient(180deg, #ff5252, #ff9800); }
+        .lm-legend { display:flex; flex-wrap:wrap; gap:4px 12px; font-size:10.5px; color:#777; margin-top:8px; }
+        .lm-legend b { margin-right:3px; }
+        .lm-legend-r { margin-left:auto; }
+        .lm-sub { font-size:14px; font-weight:bold; margin-bottom:4px; }
+        .lm-sub span { font-size:11px; color:#777; font-weight:normal; margin-left:8px; }
         table.lm-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
         table.lm-table tr.lm-month-row td { padding: 10px 0 6px 0; }
         table.lm-table tr.lm-month-row:first-child td { padding-top: 0; }
@@ -1017,7 +1052,7 @@
     </div>
 
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
-        <button onclick="calculateBazi()">執行運算</button>
+        <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
     </div>
     <div class="act-row" id="aiBtnContainer" style="display:none;">
         <button onclick="saveCurrentChartPrompt()" class="act-btn">💾 儲存命盤</button>
@@ -1035,12 +1070,19 @@
         <div id="liuriOutput"></div>
 
         <!-- 4. 原局結構拆解 (天地通透) -->
-        <details class="acc-section">
-            <summary class="acc-summary">☯️ 天地通透（藏干通根與透干）<span class="acc-chevron">▾</span></summary>
+                <details class="acc-section">
+            <summary class="acc-summary">☯️ 天地通透<span class="acc-chevron">▾</span></summary>
             <div class="acc-body">
-                <div id="tonggenOutput"></div> 
-                <div style="height: 1px; background: linear-gradient(90deg, transparent, #444, transparent); margin: 20px 0;"></div>
-                <div id="touganOutput"></div> 
+                <div class="lm-tabs tt2-tabs">
+                    <button class="lm-tab on" data-k="nat" onclick="tt2Tab('nat')">原局通根透干</button>
+                    <button class="lm-tab" data-k="dyn" onclick="tt2Tab('dyn')">歲運引動</button>
+                </div>
+                <div class="tt2-pane" data-k="nat">
+                    <div id="tonggenOutput"></div>
+                    <div style="height: 1px; background: linear-gradient(90deg, transparent, #444, transparent); margin: 20px 0;"></div>
+                    <div id="touganOutput"></div>
+                </div>
+                <div class="tt2-pane" data-k="dyn" style="display:none;"><div id="dynamicTonggenTouganOutput"></div></div>
             </div>
         </details>
         
@@ -1049,7 +1091,6 @@
         
         <!-- 5. 歲運交感與引動 (動態時間軸) -->
         <div id="dayunLiunianOutput"></div>
-        <div id="dynamicTonggenTouganOutput"></div>
         
         <!-- 6. 落地戰術指南 -->
         <div id="monthlyTacticsOutput"></div>
@@ -1550,11 +1591,20 @@
         setVal('gender', inputs.gender);
     }
 
+    // 手動調整身強身弱：覆寫後重新運算，並維持畫面位置
+    function stOvOpen() { const el = document.getElementById('stOv'); if (el) el.hidden = !el.hidden; }
+    function stOvSet(v) {
+        window.__strengthOverride = v || null;
+        const y = window.scrollY;
+        calculateBazi();
+        window.scrollTo(0, y);
+        const el = document.getElementById('stOv'); if (el) el.hidden = false;
+    }
     function saveCurrentChartPrompt() {
         const name = prompt('幫這份命盤取個名字（例如：我自己、爸爸、客戶王小姐）');
         if (!name) return;
         const list = getSavedCharts();
-        list.push({ name: name.trim(), savedAt: Date.now(), inputs: serializeCurrentInputs() });
+        list.push({ name: name.trim(), savedAt: Date.now(), inputs: serializeCurrentInputs(), ov: window.__strengthOverride || null });
         setSavedCharts(list);
         renderSavedChartsList();
     }
@@ -1564,6 +1614,7 @@
         const item = list[idx];
         if (!item) return;
         applySavedInputs(item.inputs);
+        window.__strengthOverride = item.ov || null;
         calculateBazi();
         const rb = document.getElementById('resultBox');
         if (rb) rb.scrollIntoView({ behavior: 'smooth' });
@@ -1792,10 +1843,10 @@
             const top = r.top - th - 6 < 8 ? r.bottom + 6 : r.top - th - 6;
             tip.style.left = left + 'px'; tip.style.top = top + 'px';
         };
-        document.addEventListener('click', (e) => { const el = e.target.closest && e.target.closest('.pt-tag[data-tip]'); if (el && el !== cur) { e.stopPropagation(); show(el); } else hide(); }, true);
+        document.addEventListener('click', (e) => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el && el !== cur) { e.stopPropagation(); show(el); } else hide(); }, true);
         if (window.matchMedia && matchMedia('(hover:hover)').matches) {
-            document.addEventListener('mouseover', (e) => { const el = e.target.closest && e.target.closest('.pt-tag[data-tip]'); if (el) show(el); });
-            document.addEventListener('mouseout', (e) => { if (e.target.closest && e.target.closest('.pt-tag[data-tip]')) hide(); });
+            document.addEventListener('mouseover', (e) => { const el = e.target.closest && e.target.closest('[data-tip]'); if (el) show(el); });
+            document.addEventListener('mouseout', (e) => { if (e.target.closest && e.target.closest('[data-tip]')) hide(); });
         }
         window.addEventListener('scroll', hide, true);
     })();
@@ -2399,7 +2450,7 @@
         if (shengMap[state[0].el] === state[2].el && shengMap[state[2].el] === dayElement) state[0].score = state[0].max;
         if (shengMap[state[1].el] === state[0].el && shengMap[state[0].el] === state[2].el && shengMap[state[2].el] === dayElement) state[1].score = state[1].max;
 
-        // 步驟 6｜四庫整合（依老師逐步解說）
+        // 步驟 6｜四庫整合（依量化系統規則）
         //  「同柱／隔柱」＝本柱天干＋左右相鄰兩柱的天干（不看地支）
         //  基礎判斷：辰＝同柱干為木／水／土時取該五行，否則土；丑＝同柱干為土／金時取該五行，否則土；
         //            未、戌＝火土能量相當，以幫扶日主者視為火或土
@@ -3092,9 +3143,13 @@
                 <div class="wx-head">
                     <span>十神</span>
                     <span class="st-head-r">
-                        <span class="pe-anim pe-badge st-badge" style="--d:1.15s;">${strengthLabel}・${totalScore}分</span>
+                        <button class="pe-anim pe-badge st-badge ${window.__strengthOverride ? 'ov' : ''}" style="--d:1.15s;" onclick="stOvOpen()" title="量化判定：${ctx.autoStrengthLabel}・${totalScore}分">${strengthLabel}・${window.__strengthOverride ? '手動' : totalScore + '分'} ▾</button>
                         ${daYunData.length ? `<label class="st-switch"><input type="checkbox" onchange="stToggleDayun(this.checked)"><span class="st-knob"></span>大運</label>` : ''}
                     </span>
+                </div>
+                <div class="st-ov" id="stOv" hidden>
+                    <span class="st-ov-lbl">量化 ${ctx.autoStrengthLabel}・${totalScore}分</span>
+                    ${[['', '自動'], ['身強', '身強'], ['身弱', '身弱'], ['從強格', '從強'], ['從弱格', '從弱']].map(([v, n]) => `<button class="st-ov-btn ${(window.__strengthOverride || '') === v ? 'on' : ''}" onclick="stOvSet('${v}')">${n}</button>`).join('')}
                 </div>
                 <div class="st-body">
                     <div class="st-svg-wrap">${s}</div>
@@ -3279,8 +3334,8 @@
 
     /**
      * 流日財星能量（只看當日干支，與身強身弱無關；承接力日後由「體感趨勢」疊圖處理）
-     * 天干：財星 1.0、食傷 0.5（老師：主要看財星，只有食傷能量較弱）
-     * 地支：依老師藏干比重，財星×1.0、食傷×0.5；地支不在財旺清單則不計
+     * 天干：財星 1.0、食傷 0.5（量化系統：主要看財星，只有食傷能量較弱）
+     * 地支：依量化系統藏干比重，財星×1.0、食傷×0.5；地支不在財旺清單則不計
      * 滿分 2.0（干支皆純財，如金日主乙卯）→ 換算 0–100
      */
     function computeLiuriWealth(dGan, dZhi, dayGan, dayElement) {
@@ -3297,7 +3352,7 @@
                 if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${elementColors[ganElementMap[hg]]}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
             });
         }
-        // 財星是否出現（天干為財，或地支藏干含財）——老師：主要看財星，只有食傷能量較弱
+        // 財星是否出現（天干為財，或地支藏干含財）——量化系統：主要看財星，只有食傷能量較弱
         const hasCai = ganElementMap[dGan] === caiEl || Object.keys(zhiHiddenWeights[dZhi] || {}).some(hg => ganElementMap[hg] === caiEl);
         let score = Math.round((ganE + zhiE) / 2 * 100);
         // 教材組合為舉例（包含但不限於）：天干、地支皆在清單內，且有財星出現，即為財旺日
@@ -4167,7 +4222,7 @@
     }
 
     /**
-     * 獨立的「從格」判斷——完全不使用老師系統的量化總分，改用傳統子平「通根有無」＋
+     * 獨立的「從格」判斷——完全不使用量化系統總分，改用傳統子平「通根有無」＋
      * 「滿盤一面倒（比劫印 or 財官食傷其中一方掛零）」的離散式判斷，與量化分數系統脫鉤。
      * 回傳 '從強' / '從弱' / null（null 代表不成立從格，仍依正格常規論）。
      */
@@ -4204,9 +4259,9 @@
      * 子平格局定式＋用神／忌神判定（簡化版，僅供參考，非嚴格對應單一流派）。
      * 格局：以月令（月支）藏干為主氣，優先採「已透干」者定格；比肩／劫財月令另定建祿／羊刃（月劫）；
      *       從強格／從弱格的判定改用傳統子平「通根＋滿盤一面倒」的獨立邏輯（見 checkCongGeIndependently），
-     *       與下方「用神／忌神」的量化分數（老師系統）判斷脫鉤，兩者刻意採不同方法。
+     *       與下方「用神／忌神」的量化分數（量化系統）判斷脫鉤，兩者刻意採不同方法。
      * 用神／忌神：先判斷是否需要調候（月支寒暖＋原局水火比例），調候優先於扶抑；
-     *            從格時用神方向依上方獨立判斷的從強／從弱而定；非從格時才採用老師系統的量化身強／身弱。
+     *            從格時用神方向依上方獨立判斷的從強／從弱而定；非從格時才採用量化系統的量化身強／身弱。
      */
     function determineGeJuAndYongShen(mz, dGan, dayElement, baseGans, baseZhis, pNames, strengthLabel, elementCount, totalElements) {
         // ---- 1. 格局：月令司令神（本氣優先，若有其他藏干已透干則以透干者優先） ----
@@ -4242,7 +4297,7 @@
             geJuBaseName = geJuNameMap[geJuTenGod] || '雜氣格';
         }
 
-        // 獨立判斷從格（不依賴老師系統的量化總分）
+        // 獨立判斷從格（不依賴量化系統總分）
         const genEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
         const congGeResult = checkCongGeIndependently(dGan, dayElement, baseGans, baseZhis, pNames, genEl);
 
@@ -4250,7 +4305,7 @@
         let isExtreme = !!congGeResult;
         if (isExtreme) {
             const extremeLabel = congGeResult === '從強' ? '從強格（專旺）' : '從弱格';
-            geJuName = `${extremeLabel}（不依正格論，原局月令本屬${geJuBaseName}；依傳統子平通根＋滿盤判定，非老師量化分數）`;
+            geJuName = `${extremeLabel}（不依正格論，原局月令本屬${geJuBaseName}；依傳統子平通根＋滿盤判定，非量化系統分數）`;
         }
         const geJuNote = `月支「${mz}」藏干以「${geJuGan}」定格${isTou ? '，且已透干（格局清晰）' : '，未透干，僅以藏干本氣論格'}` +
             (skippedBiJie ? `；${skippedBiJie}為比劫透出，不另成格` : '');
@@ -4278,17 +4333,17 @@
         let yongCats, jiCats, logicNote;
         if (congGeResult === '從強') {
             yongCats = ['比劫', '印']; jiCats = ['財', '官殺', '食傷'];
-            logicNote = '從強格：日主氣勢已成一方獨大，用神反取比劫、印星以順其勢；財官食傷逆勢而為，稱忌神。（此判斷依傳統子平通根＋滿盤，非老師量化分數）';
+            logicNote = '從強格：日主氣勢已成一方獨大，用神反取比劫、印星以順其勢；財官食傷逆勢而為，稱忌神。（此判斷依傳統子平通根＋滿盤，非量化系統分數）';
         } else if (congGeResult === '從弱') {
             yongCats = ['財', '官殺', '食傷']; jiCats = ['比劫', '印'];
-            logicNote = '從弱格：日主氣勢已從他方，用神反取財官食傷順其強勢；比劫印星欲扶身反而逆勢，稱忌神。（此判斷依傳統子平通根＋滿盤，非老師量化分數）';
+            logicNote = '從弱格：日主氣勢已從他方，用神反取財官食傷順其強勢；比劫印星欲扶身反而逆勢，稱忌神。（此判斷依傳統子平通根＋滿盤，非量化系統分數）';
         } else if (strengthLabel === '身強' || strengthLabel === '從強格') {
             yongCats = ['財', '官殺', '食傷']; jiCats = ['比劫', '印'];
-            logicNote = '身強：日主偏旺（依老師量化分數系統判定），用神取財官食傷剋洩耗身；印比為忌神，恐助身過旺。';
+            logicNote = '身強：日主偏旺（依量化系統判定），用神取財官食傷剋洩耗身；印比為忌神，恐助身過旺。';
         } else {
             // 涵蓋 strengthLabel === '身弱' 或 '從弱格'：只要獨立判斷未成立從格，一律以正格「身弱」扶抑邏輯處理
             yongCats = ['比劫', '印']; jiCats = ['財', '官殺', '食傷'];
-            logicNote = '身弱：日主偏弱（依老師量化分數系統判定），用神取比劫印星生扶日主；財官食傷為忌神，恐耗身過度。';
+            logicNote = '身弱：日主偏弱（依量化系統判定），用神取比劫印星生扶日主；財官食傷為忌神，恐耗身過度。';
         }
 
         let yongElements = toElements(yongCats), jiElements = toElements(jiCats);
@@ -4317,7 +4372,9 @@
         const baseZhis = [yz, mz, dz, tz];
         const pNames = ['年', '月', '日', '時'];
 
-        const addTactic = (cat, monthStr, badge, desc) => {
+        const months = [], ev = [];
+        const addTactic = (cat, monthStr, badge, desc, kind, mi) => {
+            ev.push({ cat, kind, mi, desc });
             tactics[cat].push(`
                 <tr class="lm-month-row"><td colspan="2"><span class="lm-month-chip">📅 ${monthStr}</span></td></tr>
                 <tr class="lm-event-row">
@@ -4344,6 +4401,8 @@
                 : `${y}年${m}月`; // 節氣資料抓取失敗時的備援顯示
             // 時間格式比照六親分頁：過去＝深藍、現在＝亮藍＋「現在」標記；干支依五行上色
             const gzHtml = `<span style="color:${elementColors[ganElementMap[mGan]]}">${mGan}</span><span style="color:${elementColors[zhiElementMap[mZhi]]}">${mZhi}</span>`;
+            months.push({ i, m, gan: mGan, zhi: mZhi, start: jieRange ? jieRange.startLabel : `${m}月` });
+            const mi = months.length - 1;
             let monthStr = `<span class="lm-time${i < 0 ? ' is-past' : ''}">${timeText}</span> <span class="lm-gz">${gzHtml}</span>`
                 + (i === 0 ? ' <span class="rel-now">現在</span>' : (i < 0 ? '<span class="lm-past-note">（已過）</span>' : ''));
 
@@ -4376,58 +4435,81 @@
             const xingBadge = (target) => `<b style="color:var(--color-xing); font-size:11px;">🌀${target}自刑</b>`;
 
 
-            if (zhiChongMap[dz] === mZhi) addTactic('love', monthStr, clashBadge('日支'), `沖動夫妻宮 (${dz}${mZhi}沖)`);
-            if (zhiHeMap[dz] === mZhi) addTactic('love', monthStr, combineBadge('日支'), `合動夫妻宮 (${dz}${mZhi}合)`);
-            if ((gender === 1 && isWealth) || (gender === 0 && isGuanSha)) addTactic('love', monthStr, originBadge, `✨ 配偶星「${mGan}」${actionDesc}`);
+            if (zhiChongMap[dz] === mZhi) addTactic('love', monthStr, clashBadge('日支'), `沖動夫妻宮 (${dz}${mZhi}沖)`, 'chong', mi);
+            if (zhiHeMap[dz] === mZhi) addTactic('love', monthStr, combineBadge('日支'), `合動夫妻宮 (${dz}${mZhi}合)`, 'he', mi);
+            if ((gender === 1 && isWealth) || (gender === 0 && isGuanSha)) addTactic('love', monthStr, originBadge, `✨ 配偶星「${mGan}」${actionDesc}`, 'yin', mi);
 
-            if (zhiChongMap[mz] === mZhi) addTactic('career', monthStr, clashBadge('月支'), `沖動事業宮 (${mz}${mZhi}沖)`);
-            if (isShiShang) addTactic('career', monthStr, originBadge, `💡 食傷「${mGan}」${actionDesc}`);
-            if (isGuanSha) addTactic('career', monthStr, originBadge, `⚠️ 官殺「${mGan}」${actionDesc}`);
+            if (zhiChongMap[mz] === mZhi) addTactic('career', monthStr, clashBadge('月支'), `沖動事業宮 (${mz}${mZhi}沖)`, 'chong', mi);
+            if (isShiShang) addTactic('career', monthStr, originBadge, `💡 食傷「${mGan}」${actionDesc}`, 'yin', mi);
+            if (isGuanSha) addTactic('career', monthStr, originBadge, `⚠️ 官殺「${mGan}」${actionDesc}`, 'yin', mi);
 
-            if (zhiChongMap[tz] === mZhi) addTactic('wealth', monthStr, clashBadge('時支'), `沖動投資/子女宮 (${tz}${mZhi}沖)`);
-            if (zhiHeMap[tz] === mZhi) addTactic('wealth', monthStr, combineBadge('時支'), `合動時柱 (${tz}${mZhi}合)`);
-            if (isBiJie) addTactic('wealth', monthStr, originBadge, `💸 比劫「${mGan}」${actionDesc}`);
+            if (zhiChongMap[tz] === mZhi) addTactic('wealth', monthStr, clashBadge('時支'), `沖動投資/子女宮 (${tz}${mZhi}沖)`, 'chong', mi);
+            if (zhiHeMap[tz] === mZhi) addTactic('wealth', monthStr, combineBadge('時支'), `合動時柱 (${tz}${mZhi}合)`, 'he', mi);
+            if (isBiJie) addTactic('wealth', monthStr, originBadge, `💸 比劫「${mGan}」${actionDesc}`, 'yin', mi);
             if (['辰','戌','丑','未'].includes(mZhi)) {
                 let clashIndex = baseZhis.indexOf(zhiChongMap[mZhi]);
                 if (clashIndex !== -1) {
-                    addTactic('wealth', monthStr, kuBadge(`${pNames[clashIndex]}庫`), `財庫引動 (${baseZhis[clashIndex]}${mZhi}沖)`);
+                    addTactic('wealth', monthStr, kuBadge(`${pNames[clashIndex]}庫`), `財庫引動 (${baseZhis[clashIndex]}${mZhi}沖)`, 'ku', mi);
                 }
             }
 
-            if (zhiChongMap[dz] === mZhi) addTactic('health', monthStr, clashBadge('日支'), `根基逢沖 (${dz}${mZhi}沖)`);
-            else if (zhiChongMap[mz] === mZhi) addTactic('health', monthStr, clashBadge('月支'), `提綱逢沖 (${mz}${mZhi}沖)`);
-            if (['辰','午','酉','亥'].includes(mZhi) && mZhi === dz) addTactic('health', monthStr, xingBadge('日支'), `自刑引動 (${dz}${mZhi}刑)`);
+            if (zhiChongMap[dz] === mZhi) addTactic('health', monthStr, clashBadge('日支'), `根基逢沖 (${dz}${mZhi}沖)`, 'chong', mi);
+            else if (zhiChongMap[mz] === mZhi) addTactic('health', monthStr, clashBadge('月支'), `提綱逢沖 (${mz}${mZhi}沖)`, 'chong', mi);
+            if (['辰','午','酉','亥'].includes(mZhi) && mZhi === dz) addTactic('health', monthStr, xingBadge('日支'), `自刑引動 (${dz}${mZhi}刑)`, 'xing', mi);
 
-            if (zhiChongMap[yz] === mZhi) addTactic('family', monthStr, clashBadge('年支'), `沖動父母宮 (${yz}${mZhi}沖)`);
-            if (zhiHeMap[yz] === mZhi) addTactic('family', monthStr, combineBadge('年支'), `合動父母宮 (${yz}${mZhi}合)`);
+            if (zhiChongMap[yz] === mZhi) addTactic('family', monthStr, clashBadge('年支'), `沖動父母宮 (${yz}${mZhi}沖)`, 'chong', mi);
+            if (zhiHeMap[yz] === mZhi) addTactic('family', monthStr, combineBadge('年支'), `合動父母宮 (${yz}${mZhi}合)`, 'he', mi);
         }
 
         const formatList = (list, emptyMsg) => list.length > 0 ? `<table class="lm-table">${list.join('')}</table>` : `<div style="font-size:13px; color:#888; margin-top:5px; padding-left:10px;">${emptyMsg}</div>`;
-
+        const TOPICS = [
+            ['love', '感情', '#ff9800', '觀測日支與配偶星', '此週期感情宮位無明顯劇烈引動'],
+            ['career', '事業', '#2ed573', '觀測月柱與官殺食傷', '此週期事業宮位無明顯劇烈引動'],
+            ['wealth', '財運', '#00d2ff', '觀測時柱與比劫財星', '此週期無明顯財庫沖動或破財徵兆'],
+            ['health', '健康', '#ff5252', '觀測日月支逢沖刑', '此週期根基穩固，無重大沖刑'],
+            ['family', '家庭', '#a29bfe', '觀測年柱', '此週期家庭宮位平順']
+        ];
+        // 每格的記號：沖＝紅點、刑＝粉點、庫＝金菱、合＝青環、十神引動＝主題色方塊（同格多件以優先序顯示並標件數）
+        const KIND = { chong: ['●', '#ff5252'], xing: ['●', '#ff4fa3'], ku: ['◆', '#ffd166'], he: ['○', '#00d2ff'], yin: ['■', null] };
+        const cellOf = (cat, mi, col) => {
+            const L = ev.filter(e => e.cat === cat && e.mi === mi);
+            if (!L.length) return '<i class="lm-dot0"></i>';
+            const pri = ['chong', 'xing', 'ku', 'he', 'yin'].find(k => L.some(e => e.kind === k));
+            const [ch, c] = KIND[pri];
+            return `<b class="lm-mk" style="color:${c || col}" data-tip="${months[mi].gan}${months[mi].zhi}（${months[mi].start}起）：${L.map(e => e.desc).join('；')}">${ch}${L.length > 1 ? `<sup>${L.length}</sup>` : ''}</b>`;
+        };
+        const colCls = (o) => o.i < 0 ? 'past' : (o.i === 0 ? 'now' : '');
+        const grid = `
+            <div class="lm-grid-wrap"><table class="lm-grid">
+                <tr><th class="lm-rl"></th>${months.map(o => `<th class="${colCls(o)}"><span style="color:${elementColors[ganElementMap[o.gan]]}">${o.gan}</span><span style="color:${elementColors[zhiElementMap[o.zhi]]}">${o.zhi}</span><small>${o.m}月</small></th>`).join('')}</tr>
+                ${TOPICS.map(([k, n, col]) => `<tr><td class="lm-rl" style="color:${col}" onclick="lmTab('${k}')">${n}</td>${months.map((o, mi) => `<td class="${colCls(o)}">${cellOf(k, mi, col)}</td>`).join('')}</tr>`).join('')}
+                <tr class="lm-sum"><td class="lm-rl">變動</td>${months.map((o, mi) => { const n = ev.filter(e => e.mi === mi && e.kind !== 'yin').length; return `<td class="${colCls(o)}">${n ? `<span class="lm-bar" style="height:${Math.min(4, n) * 4 + 2}px"></span>` : ''}</td>`; }).join('')}</tr>
+            </table></div>
+            <div class="lm-legend"><span><b style="color:#ff5252">●</b>沖</span><span><b style="color:#ff4fa3">●</b>刑</span><span><b style="color:#ffd166">◆</b>庫</span><span><b style="color:#00d2ff">○</b>合</span><span><b>■</b>十神引動</span><span class="lm-legend-r">淡＝已過・框＝本月</span></div>`;
+        const upcoming = k => ev.filter(e => e.cat === k && months[e.mi].i >= 0).length;
         return `
-            <div class="score-box" style="text-align: left; padding: 20px; border-color: #555; background: rgba(0,0,0,0.3); margin-top: 0; margin-bottom: 0; border-radius: 8px;">
-                <div style="margin-bottom: 15px;">
-                    <b style="color:#ff9800; font-size:14px;">💖 感情 / 婚姻 (觀測日支與配偶星)</b>
-                    ${formatList(tactics.love, '此週期感情宮位無明顯劇烈引動')}
+            <div class="lm-wrap">
+                <div class="lm-tabs">
+                    <button class="lm-tab on" data-k="all" onclick="lmTab('all')">總覽</button>
+                    ${TOPICS.map(([k, n, col]) => `<button class="lm-tab" data-k="${k}" style="--c:${col}" onclick="lmTab('${k}')">${n}${upcoming(k) ? `<sup>${upcoming(k)}</sup>` : ''}</button>`).join('')}
                 </div>
-                <div style="margin-bottom: 15px;">
-                    <b style="color:#2ed573; font-size:14px;">📈 事業 / 職場 (觀測月柱與官殺食傷)</b>
-                    ${formatList(tactics.career, '此週期事業宮位無明顯劇烈引動')}
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <b style="color:#00d2ff; font-size:14px;">💰 財運 / 投資 (觀測時柱與比劫財星)</b>
-                    ${formatList(tactics.wealth, '此週期無明顯財庫沖動或破財徵兆')}
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <b style="color:#ff5252; font-size:14px;">🏥 健康 / 情緒 (觀測日月支逢沖刑)</b>
-                    ${formatList(tactics.health, '此週期根基穩固，無重大沖刑')}
-                </div>
-                <div>
-                    <b style="color:#a29bfe; font-size:14px;">🏡 家庭 / 長輩 (觀測年柱)</b>
-                    ${formatList(tactics.family, '此週期家庭宮位平順')}
+                <div class="lm-pane" data-k="all">${grid}</div>
+                <div class="lm-lists">
+                ${TOPICS.map(([k, n, col, sub, empty]) => `<div class="lm-pane" data-k="${k}" style="display:none;">
+                    <div class="lm-sub" style="color:${col}">${n}<span>${sub}</span></div>
+                    ${formatList(tactics[k], empty)}
+                </div>`).join('')}
                 </div>
             </div>
         `;
+    }
+    function tt2Tab(k) {
+        document.querySelectorAll('.tt2-tabs .lm-tab').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+        document.querySelectorAll('.tt2-pane').forEach(p => p.style.display = p.dataset.k === k ? '' : 'none');
+    }
+    function lmTab(k) {
+        document.querySelectorAll('#monthlyTacticsOutput .lm-tab').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+        document.querySelectorAll('#monthlyTacticsOutput .lm-pane').forEach(p => p.style.display = p.dataset.k === k ? '' : 'none');
     }
 
     function calculateBaziCore() {
@@ -4648,6 +4730,9 @@
         const totalScore = calculateQuantStrengthScore(baziMap, dayElement);
         let strengthLabel = '';
         if (totalScore > 80) strengthLabel = '從強格'; else if (totalScore >= 45) strengthLabel = '身強'; else if (totalScore >= 20) strengthLabel = '身弱'; else strengthLabel = '從弱格';
+        // 手動調整：覆寫量化判定（分數本身不變），下游的充能顏色、事業、流日、提詞都依覆寫後的結果
+        const autoStrengthLabel = strengthLabel;
+        if (window.__strengthOverride) strengthLabel = window.__strengthOverride;
 
         // ------------------------------------------------------------------------------------------
         // --- 整合全新「核心能量儀表板」---
@@ -5177,7 +5262,7 @@
 
         // [Dash 2: 顯星/定格 (Dynamic Penetration & Rooting)]
         // 「定格」統一改用 determineGeJuAndYongShen() 的結果（含建祿/羊刃/從格特例判斷，避免與下方重複計算）
-        // 從強/從弱的短標籤取自「獨立子平判斷」(congGeResult)，不使用老師量化分數的 strengthLabel 字串，兩套系統徹底脫鉤
+        // 從強/從弱的短標籤取自「獨立子平判斷」(congGeResult)，不使用量化系統分數的 strengthLabel 字串，兩套系統徹底脫鉤
         let traditionalPattern = geJuYongShen.isExtreme
             ? (geJuYongShen.congGeResult === '從強' ? '從強格' : '從弱格')
             : geJuYongShen.geJuName;
@@ -5421,7 +5506,7 @@
         for (let i = 0; i < 5; i++) orderedElements.push(elementsArr[(dayIdx + i) % 5]);
         const elementPct = {};
         elementsArr.forEach(el => elementPct[el] = totalElements > 0 ? elementCount[el] / totalElements * 100 : 0);
-        let svgHtml = renderTenGodStar({ dayElement, dayGan, orderedElements, elementSpecificShiShen, elementPct, strengthLabel, totalScore, daYunData, currentYear });
+        let svgHtml = renderTenGodStar({ dayElement, dayGan, orderedElements, elementSpecificShiShen, elementPct, strengthLabel, autoStrengthLabel, totalScore, daYunData, currentYear });
 
         // --- 組裝成完整儀表板 ---
         let dashboardHtml = `<div class="dash-anim anim-pending">
@@ -5661,7 +5746,7 @@
         dynHtml += nyAlerts.length > 0 ? nyAlerts.join('') : '<div style="color:#888; font-size:13px; padding-left: 10px;">無明顯通透引動</div>';
 
         dynHtml += `</div></div>`;
-        document.getElementById('dynamicTonggenTouganOutput').innerHTML = wrapAccordion('🚀 歲運通透引動雷達', dynHtml, false);
+        document.getElementById('dynamicTonggenTouganOutput').innerHTML = dynHtml;
 
         const kuMap = { '辰':'水', '戌':'火', '丑':'金', '未':'木' };
         const kuClash = { '辰':'戌', '戌':'辰', '丑':'未', '未':'丑' };
@@ -5861,16 +5946,16 @@
             `;
         }
         dlHtml += `</div>`;
-        document.getElementById('dayunLiunianOutput').innerHTML = wrapAccordion('🌊 大運與流年時間軸', dlHtml, false);
+        document.getElementById('dayunLiunianOutput').innerHTML = ''; // 大運流年時間軸已由歲運互動盤取代，不再顯示
 
         const monthlyHtml = generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender);
-        document.getElementById('monthlyTacticsOutput').innerHTML = wrapAccordion('📅 近月動態流月掃描（過去 6 個月驗證＋未來 1 年預測）', monthlyHtml, false);
+        document.getElementById('monthlyTacticsOutput').innerHTML = wrapAccordion('📅 流月趨勢掃描', monthlyHtml, false);
 
         window.currentBaziDataForAI = {
             gender: genderStr,
             pillars: `${yg}${yz}年 ${mg}${mz}月 ${dg}${dz}日 ${tg}${tz}時`,
             dayMaster: `${dg} (${dayElement})`,
-            strength: strengthLabel,
+            strength: strengthLabel, autoStrength: autoStrengthLabel,
             totalScore: totalScore,
             elements: {
                 '木': (elementCount['木'] / totalElements * 100).toFixed(1),
@@ -5916,7 +6001,7 @@
             baziData.pureSiku = cleanHtmlToPureText(document.getElementById('sikuOutput').innerHTML);
             baziData.pureHeban = (window.__iaPromptText || {}).heban || '無明顯反應';
             baziData.pureChongxing = (window.__iaPromptText || {}).chong || '無明顯反應';
-            baziData.pure12Month = cleanHtmlToPureText(document.getElementById('monthlyTacticsOutput').innerHTML);
+            baziData.pure12Month = cleanHtmlToPureText((document.querySelector('#monthlyTacticsOutput .lm-lists') || document.getElementById('monthlyTacticsOutput')).innerHTML);
             baziData.pureLiuri = cleanHtmlToPureText(document.getElementById('liuriOutput').innerHTML);
         }
 
@@ -5941,7 +6026,7 @@
 【命理師的論命規範，請務必遵守】
 - 格局定式與成格／破格標籤已由系統依傳統子平精算完成（見下方【1】），直接引用即可，不需要重新判斷或推翻，但要用一到兩句話把判斷依據轉成白話。
 - 用神／忌神由命主自行訂定，本報告刻意不提供；請「不要」自行推定或宣告用神、忌神、喜神，論述時以十神生剋制化、格局成敗與原局結構為主。
-- 【1】中「身強身弱（老師量化分數系統）」與「傳統子平格局定式」是兩套獨立系統、各自獨立判斷，請勿混為一談、勿互相解釋成因、也不要說其中一個是另一個的依據——兩者可能結論一致，也可能不一致，若不一致屬正常現象，如有需要可以簡單向讀者說明這是兩套不同方法的交叉參考，不用強行調和。
+- 【1】中「身強身弱（量化系統）」與「傳統子平格局定式」是兩套獨立系統、各自獨立判斷，請勿混為一談、勿互相解釋成因、也不要說其中一個是另一個的依據——兩者可能結論一致，也可能不一致，若不一致屬正常現象，如有需要可以簡單向讀者說明這是兩套不同方法的交叉參考，不用強行調和。
 - 論性格、事業、財運、感情時，具體點出「十神生剋制化」的因果鏈（例如「七殺無食傷制化，故決斷力強但易衝動犯險」），而非只複述十神字面意義。
 - 論刑沖會合時，說明「動的是哪個宮位」（年柱＝根基／祖蔭，月柱＝事業／父母，日支＝配偶／自身，時柱＝子女／晚運），並解釋動了之後對應到現實中的什麼狀況。
 - 可使用命理專業術語（如：得令、得地、得勢、通根、透干、清透、雜氣、財官印食傷比劫、墓庫、調候、格局、成格、破格），但每次專有名詞出現後，請用一句白話立即補充說明，讓非命理背景的讀者也能看懂，不要整段堆術語。
@@ -5951,7 +6036,7 @@
 - 性別：${data.gender}
 - 八字原局：${data.pillars}
 - 日主元神：${data.dayMaster}
-- 身強身弱（老師量化分數系統，非傳統子平格局）：${data.strength} (量化總分：${data.totalScore} 分)
+- 身強身弱（量化系統，非傳統子平格局）：${data.strength} (量化總分：${data.totalScore} 分${data.autoStrength && data.autoStrength !== data.strength ? '；使用者手動調整，量化原判定為' + data.autoStrength : ''})
 - 五行比例：木 ${data.elements['木']}%、火 ${data.elements['火']}%、土 ${data.elements['土']}%、金 ${data.elements['金']}%、水 ${data.elements['水']}%
 - 傳統子平格局定式（獨立判斷，與上一行的量化分數系統無關，請勿混用或互相解釋）：${data.geJu}（${data.geJuNote}）
 - 傳統身強弱（僅供成格判斷使用，與上方量化分數為不同系統）：${data.tradStrength}
