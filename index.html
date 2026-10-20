@@ -3420,6 +3420,16 @@
     const LIURI_ZHI_MIN = 0.15;
     // 干支權重（大運起一路到流日一致）：地支代表根基與實質力量約七成，天干代表外顯約三成
     const GZ_W = { gan: 0.3, zhi: 0.7 };
+    // 透干引動（流日表現層，不改藏干比重表）：天干與地支的餘氣同五行時，餘氣被引出，升級到該地支中氣的比重
+    //  例：木日主遇辛巳，巳中庚金 10% → 升為 40%（巳的中氣戊土比重）；本氣、中氣不再加
+    function liuriHiddenEff(gan, zhi) {
+        const hw0 = zhiHiddenWeights[zhi] || {}, hs = Object.keys(hw0).sort((a, b) => hw0[b] - hw0[a]);
+        const out = { ...hw0 };
+        if (hs.length < 3 || !ganElementMap[gan]) return out;
+        const midW = hw0[hs[1]];
+        hs.slice(2).forEach(h => { if (ganElementMap[h] === ganElementMap[gan] && hw0[h] < midW) out[h] = midW; });
+        return out;
+    }
     function computeLiuriWealth(dGan, dZhi, dayGan, dayElement) {
         // 依原則掃描（不查表）：財星 1.0、食傷 0.5（食傷生財）；地支依量化系統藏干比重加總
         const caiEl = wuxingRel[dayElement].ke, ssEl = wuxingRel[dayElement].sheng;
@@ -3427,10 +3437,10 @@
         const C = g => elementColors[ganElementMap[g]];
         const ganOK = val(dGan) > 0;
         let zhiE = 0; const zhiParts = [];
-        const hw = zhiHiddenWeights[dZhi] || {};
+        const hw = liuriHiddenEff(dGan, dZhi), hw0 = zhiHiddenWeights[dZhi] || {};
         Object.keys(hw).forEach(hg => {
             const v = val(hg) * hw[hg];
-            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
+            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${hw[hg] > hw0[hg] ? `${Math.round(hw0[hg] * 100)}%→${Math.round(hw[hg] * 100)}%（透干引動）` : Math.round(hw[hg] * 100) + '%'}`); }
         });
         const zhiOK = zhiE >= LIURI_ZHI_MIN;
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
@@ -3566,10 +3576,10 @@
         const C = g => elementColors[ganElementMap[g]];
         const ganOK = val(dGan) > 0;
         let zhiE = 0; const zhiParts = [];
-        const hw = zhiHiddenWeights[dZhi] || {};
+        const hw = liuriHiddenEff(dGan, dZhi), hw0 = zhiHiddenWeights[dZhi] || {};
         Object.keys(hw).forEach(hg => {
             const v = val(hg) * hw[hg];
-            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
+            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${hw[hg] > hw0[hg] ? `${Math.round(hw0[hg] * 100)}%→${Math.round(hw[hg] * 100)}%（透干引動）` : Math.round(hw[hg] * 100) + '%'}`); }
         });
         const zhiOK = zhiE >= LIURI_ZHI_MIN;
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
@@ -3592,10 +3602,10 @@
         const C = g => elementColors[ganElementMap[g]];
         const ganOK = val(dGan) > 0;
         let zhiE = 0; const zhiParts = [];
-        const hw = zhiHiddenWeights[dZhi] || {};
+        const hw = liuriHiddenEff(dGan, dZhi), hw0 = zhiHiddenWeights[dZhi] || {};
         Object.keys(hw).forEach(hg => {
             const v = val(hg) * hw[hg];
-            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
+            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${hw[hg] > hw0[hg] ? `${Math.round(hw0[hg] * 100)}%→${Math.round(hw[hg] * 100)}%（透干引動）` : Math.round(hw[hg] * 100) + '%'}`); }
         });
         const zhiOK = zhiE >= LIURI_ZHI_MIN;
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
