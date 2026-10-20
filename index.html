@@ -2922,6 +2922,9 @@
     COMBO_CATALOG['偏財格'] = COMBO_CATALOG['正財格'];
     COMBO_CATALOG['偏印格'] = COMBO_CATALOG['正印格'];
     COMBO_CATALOG['月劫格'] = COMBO_CATALOG['建祿格'];
+    // 從格：順勢或洩秀為成；逆其勢為破（從強忌官殺剋旺神、財星爭奪；從弱忌印比扶身）
+    COMBO_CATALOG['從強格'] = [['從強洩秀','成'],['印比成勢','成'],['從強逢官殺','破'],['群劫爭財','破']];
+    COMBO_CATALOG['從弱格'] = [['從勢流通','成'],['比劫逆勢','破'],['印星逆勢','破']];
     const COMBO_WARNINGS = ['官殺混雜','傷官見官','梟神奪食','比劫奪財','貪財壞印'];
     const ALL_GEJU = ['正官','七殺','正財','偏財','食神','傷官','正印','偏印','建祿','羊刃','月劫','從強','從弱'];
 
@@ -3027,6 +3030,32 @@
                 if (hit.length) add('羊刃逢沖', '破', '月支羊刃被沖', hit.map(o => `${pN[o.i]}支${o.z}沖月支${zhis[1]}`).join('、'));
                 break;
             }
+        }
+        // ---- 從格：另有成敗規則，不套用正格的全盤警示 ----
+        if (baseName === '從強格' || baseName === '從弱格') {
+            const mark = (name, lv, why) => { const o = out.find(x => x.name === name); if (o) { o.mit = lv; o.why += why; } };
+            if (baseName === '從強格') {
+                if (tou('食傷').length) add('從強洩秀', '成', '旺神以食傷宣洩，氣勢流通（如木火通明）', desc('食傷'));
+                if (tou('印').length) add('印比成勢', '成', '印星透干，生扶旺神、氣勢更純', desc('印'));
+                if (tou('官殺').length) {
+                    add('從強逢官殺', '破', '官殺透干，剋犯旺神', desc('官殺'));
+                    if (tou('印').length) mark('從強逢官殺', 'qing', `；印星通關（官殺生印、印生身）：${desc('印')} → 減輕`);
+                }
+                if (tou('財').length) {
+                    add('群劫爭財', '破', '財星透干，眾比劫爭奪', desc('財'));
+                    if (tou('食傷').length) mark('群劫爭財', touRoot('食傷') ? 'jie' : 'qing', `；食傷通關：${desc('食傷')} → ${touRoot('食傷') ? '已化解' : '減輕'}`);
+                }
+            } else {
+                const kinds = ['食傷', '財', '官殺'].filter(k => tou(k).length);
+                if (kinds.length >= 2) add('從勢流通', '成', '財、官殺、食傷中至少兩類透干，順勢流通', kinds.map(k => desc(k)).join('；'));
+                if (touRoot('比劫')) add('比劫逆勢', '破', '比劫透干有根，日主不甘從', desc('比劫'));
+                if (touRoot('印')) {
+                    add('印星逆勢', '破', '印星透干有根，生扶日主、逆其勢', desc('印'));
+                    if (touRoot('財')) mark('印星逆勢', 'jie', `；財星制印：${desc('財')} → 已化解`);
+                    else if (tou('財').length) mark('印星逆勢', 'qing', `；財星制印：${desc('財')} → 減輕`);
+                }
+            }
+            return out;
         }
         // ---- 全盤警示（不分格局） ----
         if (tou('官').length && tou('殺').length) add('官殺混雜', '破', '正官、七殺同時透干', `${desc('官')}、${desc('殺')}`);
@@ -5414,21 +5443,19 @@
             return `<span class="gj-lamp gj-anim ${lit ? (type === '成' ? 'ok' : 'bad') : ''} ${m || ''}" style="--d:${(1.2 + i * 0.05).toFixed(2)}s;"><i>${m === 'jie' ? '解' : m === 'qing' ? '輕' : type}</i>${name}</span>`;
         };
         window.__tgGuards = [];
-        if (geJuYongShen.isExtreme) {
-            comboHtml = '<div class="gj-cb-none">從格不論成敗</div>';
-            comboPromptText = '從格，不論成敗';
-        } else {
-            const combos = detectGeJuCombos([yg, mg, dg, tg], [yz, mz, dz, tz], dg, geJuYongShen.geJuBaseName, tradStrong);
+        {
+            const comboBase = geJuYongShen.isExtreme ? (geJuYongShen.congGeResult === '從強' ? '從強格' : '從弱格') : geJuYongShen.geJuBaseName;
+            const combos = detectGeJuCombos([yg, mg, dg, tg], [yz, mz, dz, tz], dg, comboBase, tradStrong);
             window.__tgGuards = combos.filter(c => c.mit && c.guard);
             if (window.__tgGuards.length && window.__renderLiuri) window.__renderLiuri();
             const hitNames = combos.map(c => c.name);
             combos.forEach(c => { if (c.mit) comboMit[c.name] = c.mit; });
-            const cand = COMBO_CATALOG[geJuYongShen.geJuBaseName] || [];
-            const warn = COMBO_WARNINGS.filter(w => !cand.some(c => c[0] === w));
+            const cand = COMBO_CATALOG[comboBase] || [];
+            const warn = geJuYongShen.isExtreme ? [] : COMBO_WARNINGS.filter(w => !cand.some(c => c[0] === w));
             let li = 0;
             comboHtml = `
                 <div class="gj-lamp-row"><span class="gj-lamp-lbl">本格</span><div class="gj-lamps">${cand.map(([n, t]) => lampHtml(n, t, hitNames.includes(n), li++)).join('') || '<span class="gj-lamp-empty">此格無組合標籤</span>'}</div></div>
-                <div class="gj-lamp-row"><span class="gj-lamp-lbl">全盤</span><div class="gj-lamps">${warn.map(n => lampHtml(n, '破', hitNames.includes(n), li++)).join('')}</div></div>
+                ${warn.length ? `<div class="gj-lamp-row"><span class="gj-lamp-lbl">全盤</span><div class="gj-lamps">${warn.map(n => lampHtml(n, '破', hitNames.includes(n), li++)).join('')}</div></div>` : ''}
                 ${combos.length ? `<div class="gj-cb-list">${combos.map((c, i) => `
                     <div class="gj-cb ${c.type === '成' ? 'ok' : 'bad'} ${c.mit || ''} gj-anim" style="--d:${(1.5 + i * 0.1).toFixed(2)}s;">
                         <div class="gj-cb-top"><span class="gj-cb-tag">${c.mit === 'jie' ? '破→解' : c.mit === 'qing' ? '破・輕' : c.type}</span><b>${c.name}</b><span class="gj-cb-cond">${c.cond}</span></div>
