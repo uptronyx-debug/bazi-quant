@@ -673,6 +673,18 @@
 
         /* ===== 我的命盤（localStorage 儲存/切換） ===== */
         .saved-charts-panel { margin-bottom: 18px; }
+        .seg2 { display:grid; grid-template-columns:1fr 1fr; gap:0; padding:4px; border-radius:10px; border:1px solid var(--border); background:#1b1b1b; }
+        .seg2 button { grid-column:auto; margin:0; background:transparent; color:#888; border:none; border-radius:7px; padding:10px; font-size:15px; }
+        .seg2 button:hover { background:#262626; color:#ccc; transform:none; box-shadow:none; }
+        .seg2 button.on { background:var(--accent); color:#000; }
+        .bz-cand { display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; font-size:13px; color:#ccc; padding:2px 4px; min-height:22px; }
+        .bz-cand b { color:#e8f6fa; }
+        .bz-lbl { color:#7f95a3; font-size:12px; }
+        .bz-age { color:#00d2ff; font-size:12px; }
+        .bz-warn { color:#ffa94d; font-size:12px; }
+        .bz-alt { display:flex; gap:5px; margin-left:auto; }
+        .bz-alt button { width:auto; grid-column:auto; margin:0; padding:2px 9px; font-size:11.5px; border-radius:999px; background:transparent; border:1px solid #333; color:#888; }
+        .bz-alt button.on { color:#00d2ff; border-color:#00d2ff; }
         .site-foot { display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:26px; }
         .vc-panel { position:relative; display:inline-flex; align-items:center; gap:8px; padding:6px 12px 6px 10px; border-radius:999px; background:linear-gradient(180deg, #0d1a20, #091216); border:1px solid rgba(0,210,255,.35); box-shadow:0 0 12px rgba(0,210,255,.18), inset 0 0 10px rgba(0,210,255,.08); overflow:hidden; }
         .vc-panel::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(0,210,255,.18), transparent); transform:translateX(-100%); animation:vcScan 4s ease-in-out infinite; pointer-events:none; }
@@ -1018,7 +1030,7 @@
 
     <!-- 手動八字輸入介面 -->
     <div class="form-group" id="baziInputGroup" style="display: none; flex-direction: column; gap: 15px; margin-bottom: 20px;">
-        <div class="loc-row" id="genderSlotBazi"></div>
+        <div class="seg2" id="genderSeg"><button type="button" data-g="1" onclick="setGenderSeg(1)">男生</button><button type="button" data-g="0" onclick="setGenderSeg(0)">女生</button></div>
         <div style="background-color: #2a2a2a; padding: 15px; border-radius: 6px; border: 1px solid var(--border);">
             <div style="display: grid; grid-template-columns: 40px 1fr 1fr; gap: 10px; align-items: center; margin-bottom: 10px;">
                 <span style="color:#aaa; font-size:14px; font-weight:bold; text-align:center;">年柱</span>
@@ -1041,16 +1053,8 @@
                 <select id="tz" style="padding: 10px; font-size:15px;"></select>
             </div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
-            <div style="position: relative;">
-                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 13px;">西元年</span>
-                <input type="number" id="baziYear" title="出生年份，用來推算流年" style="padding-left: 60px; padding-right: 8px;">
-            </div>
-            <div style="position: relative;">
-                <span style="position: absolute; left: 12px; top: 13px; color: #888; font-size: 13px;">起運歲</span>
-                <input type="number" id="baziStartAge" value="1" title="大運幾歲開始交運 (虛歲)" style="padding-left: 60px; padding-right: 8px;">
-            </div>
-        </div>
+        <div id="baziCand" class="bz-cand"></div>
+        <input type="hidden" id="baziYear"><input type="hidden" id="baziStartAge" value="1">
     </div>
 
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
@@ -1321,11 +1325,38 @@
         if (typeof updateLocInfo === 'function') updateLocInfo();
     }
 
+    // ===== 手動八字：性別切換＋由四柱反推出生日期（自動得到出生年與起運歲） =====
+    function setGenderSeg(g) {
+        g = String(g); document.getElementById('gender').value = g;
+        document.querySelectorAll('#genderSeg button').forEach(b => b.classList.toggle('on', b.dataset.g === g));
+        if (document.getElementById('baziCand')) renderBaziCand();
+    }
+    function baziCands() {
+        const v = id => document.getElementById(id).value;
+        try { return Solar.fromBaZi(v('yg') + v('yz'), v('mg') + v('mz'), v('dg') + v('dz'), v('tg') + v('tz'), 2, 1900).sort((a, b) => a.getYear() - b.getYear()); }
+        catch (e) { return []; }
+    }
+    function baziPick(L) {
+        const want = parseInt(document.getElementById('baziYear').value);
+        const Y = new Date().getFullYear();
+        return L.find(s => s.getYear() === want) || L.filter(s => s.getYear() <= Y).pop() || L[0] || null;
+    }
+    document.addEventListener('change', (e) => {
+        if (e.target.closest && e.target.closest('#baziInputGroup select')) { document.getElementById('baziYear').value = ''; renderBaziCand(); }
+    });
+    function baziPickYear(y) { document.getElementById('baziYear').value = y; renderBaziCand(); }
+    function renderBaziCand() {
+        const box = document.getElementById('baziCand'); if (!box || typeof Solar === 'undefined') return;
+        const L = baziCands(), s = baziPick(L), Y = new Date().getFullYear();
+        if (!s) { document.getElementById('baziYear').value = ''; box.innerHTML = '<span class="bz-warn">這組干支查無對應日期，大運起運歲改用估算</span>'; return; }
+        document.getElementById('baziYear').value = s.getYear();
+        const age = Y - s.getYear();
+        box.innerHTML = `<span class="bz-lbl">推算出生</span><b>${s.getYear()}/${s.getMonth()}/${s.getDay()} ${s.getHour()}時</b><span class="bz-age">${age >= 0 ? '約 ' + age + ' 歲' : '未出生'}</span>`
+            + (L.length > 1 ? `<span class="bz-alt">${L.map(o => `<button type="button" class="${o === s ? 'on' : ''}" onclick="baziPickYear(${o.getYear()})">${o.getYear()}</button>`).join('')}</span>` : '');
+    }
     function toggleInputMode() {
         const mode = document.querySelector('input[name="inputMode"]:checked').value;
-        const gb = document.getElementById('genderBox');
-        if (mode === 'date') document.querySelector('#dateInputGroup .loc-row').prepend(gb);
-        else document.getElementById('genderSlotBazi').appendChild(gb);
+        if (mode !== 'date') { setGenderSeg(document.getElementById('gender').value); renderBaziCand(); }
         if (mode === 'date') {
             document.getElementById('dateInputGroup').style.display = 'flex';
             document.getElementById('baziInputGroup').style.display = 'none';
@@ -4624,7 +4655,18 @@
             dg = document.getElementById('dg').value; dz = document.getElementById('dz').value;
             tg = document.getElementById('tg').value; tz = document.getElementById('tz').value;
             
-            startYearOfLife = parseInt(document.getElementById('baziYear').value) || (currentYear - 30);
+            // 由四柱反推出生日期：找得到就用真實的出生年與大運；找不到才用估算
+            const cand = baziPick(baziCands());
+            if (cand) {
+                startYearOfLife = cand.getYear();
+                cand.getLunar().getEightChar().getYun(gender).getDaYun().forEach(dy => {
+                    if (dy.getIndex() > 0 && dy.getIndex() <= 10) {
+                        const gz = dy.getGanZhi();
+                        daYunData.push({ index: dy.getIndex(), startYear: dy.getStartYear(), startAge: dy.getStartAge(), gan: gz.charAt(0), zhi: gz.charAt(1), ganZhi: gz });
+                    }
+                });
+            }
+            if (!startYearOfLife) startYearOfLife = currentYear - 30;
             let yunStartAge = parseInt(document.getElementById('baziStartAge').value) || 1;
 
             const isYangYear = stemPolarity[yg] === 1;
@@ -4634,7 +4676,7 @@
             const stems = ["甲","乙","丙","丁","戊","己","庚","辛","壬","癸"];
             const branches = ["子","丑","寅","卯","辰","巳","午","未","申","酉","戌","亥"];
 
-            for (let i = 1; i <= 10; i++) {
+            for (let i = 1; i <= 10 && !cand; i++) {
                 let gIdx = (stems.indexOf(mg) + i * direction) % 10;
                 if(gIdx < 0) gIdx += 10;
                 let zIdx = (branches.indexOf(mz) + i * direction) % 12;
