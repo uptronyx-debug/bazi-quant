@@ -3418,6 +3418,8 @@
     // 流日趨勢圖共用門檻：地支目標十神合計（依藏干比重×權重）低於此值視為零星餘氣、不計（如寅中戊土 10%）
     // 所有用到「每日趨勢圖」的分頁都用同一個門檻，日與日之間才可比較
     const LIURI_ZHI_MIN = 0.15;
+    // 干支權重（大運起一路到流日一致）：地支代表根基與實質力量約七成，天干代表外顯約三成
+    const GZ_W = { gan: 0.3, zhi: 0.7 };
     function computeLiuriWealth(dGan, dZhi, dayGan, dayElement) {
         // 依原則掃描（不查表）：財星 1.0、食傷 0.5（食傷生財）；地支依量化系統藏干比重加總
         const caiEl = wuxingRel[dayElement].ke, ssEl = wuxingRel[dayElement].sheng;
@@ -3434,7 +3436,7 @@
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
         // 當天要有財星（天干為財，或地支藏干含財）才算財旺日；只有食傷屬於生財之源，力量較弱
         const hasCai = ganElementMap[dGan] === caiEl || (zhiOK && Object.keys(hw).some(hg => ganElementMap[hg] === caiEl));
-        const score = Math.max(0, Math.min(100, Math.round((val(dGan) + zhiE) / 2 * 100)));
+        const score = Math.max(0, Math.min(100, Math.round((val(dGan) * GZ_W.gan + zhiE * GZ_W.zhi) * 100)));
         const tier = (ganOK && zhiOK && hasCai) ? '財旺日' : ((ganOK || zhiOK) ? '半財' : '平');
         const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
         const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
@@ -3539,9 +3541,15 @@
         if (ctx.targets.includes(careerCatOf(ganElementMap[zhiMainGan(zhi)], dayElement))) n++;
         return n;
     }
+    // 每柱：天干 30%＋地支本氣 70%（轉職為人生大事，地支只看本氣，從嚴）
+    function careerPillarW(gan, zhi, ctx, dayElement) {
+        const g = ctx.targets.includes(careerCatOf(ganElementMap[gan], dayElement)) ? 1 : 0;
+        const z = ctx.targets.includes(careerCatOf(ganElementMap[zhiMainGan(zhi)], dayElement)) ? 1 : 0;
+        return g * GZ_W.gan + z * GZ_W.zhi;
+    }
     function careerScore(yG, yZ, mG, mZ, ctx, dayElement) {
         const y = careerPillarScore(yG, yZ, ctx, dayElement), m = careerPillarScore(mG, mZ, ctx, dayElement);
-        const score = Math.round(y / 2 * 40 + m / 2 * 60);
+        const score = Math.round(careerPillarW(yG, yZ, ctx, dayElement) * 40 + careerPillarW(mG, mZ, ctx, dayElement) * 60);
         return { y, m, score, ok: score >= 60 };
     }
 
@@ -3566,7 +3574,7 @@
         const zhiOK = zhiE >= LIURI_ZHI_MIN;
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
         const hasGS = ganElementMap[dGan] === gsEl || (zhiOK && Object.keys(hw).some(hg => ganElementMap[hg] === gsEl));
-        const score = Math.max(0, Math.min(100, Math.round((val(dGan) + zhiE) / 2 * 100)));
+        const score = Math.max(0, Math.min(100, Math.round((val(dGan) * GZ_W.gan + zhiE * GZ_W.zhi) * 100)));
         const tier = (ganOK && zhiOK && hasGS) ? '官旺日' : ((ganOK || zhiOK) ? '半官' : '平');
         const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
         const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
@@ -3591,7 +3599,7 @@
         });
         const zhiOK = zhiE >= LIURI_ZHI_MIN;
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
-        const score = Math.max(0, Math.min(100, Math.round((val(dGan) + zhiE) / 2 * 100)));
+        const score = Math.max(0, Math.min(100, Math.round((val(dGan) * GZ_W.gan + zhiE * GZ_W.zhi) * 100)));
         const tier = (ganOK && zhiOK) ? '慎言日' : ((ganOK || zhiOK) ? '人際活絡' : '平');
         const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
         const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
