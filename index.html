@@ -417,6 +417,14 @@
         .lw-半官 .lw-chip { color:#7fb8ea; border-color:#3a6fa8; }
         .lw-topic { cursor:pointer; }
         .lw-topic.off { cursor:default; }
+        .topic-ren .lw-topic.on { color:#c792ea; border-color:#c792ea; background:rgba(199,146,234,.12); box-shadow:0 0 8px rgba(199,146,234,.35); }
+        .topic-ren .lc-cell { background: linear-gradient(180deg, rgba(199,146,234,var(--a)), rgba(199,146,234,calc(var(--a) * .35))), #121212; }
+        .topic-ren .lc-cell.wang { border-color:rgba(199,146,234,.7); box-shadow:0 0 8px rgba(199,146,234,.25); }
+        .topic-ren .lc-wang { background:#c792ea; box-shadow:0 0 5px #c792ea; }
+        .lw-慎言日 .lw-chip { color:#000; background:#c792ea; border-color:#c792ea; box-shadow:0 0 6px rgba(199,146,234,.6); }
+        .lw-人際活絡 .lw-chip { color:#d4b0ee; border-color:#8a5fb0; }
+        .lw-tip { font-size:11.5px; color:#a99bb8; line-height:1.6; margin:2px 0 10px; padding:6px 10px; border-left:2px solid #c792ea; background:rgba(199,146,234,.06); border-radius:0 6px 6px 0; }
+        .lw-tip b { color:#e3c4f7; }
         .topic-work .lw-topic.on { color:#5ab0ff; border-color:#5ab0ff; background:rgba(90,176,255,.12); box-shadow:0 0 8px rgba(90,176,255,.35); }
         .topic-work .lc-cell { background: linear-gradient(180deg, rgba(90,176,255,var(--a)), rgba(90,176,255,calc(var(--a) * .35))), #121212; }
         .topic-work .lc-cell.wang { border-color:rgba(90,176,255,.7); box-shadow:0 0 8px rgba(90,176,255,.25); }
@@ -3529,6 +3537,30 @@
     }
 
     /**
+     * 人際流日（比劫能量）：不分身強身弱，掃描比肩、劫財旺的日子
+     *  天干：比劫 1.0；地支：依量化系統藏干比重，比劫 ×1.0
+     *  天干、地支皆含比劫 → 慎言日（人際交集旺，容易節外生枝、口角）
+     *  身弱者比劫為幫扶，體感通常不明顯；身強者較容易感受到
+     */
+    function computeLiuriRen(dGan, dZhi, dayGan, dayElement) {
+        const val = g => ganElementMap[g] === dayElement ? 1.0 : 0;
+        const C = g => elementColors[ganElementMap[g]];
+        const ganOK = val(dGan) > 0;
+        let zhiE = 0; const zhiParts = [];
+        const hw = zhiHiddenWeights[dZhi] || {};
+        Object.keys(hw).forEach(hg => {
+            const v = val(hg) * hw[hg];
+            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
+        });
+        const zhiOK = zhiE > 0;
+        const score = Math.max(0, Math.min(100, Math.round((val(dGan) + zhiE) / 2 * 100)));
+        const tier = (ganOK && zhiOK) ? '慎言日' : ((ganOK || zhiOK) ? '人際活絡' : '平');
+        const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
+        const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
+        return { score, tier, ganOK, zhiOK, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
+    }
+
+    /**
      * 流日三合／三會偵測（延伸應用，非教材規則）：
      *  只在「原局＋大運＋流年」已具兩字、由流日補上第三字時成立（原局本身已成局者不算）
      *  財局 → 財星加強；食傷局 → 食傷生財；比劫局 → 比劫奪財（破財）；
@@ -3555,6 +3587,10 @@
             const from = used.map(u => `${u.from}${u.zhi}`).join('、');
             const strong = ju.kind === '三會';
             let effect = null;
+            if (topic === 'ren') {
+                if (ju.el === dayElement) out.push({ name, kind: ju.kind, from, members: ju.zhi, type: 'boost', label: '比劫局', bonus: strong ? 30 : 25 });
+                return;
+            }
             if (topic === 'work') {
                 if (ju.el === gsEl) effect = { type: 'boost', label: '官殺局', bonus: strong ? 30 : 25 };
                 else if (ju.el === caiEl) effect = { type: 'boost', label: '財局（財生官）', bonus: strong ? 15 : 12 };
@@ -4829,6 +4865,8 @@
                 const topic = window.__lwTopic || 'cai';
                 const T = topic === 'work'
                     ? { c: '#5ab0ff', c2: '#3a6fa8', c3: '#a8d4ff', rgb: '90,176,255', hot: '官旺日', mark: '旺', energy: '官殺能量', hotShort: '官旺' }
+                    : topic === 'ren'
+                    ? { c: '#c792ea', c2: '#8a5fb0', c3: '#e3c4f7', rgb: '199,146,234', hot: '慎言日', mark: '慎', energy: '比劫能量', hotShort: '慎言' }
                     : { c: '#ffb347', c2: '#c98a3a', c3: '#ffcf7a', rgb: '255,179,71', hot: '財旺日', mark: '旺', energy: '財星能量', hotShort: '財旺' };
                 const isHot = t => t === T.hot;
                 if (typeof Solar === 'undefined') { document.getElementById('liuriOutput').innerHTML = ''; return; }
@@ -4846,13 +4884,13 @@
                 // 財星能量＋三合三會加權＋破財
                 const fullDay = (bz, year) => {
                     const g = bz.getDayGan(), z = bz.getDayZhi();
-                    const w = topic === 'work' ? computeLiuriWork(g, z, dayGan, dayElement) : computeLiuriWealth(g, z, dayGan, dayElement);
+                    const w = topic === 'work' ? computeLiuriWork(g, z, dayGan, dayElement) : topic === 'ren' ? computeLiuriRen(g, z, dayGan, dayElement) : computeLiuriWealth(g, z, dayGan, dayElement);
                     const ju = detectLiuriJu(z, juSources(bz, year), dayElement, topic);
                     const bonus = ju.filter(j => j.type === 'boost').reduce((a, j) => a + j.bonus, 0);
                     if (bonus) w.score = Math.min(100, w.score + bonus);
                     // 三合／三會成局（加強）時，局內的六合被局取代，不再視為合絆破財
                     const boostMembers = ju.filter(j => j.type === 'boost').flatMap(j => j.members);
-                    const po = topic === 'work' ? [] : detectPoCai(g, z, baseGans, baseZhis, dayGan, dayElement)
+                    const po = topic !== 'cai' ? [] : detectPoCai(g, z, baseGans, baseZhis, dayGan, dayElement)
                         .filter(h => !(h.liuheZhi && boostMembers.includes(h.liuheZhi)))
                         .concat(ju.filter(j => j.type === 'po').map(j => ({ type: j.kind, txt: j.txt })));
                     const career = null; // 轉職改以「轉職」檢視（月為單位）呈現，不與流日重疊
@@ -4936,7 +4974,7 @@
                         <circle class="lw-pulse" cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="6" fill="none" stroke="#00d2ff" stroke-width="1.8"/>
                         <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${wang ? 6 : 4.4}" fill="${wang ? T.c : '#141414'}" stroke="${wang ? T.c3 : T.c2}" stroke-width="1.8"/>
                         <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="16" fill="transparent"/>
-                        ${wang ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y - 14).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="bold" fill="${T.c3}">旺</text>` : ''}
+                        ${wang ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y - 14).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="bold" fill="${T.c3}">${T.mark}</text>` : ''}
                         ${pt.d.career && pt.d.career.ok ? `<g class="lw-zhuan"><rect x="${(pt.x - 9).toFixed(1)}" y="${(pt.y - (wang ? 45 : 30)).toFixed(1)}" width="18" height="16" rx="4" fill="#2ed573"/><text x="${pt.x.toFixed(1)}" y="${(pt.y - (wang ? 45 : 30) + 12.5).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">轉</text></g>` : ''}
                         ${pt.d.juList.some(j => j.type === 'boost') ? `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="11" fill="none" stroke="#b388ff" stroke-width="1.6" stroke-dasharray="3 2.5" class="lw-ju-ring"/>` : ''}
                         ${pt.d.poCai.length ? `<g class="lw-po"><circle cx="${pt.x.toFixed(1)}" cy="${(Math.min(baseY - 12, pt.y + 18)).toFixed(1)}" r="9.5" fill="#2a0d0d" stroke="#ff5252" stroke-width="1.4"/><text x="${pt.x.toFixed(1)}" y="${(Math.min(baseY - 12, pt.y + 18) + 4.3).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff6b6b">破</text></g>` : ''}
@@ -5104,13 +5142,13 @@
                     <div class="lw-topics">
                         <span class="lw-topic ${topic === 'cai' ? 'on' : ''}" onclick="lwTopic('cai')">💰 財</span>
                         <span class="lw-topic ${topic === 'work' ? 'on' : ''}" onclick="lwTopic('work')">💼 工作</span>
-                        <span class="lw-topic off" title="規劃中">🤝 人際</span>
+                        <span class="lw-topic ${topic === 'ren' ? 'on' : ''}" onclick="lwTopic('ren')">🤝 人際</span>
                         <span class="lw-topic off" title="規劃中">🌸 桃花</span>
                     </div>
                     <div class="lw-view">
                         <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
                         <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
-                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>`}
+                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : topic === 'cai' ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>` : ''}
                     </div>
                     </div>
                     <div class="liuri-legend">
@@ -5118,12 +5156,13 @@
                         ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財</span>` : ''}
                         <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
                     </div>
+                    ${topic === 'ren' ? `<div class="lw-tip">比劫旺的日子人際交集多、容易節外生枝。小人與貴人一線之隔：<b>謹言慎行、少說多聽</b>，避免在這天做重大表態。</div>` : ''}
                     <div class="lw-pane" data-v="d10">
                     <div class="liuri-chart-wrap lw-scroll">${svg}</div>
                     <div id="liuriCard"></div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
-                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>`}
+                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : topic === 'cai' ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : ''}
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('⚡ 流日動能', body, true);
                 document.getElementById('liuriOutput').className = 'topic-' + topic;
@@ -5191,10 +5230,10 @@
                                 style="--a:${a}; --d:${(dn * 0.012).toFixed(3)}s;" onclick="lwCalPick('${key}')">
                             <span class="lc-n">${dn}</span>
                             <span class="lc-gz"><b style="color:${elementColors[ganElementMap[info.g]]}">${info.g}</b><b style="color:${elementColors[zhiElementMap[info.z]]}">${info.z}</b></span>
-                            <span class="lc-tags">${wang ? '<i class="lc-wang">旺</i>' : ''}${info.ju.some(j => j.type === 'boost') ? '<i class="lc-ju">局</i>' : ''}${info.career && info.career.ok ? '<i class="lc-zh">轉</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}</span>
+                            <span class="lc-tags">${wang ? `<i class="lc-wang">${T.mark}</i>` : ''}${info.ju.some(j => j.type === 'boost') ? '<i class="lc-ju">局</i>' : ''}${info.career && info.career.ok ? '<i class="lc-zh">轉</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}</span>
                         </div>`;
                     }
-                    let detail = `<div class="lc-detail lc-hint">${topic === 'work' ? '點選日期查看官殺星細節' : '點選日期查看財星與破財細節'}</div>`;
+                    let detail = `<div class="lc-detail lc-hint">${topic === 'work' ? '點選日期查看官殺星細節' : topic === 'ren' ? '點選日期查看比劫細節' : '點選日期查看財星與破財細節'}</div>`;
                     if (sel) {
                         const { d, info } = sel;
                         detail = `<div class="lc-detail">
