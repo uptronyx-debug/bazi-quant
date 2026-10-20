@@ -879,6 +879,20 @@
         .mg-sex { grid-column:1 / 2; }
         .mg-sex button { padding:7px; font-size:13px; }
         .mg-go { grid-column:auto; margin:0; padding:9px; font-size:14px; }
+        .mg-done { display:flex; align-items:center; font-size:12.5px; color:#8fa3ad; padding:4px 2px; }
+        button.mg-del { width:auto; grid-column:auto; margin:0 0 0 auto; padding:6px 14px; font-size:12px; font-weight:normal; background:transparent; color:#888; border:1px solid #333; border-radius:999px; }
+        button.mg-del:hover { background:#222; color:#ccc; transform:none; box-shadow:none; }
+        button.mg-del.arm { color:#ff6b6b; border-color:#ff5252; }
+        .saved-chart-del.arm { color:#ff6b6b !important; font-size:11px; }
+        .mg-pie { display:flex; align-items:center; gap:14px; margin-bottom:8px; }
+        .mg-donut { width:96px; height:96px; flex-shrink:0; transform:rotate(0deg); }
+        .mg-donut-t { font-size:6px; font-weight:bold; }
+        .mg-legend { display:flex; flex-direction:column; gap:3px; font-size:12px; color:#bbb; flex:1; max-width:150px; }
+        .mg-lg { display:flex; align-items:center; gap:6px; white-space:nowrap; }
+        .mg-lg i { width:8px; height:8px; border-radius:2px; }
+        .mg-lg b { margin-left:auto; color:#888; font-weight:normal; }
+        .mg-nohour { font-style:normal; font-size:11px; color:#777; margin-left:6px; }
+        .mg-pie .mg-del { align-self:flex-start; }
         .mg-res { border:1px solid #2a2a2a; border-radius:10px; padding:12px; background:#151515; }
         .mg-pill { display:flex; align-items:center; gap:12px; margin-bottom:10px; flex-wrap:wrap; }
         .mg-pill span { display:flex; flex-direction:column; align-items:center; font-size:17px; line-height:1.15; }
@@ -891,7 +905,7 @@
         .mg-bar-t { height:7px; border-radius:4px; background:#232323; overflow:hidden; }
         .mg-bar-t i { display:block; height:100%; border-radius:4px; }
         .mg-bar-v { color:#aaa; text-align:right; }
-        .mg-top { font-size:13px; color:#aaa; margin-bottom:8px; }
+        .mg-top { display:flex; align-items:baseline; flex-wrap:wrap; font-size:13px; color:#aaa; margin-bottom:8px; }
         .mg-cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
         .mg-card { border:1px solid #2a2a2a; border-radius:8px; padding:8px 10px; opacity:.6; }
         .mg-card.main { opacity:1; border-color:var(--c); box-shadow:0 0 8px color-mix(in srgb, var(--c) 30%, transparent); }
@@ -1570,7 +1584,7 @@
                         <span class="fr-rank-name">${f.name}</span>
                         <span class="fr-rank-track"><span style="width:${f.score.total}%; background:${g.color};"></span></span>
                         <span class="fr-rank-score" style="color:${g.color}">${f.score.total}</span>
-                        <span class="saved-chart-del" onclick="event.stopPropagation(); deleteFriend(${f.idx})">✕</span>
+                        <span class="saved-chart-del" onclick="event.stopPropagation(); deleteFriend(${f.idx}, this)">✕</span>
                     </div>`;
             }).join('') + `</div>`;
         }
@@ -1589,9 +1603,16 @@
         renderFriendsTab();
     }
     function selectFriend(idx) { __selectedFriendIdx = idx; renderFriendsTab(); }
-    function deleteFriend(idx) {
+    // 點兩下確認（不用 confirm，部分瀏覽器或預覽環境會擋掉對話框）：第一下變紅色「刪除？」，3 秒內再點才執行
+    function armTwice(el) {
+        if (!el || el.dataset.arm) return true;
+        el.dataset.arm = '1'; const o = el.textContent; el.textContent = '刪除？'; el.classList.add('arm');
+        setTimeout(() => { if (el.isConnected) { delete el.dataset.arm; el.textContent = o; el.classList.remove('arm'); } }, 3000);
+        return false;
+    }
+    function deleteFriend(idx, el) {
         const list = getFriends();
-        if (!list[idx] || !confirm(`確定刪除「${list[idx].name}」？`)) return;
+        if (!list[idx] || !armTwice(el)) return;
         list.splice(idx, 1); setFriends(list);
         __selectedFriendIdx = null;
         renderFriendsTab();
@@ -1636,22 +1657,29 @@
     function gongTypeOf(z) { return GONG_TYPES.find(t => t.zhis.includes(z)); }
 
     // 另一半命盤：有時辰排四柱，沒有時辰排三柱（中午排盤避開子時換日）
-    // 十神分布：天干 1.0（日干除外）＋地支依量化系統藏干比重
+    // 十神「數量」：天干主星（日干除外）每個 1、地支藏干（副星）每個 1
+    // 並列最多：皆為核心性格；排序以有天干主星者優先（月干主星最強）
+    // 正偏：數量多者為主；數量相同時，有天干主星者為主；仍相同則兩者並重（雙重性格）
     function calcPartner(p) {
         const [y, m, d] = p.date.split('-').map(Number);
         const hasHour = p.hour !== '' && p.hour != null;
         const bz = Solar.fromYmdHms(y, m, d, hasHour ? +p.hour : 12, 0, 0).getLunar().getEightChar();
         const gans = [bz.getYearGan(), bz.getMonthGan(), bz.getDayGan()].concat(hasHour ? [bz.getTimeGan()] : []);
         const zhis = [bz.getYearZhi(), bz.getMonthZhi(), bz.getDayZhi()].concat(hasHour ? [bz.getTimeZhi()] : []);
-        const dg = gans[2], cnt = {};
-        Object.keys(TG_CAT_OF).forEach(k => cnt[k] = 0);
-        gans.forEach((g, i) => { if (i !== 2) cnt[getPreciseTenGod(g, dg)] += 1.0; });
-        zhis.forEach(z => { const w = zhiHiddenWeights[z] || {}; Object.keys(w).forEach(h => cnt[getPreciseTenGod(h, dg)] += w[h]); });
+        const dg = gans[2], cnt = {}, ganStar = {};
+        Object.keys(TG_CAT_OF).forEach(k => { cnt[k] = 0; ganStar[k] = 0; });
+        gans.forEach((g, i) => { if (i === 2) return; const t = getPreciseTenGod(g, dg); cnt[t]++; ganStar[t] += i === 1 ? 2 : 1; }); // 月干主星加權
+        zhis.forEach(z => Object.keys(zhiHiddenWeights[z] || {}).forEach(h => cnt[getPreciseTenGod(h, dg)]++));
         const total = Object.values(cnt).reduce((a, b) => a + b, 0);
-        const cat = {}; Object.keys(TG_PROFILE).forEach(c => cat[c] = TG_PROFILE[c].pair.reduce((s, t) => s + cnt[t], 0) / total * 100);
-        const top = Object.keys(cat).sort((a, b) => cat[b] - cat[a])[0];
-        const pair = TG_PROFILE[top].pair, topSub = cnt[pair[0]] >= cnt[pair[1]] ? pair[0] : pair[1];
-        return { gans, zhis, hasHour, dg, cnt, cat, top, topSub, pillars: gans.map((g, i) => g + zhis[i]) };
+        const catN = {}, catStar = {}, cat = {};
+        Object.keys(TG_PROFILE).forEach(c => { const pr = TG_PROFILE[c].pair; catN[c] = cnt[pr[0]] + cnt[pr[1]]; catStar[c] = ganStar[pr[0]] + ganStar[pr[1]]; cat[c] = catN[c] / total * 100; });
+        const order = Object.keys(TG_PROFILE).sort((a, b) => catN[b] - catN[a] || catStar[b] - catStar[a]);
+        const maxN = catN[order[0]], tops = order.filter(c => catN[c] === maxN);
+        const mainSubs = c => { const [a, b] = TG_PROFILE[c].pair;
+            if (cnt[a] !== cnt[b]) return [cnt[a] > cnt[b] ? a : b];
+            if (ganStar[a] !== ganStar[b]) return [ganStar[a] > ganStar[b] ? a : b];
+            return [a, b]; };
+        return { gans, zhis, hasHour, dg, cnt, ganStar, catN, cat, order, tops, top: tops[0], mainSubs, pillars: gans.map((g, i) => g + zhis[i]) };
     }
 
     function renderMarriageTab() {
@@ -1677,27 +1705,11 @@
                 <button class="mg-go" onclick="savePartner()">排盤</button>
             </div>`;
         if (r) {
-            const prof = TG_PROFILE[r.top];
-            const bars = Object.keys(TG_PROFILE).sort((a, b) => r.cat[b] - r.cat[a]).map(c => `
-                <div class="mg-bar"><span class="mg-bar-l" style="color:${TG_PROFILE[c].color}">${c}</span>
-                <span class="mg-bar-t"><i style="width:${r.cat[c].toFixed(1)}%; background:${TG_PROFILE[c].color}"></i></span>
-                <span class="mg-bar-v">${r.cat[c].toFixed(0)}%</span></div>`).join('');
-            const subCard = (t) => `<div class="mg-card ${t === r.topSub ? 'main' : ''}" style="--c:${prof.color}">
-                <div class="mg-card-h">${t}<small>${r.cnt[t].toFixed(1)}</small></div>
-                <div class="mg-sec">性格</div>${prof.trait[t].map(x => `<div class="mg-li">${x}</div>`).join('')}
-                ${prof.care[t] ? `<div class="mg-sec">在意</div><div class="mg-li">${prof.care[t]}</div>` : ''}
-                <div class="mg-sec">相處</div>${prof.tip[t].map(x => `<div class="mg-li">${x}</div>`).join('')}
-            </div>`;
             html += `
-                <div class="mg-res">
-                    <div class="mg-pill">${r.pillars.map((pz, i) => `<span><b style="color:${elementColors[ganElementMap[pz[0]]]}">${pz[0]}</b><b style="color:${elementColors[zhiElementMap[pz[1]]]}">${pz[1]}</b><small>${['年', '月', '日', '時'][i]}</small></span>`).join('')}${r.hasHour ? '' : '<em>無時柱</em>'}<span class="mg-del" onclick="clearPartner()">清除</span></div>
-                    <div class="mg-bars">${bars}</div>
-                    <div class="mg-top">十神最多：<b style="color:${prof.color}">${prof.pair.join('、')}</b></div>
-                    <div class="mg-cards">${prof.pair.map(subCard).join('')}</div>
-                    <button class="act-btn mg-prompt" id="partnerPromptBtn" onclick="copyPartnerPrompt()">📋 相處提詞</button>
-                </div>`;
+                <div class="mg-done">已排盤${r.hasHour ? '' : '（時辰不詳，以三柱計算）'}<button type="button" class="mg-del" id="partnerDel" onclick="clearPartner()">清除</button></div>
+                <button class="act-btn mg-prompt" id="partnerPromptBtn" onclick="copyPartnerPrompt()">📋 相處提詞</button>`;
         } else {
-            html += `<div class="rel-coming">輸入另一半的出生日期（時辰可不填），看他的個性、在意的點與相處方式</div>`;
+            html += `<div class="rel-coming">輸入另一半的出生日期（時辰可不填），排盤後產生相處提詞</div>`;
         }
         panel.innerHTML = html;
     }
@@ -1711,13 +1723,29 @@
         setPartner({ date, hour, gender });
         renderMarriageTab();
     }
-    function clearPartner() { if (!confirm('確定清除另一半的資料？')) return; setPartner(null); window.__partnerSex = null; renderMarriageTab(); }
+    // 不用 confirm（部分瀏覽器或預覽環境會擋掉對話框）：點第一次變成「確定清除？」，3 秒內再點一次才清除
+    function clearPartner() {
+        const b = document.getElementById('partnerDel');
+        if (b && !b.dataset.arm) { b.dataset.arm = '1'; b.textContent = '確定清除？'; b.classList.add('arm'); setTimeout(() => { if (b.isConnected) { delete b.dataset.arm; b.textContent = '清除'; b.classList.remove('arm'); } }, 3000); return; }
+        setPartner(null); window.__partnerSex = null; renderMarriageTab();
+    }
 
     function copyPartnerPrompt() {
         const ctx = window.__friendCtx, p = getPartner(); if (!ctx || !p) return;
-        const r = calcPartner(p), g = gongTypeOf(ctx.dz), prof = TG_PROFILE[r.top];
-        const dist = Object.keys(TG_PROFILE).sort((a, b) => r.cat[b] - r.cat[a]).map(c => `${c} ${r.cat[c].toFixed(0)}%`).join('、');
-        const sub = Object.keys(r.cnt).filter(k => r.cnt[k] > 0).sort((a, b) => r.cnt[b] - r.cnt[a]).map(k => `${k} ${r.cnt[k].toFixed(1)}`).join('、');
+        const r = calcPartner(p), g = gongTypeOf(ctx.dz);
+        const dist = r.order.map(c => `${c} ${r.catN[c]} 個`).join('、');
+        const sub = Object.keys(r.cnt).filter(k => r.cnt[k] > 0).sort((a, b) => r.cnt[b] - r.cnt[a]).map(k => `${k} ${r.cnt[k]}${r.ganStar[k] ? '（含天干主星）' : ''}`).join('、');
+        // 另一半原局通透（只放提詞，不上版面）
+        const PN = ['年', '月', '日', '時'].slice(0, r.gans.length);
+        const rootTxt = r.gans.map((g, i) => {
+            const rt = getTraditionalRoots(g, i, r.zhis, PN) || {}; const L = (rt.roots || []).map(x => `${x.pillarName}支${x.zhi}${x.type}`);
+            return `${PN[i]}干${g}${i === 2 ? '（日主）' : getPreciseTenGod(g, r.dg)}：${L.length ? '通根 ' + L.join('、') : '無根'}`;
+        }).join('\n');
+        const touTxt = [];
+        r.zhis.forEach((z, zi) => { const w = zhiHiddenWeights[z] || {}; const hs = Object.keys(w).sort((a, b) => w[b] - w[a]);
+            hs.forEach((h, k) => r.gans.forEach((g, gi) => { if (gi !== 2 && g === h) touTxt.push(`${PN[zi]}支${z}${['本氣', '中氣', '餘氣'][k] || ''}${h}${getPreciseTenGod(h, r.dg)} 透出${PN[gi]}干`); })); });
+        let relTxt = '';
+        try { relTxt = iaScan(iaPillars(r.gans, r.zhis, [])).map(x => '• ' + iaText(x)).join('\n'); } catch (e) { relTxt = ''; }
         const txt = `你是子平八字命理師。請根據下列排盤資料，給命主具體可執行的建議：如何跟這位另一半建立關係、日常怎麼互動、衝突時怎麼處理。
 
 【命主】
@@ -1728,13 +1756,16 @@
 【另一半】
 四柱：${r.pillars.join(' ')}${r.hasHour ? '' : '（時辰不詳，只有三柱）'}${p.gender != null ? `（${p.gender === 1 ? '男' : '女'}命）` : ''}
 日主：${r.dg}（${ganElementMap[r.dg]}）
-十神分布（天干＋地支藏干比重）：${dist}
+十神數量（天干主星＋地支藏干副星各計 1）：${dist}
 細項：${sub}
-十神最多：${prof.pair.join('、')}，其中較重的是${r.topSub}
-系統參考特質：性格「${prof.trait[r.topSub].join('；')}」${prof.care[r.topSub] ? `；在意「${prof.care[r.topSub]}」` : ''}；相處「${prof.tip[r.topSub].join('；')}」
+通根：
+${rootTxt}
+透干：${touTxt.length ? '\n' + touTxt.join('\n') : '無'}
+原局干支互動：${relTxt ? '\n' + relTxt : '無明顯刑沖合會'}
+
 
 【輸出要求】
-1. 另一半的個性與在意的點：以十神分布為主，夫妻宮特質為輔，點出他最在意什麼、最受不了什麼。
+1. 另一半的個性與在意的點：依十神數量與通根透干判讀（數量並列時以天干主星為主、月干最強；透干有根的十神最顯性），原局刑沖合會與命主夫妻宮特質為輔，點出他最在意什麼、最受不了什麼。
 2. 建立關係：命主該怎麼開場、怎麼讓對方有好感，具體到說話方式與行動。
 3. 日常互動：相處上的加分行為與地雷，各列 3 點。
 4. 衝突處理：對方生氣或冷戰時，命主該怎麼做。
@@ -1844,10 +1875,10 @@
         if (rb) rb.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function deleteSavedChart(idx) {
+    function deleteSavedChart(idx, el) {
         const list = getSavedCharts();
         if (!list[idx]) return;
-        if (!confirm(`確定要刪除「${list[idx].name}」這份命盤嗎？`)) return;
+        if (!armTwice(el)) return;
         list.splice(idx, 1);
         setSavedCharts(list);
         renderSavedChartsList();
@@ -1863,7 +1894,7 @@
             : list.map((item, idx) => `
                 <div class="saved-chart-chip">
                     <span class="saved-chart-name" onclick="loadSavedChart(${idx})">👤 ${item.name}</span>
-                    <span class="saved-chart-del" onclick="deleteSavedChart(${idx})">✕</span>
+                    <span class="saved-chart-del" onclick="event.stopPropagation(); deleteSavedChart(${idx}, this)">✕</span>
                 </div>
             `).join('');
         container.innerHTML = html;
@@ -5383,7 +5414,7 @@
                     <div class="lw-view">
                         <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
                         <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
-                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : topic === 'cai' ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>` : ''}
+                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : topic === 'cai' ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>` : `<span class="lw-vbtn" data-v="fr" onclick="lwView('fr')">朋友</span>`}
                     </div>
                     </div>
                     <div class="liuri-legend">
@@ -5397,7 +5428,7 @@
                     <div id="liuriCard"></div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
-                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : topic === 'cai' ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : ''}
+                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : topic === 'cai' ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : `<div class="lw-pane" data-v="fr" style="display:none;"><div id="friendPanel"></div></div>`}
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('⚡ 流日動能', body, true);
                 document.getElementById('liuriOutput').className = 'topic-' + topic;
@@ -5424,7 +5455,7 @@
                     window.__lwTopic = t;
                     const keepView = window.__lwViewCur || 'd10';
                     window.__renderLiuri();
-                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work') || (keepView === 'cc' && t === 'cai')) window.lwView(keepView);
+                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work') || (keepView === 'cc' && t === 'cai') || (keepView === 'fr' && t === 'ren')) window.lwView(keepView);
                 };
                 window.lwView = (v) => {
                     window.__lwViewCur = v;
@@ -5438,7 +5469,9 @@
                             else { const n = sel.i + d; if (n >= 0 && n < window.__zhMonths.length) window.lwZhPick(n); } };
                         attachSwipe(document.getElementById('zhCard'), () => step(-1), () => step(1)); } }
                     if (v === 'cc') { const c = document.getElementById('lwCc'); if (c) c.innerHTML = buildColorView(); }
-                    const lg = document.querySelector('#liuriOutput .liuri-legend'); if (lg) lg.style.display = (v === 'zh' || v === 'cc') ? 'none' : '';
+                    if (v === 'fr') renderFriendsTab();
+                    const lg = document.querySelector('#liuriOutput .liuri-legend'); if (lg) lg.style.display = (v === 'zh' || v === 'cc' || v === 'fr') ? 'none' : '';
+                    const tp = document.querySelector('#liuriOutput .lw-tip'); if (tp) tp.style.display = v === 'fr' ? 'none' : '';
                 };
                 window.lwCalShift = (k) => { const m = window.__lwCalMonth; window.__lwCalMonth = new Date(m.getFullYear(), m.getMonth() + k, 1); window.__lwCalSel = null; renderLwCalendar(); };
                 window.lwCalPick = (ds) => { window.__lwCalSel = ds; renderLwCalendar(); };
@@ -5513,17 +5546,15 @@
             parentScanPromptText = buildParentScanPromptText(parentScan);
             const relBody = `
                 <div class="rel-tabs">
-                    <div class="rel-tab-btn" data-tab="parents" onclick="switchRelTab('parents')">父母</div>
+                    <div class="rel-tab-btn active" data-tab="parents" onclick="switchRelTab('parents')">父母</div>
                     <div class="rel-tab-btn" data-tab="siblings" onclick="switchRelTab('siblings')">兄弟</div>
-                    <div class="rel-tab-btn active" data-tab="children" onclick="switchRelTab('children')">子女</div>
-                    <div class="rel-tab-btn" data-tab="peer" onclick="switchRelTab('peer')">朋友</div>
                     <div class="rel-tab-btn" data-tab="marriage" onclick="switchRelTab('marriage')">婚姻</div>
+                    <div class="rel-tab-btn" data-tab="children" onclick="switchRelTab('children')">子女</div>
                 </div>
-                <div class="rel-tab-panel" data-tab="parents" style="display:none;">${renderParentScanHtml(parentScan)}</div>
+                <div class="rel-tab-panel" data-tab="parents" style="display:block;">${renderParentScanHtml(parentScan)}</div>
                 <div class="rel-tab-panel" data-tab="siblings" style="display:none;">${renderSiblingScanHtml(siblingScan)}</div>
-                <div class="rel-tab-panel" data-tab="children" style="display:block;">${renderChildScanHtml(childScan)}</div>
-                <div class="rel-tab-panel" data-tab="peer" style="display:none;"><div id="friendPanel"></div></div>
                 <div class="rel-tab-panel" data-tab="marriage" style="display:none;"><div id="marriagePanel"></div></div>
+                <div class="rel-tab-panel" data-tab="children" style="display:none;">${renderChildScanHtml(childScan)}</div>
             `;
             document.getElementById('relativesOutput').innerHTML = wrapAccordion('👥 我的人際圈', relBody, false);
         } catch (e) {
