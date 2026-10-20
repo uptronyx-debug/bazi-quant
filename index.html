@@ -869,6 +869,38 @@
             .fr-input button { grid-column: 1 / -1; width: 100%; }
         }
         .rel-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 2px solid; margin-right: 4px; vertical-align: -1px; }
+        .mg-gong { display:flex; align-items:center; gap:14px; padding:10px 12px; border:1px solid #2a2a2a; border-radius:10px; background:#161616; }
+        .mg-gz { font-size:30px; font-weight:bold; line-height:1; }
+        .mg-tag { font-size:11px; color:#7f95a3; margin-bottom:4px; }
+        .mg-traits { display:flex; flex-wrap:wrap; gap:4px 6px; }
+        .mg-traits span { font-size:12px; color:#ddd; padding:2px 8px; border-radius:999px; background:#232323; }
+        .mg-input { display:grid; grid-template-columns:1.3fr 1fr; gap:8px; margin-bottom:12px; }
+        .mg-input input, .mg-input select { padding:9px 10px; font-size:14px; }
+        .mg-sex { grid-column:1 / 2; }
+        .mg-sex button { padding:7px; font-size:13px; }
+        .mg-go { grid-column:auto; margin:0; padding:9px; font-size:14px; }
+        .mg-res { border:1px solid #2a2a2a; border-radius:10px; padding:12px; background:#151515; }
+        .mg-pill { display:flex; align-items:center; gap:12px; margin-bottom:10px; flex-wrap:wrap; }
+        .mg-pill span { display:flex; flex-direction:column; align-items:center; font-size:17px; line-height:1.15; }
+        .mg-pill small { font-size:9.5px; color:#666; margin-top:2px; }
+        .mg-pill em { font-style:normal; font-size:11px; color:#777; }
+        .mg-del { margin-left:auto; font-size:11px !important; color:#777; cursor:pointer; flex-direction:row !important; }
+        .mg-bars { display:flex; flex-direction:column; gap:5px; margin-bottom:10px; }
+        .mg-bar { display:grid; grid-template-columns:36px 1fr 34px; align-items:center; gap:8px; font-size:12px; }
+        .mg-bar-l { font-weight:bold; }
+        .mg-bar-t { height:7px; border-radius:4px; background:#232323; overflow:hidden; }
+        .mg-bar-t i { display:block; height:100%; border-radius:4px; }
+        .mg-bar-v { color:#aaa; text-align:right; }
+        .mg-top { font-size:13px; color:#aaa; margin-bottom:8px; }
+        .mg-cards { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .mg-card { border:1px solid #2a2a2a; border-radius:8px; padding:8px 10px; opacity:.6; }
+        .mg-card.main { opacity:1; border-color:var(--c); box-shadow:0 0 8px color-mix(in srgb, var(--c) 30%, transparent); }
+        .mg-card-h { font-weight:bold; color:var(--c); font-size:14px; margin-bottom:4px; }
+        .mg-card-h small { font-weight:normal; color:#777; font-size:10px; margin-left:6px; }
+        .mg-sec { font-size:10px; color:#777; margin-top:6px; letter-spacing:1px; }
+        .mg-li { font-size:12px; color:#ddd; line-height:1.55; }
+        .mg-prompt { margin-top:12px; width:100%; }
+        @media (max-width: 480px) { .mg-cards { grid-template-columns:1fr; } }
         .rel-coming { font-size: 12px; color: #666; text-align: center; padding: 14px 0 4px 0; }
         @media (max-width: 500px) {
             .rel-star-grid { grid-template-columns: 1fr 1fr; }
@@ -1563,6 +1595,156 @@
         list.splice(idx, 1); setFriends(list);
         __selectedFriendIdx = null;
         renderFriendsTab();
+    }
+
+
+    // ===================================================================
+    // 婚姻分頁：由夫妻宮看伴侶特質＋輸入另一半命盤看個性與相處策略（資料存在本機瀏覽器）
+    // ===================================================================
+    const PARTNER_KEY = 'bazi_partner_v1';
+    const GONG_TYPES = [
+        { zhis: '子午卯酉', tag: '四正・桃花位', traits: ['高顏值、目光焦點、喜打扮'], sub: { 子: '皮膚白皙、質感精緻路線', 酉: '皮膚白皙、質感精緻路線', 午: '光鮮亮麗、時尚嗅覺敏銳', 卯: '光鮮亮麗、時尚嗅覺敏銳' } },
+        { zhis: '寅申巳亥', tag: '四生・驛馬', traits: ['陽剛明快、有話直說', '處事富衝勁、行動力強', '脾氣來得快去得快'] },
+        { zhis: '辰戌丑未', tag: '四墓庫', traits: ['穩重踏實、話藏心中', '安靜內斂、富有內涵'] }
+    ];
+    const TG_PROFILE = {
+        '財': { pair: ['正財', '偏財'], color: '#ffd166',
+            trait: { 正財: ['誠實守信、任勞任怨', '保守拘謹、安於現狀'], 偏財: ['處事圓滑、人緣極佳', '生意頭腦佳、物慾高'] },
+            care: { 正財: '追求穩定、社會信譽', 偏財: '開心賺／花錢、高投報率的刺激感' },
+            tip: { 正財: ['鼓勵跨出舒適圈', '嘗試新思維'], 偏財: ['協助控管風險', '強迫偏財儲蓄'] } },
+        '官殺': { pair: ['正官', '七殺'], color: '#5ab0ff',
+            trait: { 正官: ['品格端正、責任心強', '墨守成規、優柔寡斷'], 七殺: ['堅毅果決、英雄主義', '過於強勢、同理心弱'] },
+            care: { 正官: '重視紀律、社會功名', 七殺: '追求突破、領導權' },
+            tip: { 正官: ['紓壓放鬆', '協助決策'], 七殺: ['提醒溝通放軟', '擔任「壓力緩衝區」'] } },
+        '食傷': { pair: ['食神', '傷官'], color: '#ff9f68',
+            trait: { 食神: ['溫和、享受美食生活', '富藝術氣息', '三分鐘熱度、過於安逸'], 傷官: ['反應靈敏、不甘平凡', '叛逆好勝、衝撞權威'] },
+            care: {},
+            tip: { 食神: ['排事務優先順序', '一同享樂、探索生活'], 傷官: ['避免正面衝突、多誇獎', '積極交流想法'] } },
+        '印': { pair: ['正印', '偏印'], color: '#b388ff',
+            trait: { 正印: ['待人寬厚、不喜爭權', '易被動、過於依賴、缺乏獨立思考'], 偏印: ['觀察敏銳、直覺強', '獨來獨往、悲觀負面'] },
+            care: { 正印: '重和諧、討厭衝突、喜歡被照顧', 偏印: '在意界線、不愛社交、喜鑽研興趣' },
+            tip: { 正印: ['帶領行動', '跨出舒適圈'], 偏印: ['引導正向思考', '多出門散心', '給予私人空間'] } },
+        '比劫': { pair: ['比肩', '劫財'], color: '#2ed573',
+            trait: { 比肩: ['強硬不服輸、重朋友', '固執己見、易意氣用事'], 劫財: ['反應靈敏、號召力強', '魯莽衝動、不善理財'] },
+            care: { 比肩: '愛面子、自尊心強', 劫財: '團體核心、領導權' },
+            tip: { 比肩: ['給足面子、大力稱讚', '留意朋友借貸'], 劫財: ['給足面子、大力稱讚', '留意朋友借貸'] } }
+    };
+    const TG_CAT_OF = { 比肩: '比劫', 劫財: '比劫', 食神: '食傷', 傷官: '食傷', 正財: '財', 偏財: '財', 正官: '官殺', 七殺: '官殺', 正印: '印', 偏印: '印' };
+
+    function getPartner() { try { return JSON.parse(localStorage.getItem(PARTNER_KEY) || 'null'); } catch (e) { return null; } }
+    function setPartner(p) { try { if (p) localStorage.setItem(PARTNER_KEY, JSON.stringify(p)); else localStorage.removeItem(PARTNER_KEY); } catch (e) { alert('儲存失敗，可能是瀏覽器隱私模式或空間已滿。'); } }
+    function gongTypeOf(z) { return GONG_TYPES.find(t => t.zhis.includes(z)); }
+
+    // 另一半命盤：有時辰排四柱，沒有時辰排三柱（中午排盤避開子時換日）
+    // 十神分布：天干 1.0（日干除外）＋地支依量化系統藏干比重
+    function calcPartner(p) {
+        const [y, m, d] = p.date.split('-').map(Number);
+        const hasHour = p.hour !== '' && p.hour != null;
+        const bz = Solar.fromYmdHms(y, m, d, hasHour ? +p.hour : 12, 0, 0).getLunar().getEightChar();
+        const gans = [bz.getYearGan(), bz.getMonthGan(), bz.getDayGan()].concat(hasHour ? [bz.getTimeGan()] : []);
+        const zhis = [bz.getYearZhi(), bz.getMonthZhi(), bz.getDayZhi()].concat(hasHour ? [bz.getTimeZhi()] : []);
+        const dg = gans[2], cnt = {};
+        Object.keys(TG_CAT_OF).forEach(k => cnt[k] = 0);
+        gans.forEach((g, i) => { if (i !== 2) cnt[getPreciseTenGod(g, dg)] += 1.0; });
+        zhis.forEach(z => { const w = zhiHiddenWeights[z] || {}; Object.keys(w).forEach(h => cnt[getPreciseTenGod(h, dg)] += w[h]); });
+        const total = Object.values(cnt).reduce((a, b) => a + b, 0);
+        const cat = {}; Object.keys(TG_PROFILE).forEach(c => cat[c] = TG_PROFILE[c].pair.reduce((s, t) => s + cnt[t], 0) / total * 100);
+        const top = Object.keys(cat).sort((a, b) => cat[b] - cat[a])[0];
+        const pair = TG_PROFILE[top].pair, topSub = cnt[pair[0]] >= cnt[pair[1]] ? pair[0] : pair[1];
+        return { gans, zhis, hasHour, dg, cnt, cat, top, topSub, pillars: gans.map((g, i) => g + zhis[i]) };
+    }
+
+    function renderMarriageTab() {
+        const panel = document.getElementById('marriagePanel');
+        const ctx = window.__friendCtx;
+        if (!panel || !ctx) return;
+        const g = gongTypeOf(ctx.dz);
+        const p = getPartner();
+        let r = null; try { r = p ? calcPartner(p) : null; } catch (e) { r = null; }
+        const hourOpts = '<option value="">時辰不詳</option>' + Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${p && String(p.hour) === String(h) ? 'selected' : ''}>${String(h).padStart(2, '0')} 時</option>`).join('');
+        let html = `
+            <div class="rel-ev-title">💞 由夫妻宮看伴侶特質</div>
+            <div class="mg-gong">
+                <span class="mg-gz" style="color:${elementColors[zhiElementMap[ctx.dz]]}">${ctx.dz}</span>
+                <div><div class="mg-tag">${g.tag}</div>
+                <div class="mg-traits">${g.traits.concat(g.sub && g.sub[ctx.dz] ? [g.sub[ctx.dz]] : []).map(t => `<span>${t}</span>`).join('')}</div></div>
+            </div>
+            <div class="rel-ev-title" style="margin-top:14px;">🧭 另一半命盤</div>
+            <div class="mg-input">
+                <input type="date" id="partnerDate" value="${p ? p.date : ''}">
+                <select id="partnerHour">${hourOpts}</select>
+                <div class="seg2 mg-sex"><button type="button" data-g="1" class="${p && p.gender === 1 ? 'on' : ''}" onclick="partnerSex(1)">男生</button><button type="button" data-g="0" class="${p && p.gender === 0 ? 'on' : ''}" onclick="partnerSex(0)">女生</button></div>
+                <button class="mg-go" onclick="savePartner()">排盤</button>
+            </div>`;
+        if (r) {
+            const prof = TG_PROFILE[r.top];
+            const bars = Object.keys(TG_PROFILE).sort((a, b) => r.cat[b] - r.cat[a]).map(c => `
+                <div class="mg-bar"><span class="mg-bar-l" style="color:${TG_PROFILE[c].color}">${c}</span>
+                <span class="mg-bar-t"><i style="width:${r.cat[c].toFixed(1)}%; background:${TG_PROFILE[c].color}"></i></span>
+                <span class="mg-bar-v">${r.cat[c].toFixed(0)}%</span></div>`).join('');
+            const subCard = (t) => `<div class="mg-card ${t === r.topSub ? 'main' : ''}" style="--c:${prof.color}">
+                <div class="mg-card-h">${t}<small>${r.cnt[t].toFixed(1)}</small></div>
+                <div class="mg-sec">性格</div>${prof.trait[t].map(x => `<div class="mg-li">${x}</div>`).join('')}
+                ${prof.care[t] ? `<div class="mg-sec">在意</div><div class="mg-li">${prof.care[t]}</div>` : ''}
+                <div class="mg-sec">相處</div>${prof.tip[t].map(x => `<div class="mg-li">${x}</div>`).join('')}
+            </div>`;
+            html += `
+                <div class="mg-res">
+                    <div class="mg-pill">${r.pillars.map((pz, i) => `<span><b style="color:${elementColors[ganElementMap[pz[0]]]}">${pz[0]}</b><b style="color:${elementColors[zhiElementMap[pz[1]]]}">${pz[1]}</b><small>${['年', '月', '日', '時'][i]}</small></span>`).join('')}${r.hasHour ? '' : '<em>無時柱</em>'}<span class="mg-del" onclick="clearPartner()">清除</span></div>
+                    <div class="mg-bars">${bars}</div>
+                    <div class="mg-top">十神最多：<b style="color:${prof.color}">${prof.pair.join('、')}</b></div>
+                    <div class="mg-cards">${prof.pair.map(subCard).join('')}</div>
+                    <button class="act-btn mg-prompt" id="partnerPromptBtn" onclick="copyPartnerPrompt()">📋 相處提詞</button>
+                </div>`;
+        } else {
+            html += `<div class="rel-coming">輸入另一半的出生日期（時辰可不填），看他的個性、在意的點與相處方式</div>`;
+        }
+        panel.innerHTML = html;
+    }
+    window.__partnerSex = null;
+    function partnerSex(gd) { window.__partnerSex = gd; document.querySelectorAll('.mg-sex button').forEach(b => b.classList.toggle('on', +b.dataset.g === gd)); }
+    function savePartner() {
+        const date = document.getElementById('partnerDate').value, hour = document.getElementById('partnerHour').value;
+        const old = getPartner();
+        const gender = window.__partnerSex != null ? window.__partnerSex : (old ? old.gender : null);
+        if (!date) { alert('請輸入另一半的出生日期'); return; }
+        setPartner({ date, hour, gender });
+        renderMarriageTab();
+    }
+    function clearPartner() { if (!confirm('確定清除另一半的資料？')) return; setPartner(null); window.__partnerSex = null; renderMarriageTab(); }
+
+    function copyPartnerPrompt() {
+        const ctx = window.__friendCtx, p = getPartner(); if (!ctx || !p) return;
+        const r = calcPartner(p), g = gongTypeOf(ctx.dz), prof = TG_PROFILE[r.top];
+        const dist = Object.keys(TG_PROFILE).sort((a, b) => r.cat[b] - r.cat[a]).map(c => `${c} ${r.cat[c].toFixed(0)}%`).join('、');
+        const sub = Object.keys(r.cnt).filter(k => r.cnt[k] > 0).sort((a, b) => r.cnt[b] - r.cnt[a]).map(k => `${k} ${r.cnt[k].toFixed(1)}`).join('、');
+        const txt = `你是子平八字命理師。請根據下列排盤資料，給命主具體可執行的建議：如何跟這位另一半建立關係、日常怎麼互動、衝突時怎麼處理。
+
+【命主】
+四柱：${ctx.pillars}（${ctx.gender === 1 ? '男' : '女'}命）
+日主：${ctx.dg}（${ctx.dayElement}）；量化身強弱：${ctx.strengthLabel}（${ctx.totalScore} 分）
+夫妻宮（日支）：${ctx.dz}，屬${g.tag}；伴侶特質參考：${g.traits.concat(g.sub && g.sub[ctx.dz] ? [g.sub[ctx.dz]] : []).join('；')}
+
+【另一半】
+四柱：${r.pillars.join(' ')}${r.hasHour ? '' : '（時辰不詳，只有三柱）'}${p.gender != null ? `（${p.gender === 1 ? '男' : '女'}命）` : ''}
+日主：${r.dg}（${ganElementMap[r.dg]}）
+十神分布（天干＋地支藏干比重）：${dist}
+細項：${sub}
+十神最多：${prof.pair.join('、')}，其中較重的是${r.topSub}
+系統參考特質：性格「${prof.trait[r.topSub].join('；')}」${prof.care[r.topSub] ? `；在意「${prof.care[r.topSub]}」` : ''}；相處「${prof.tip[r.topSub].join('；')}」
+
+【輸出要求】
+1. 另一半的個性與在意的點：以十神分布為主，夫妻宮特質為輔，點出他最在意什麼、最受不了什麼。
+2. 建立關係：命主該怎麼開場、怎麼讓對方有好感，具體到說話方式與行動。
+3. 日常互動：相處上的加分行為與地雷，各列 3 點。
+4. 衝突處理：對方生氣或冷戰時，命主該怎麼做。
+5. 雙方命盤的互補與摩擦點：從兩人日主五行與十神分布比較。
+直接給結論與做法，不要說教、不要空泛的心靈勵志語、不要重複上面的資料。`;
+        try {
+            const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'absolute'; ta.style.left = '-9999px';
+            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+            const b = document.getElementById('partnerPromptBtn'); const o = b.innerHTML; b.innerHTML = '✅ 已複製'; setTimeout(() => b.innerHTML = o, 2500);
+        } catch (e) { alert('複製失敗，請換個瀏覽器試試。'); }
     }
 
     const SAVED_CHARTS_KEY = 'bazi_saved_charts_v1';
@@ -5341,7 +5523,7 @@
                 <div class="rel-tab-panel" data-tab="siblings" style="display:none;">${renderSiblingScanHtml(siblingScan)}</div>
                 <div class="rel-tab-panel" data-tab="children" style="display:block;">${renderChildScanHtml(childScan)}</div>
                 <div class="rel-tab-panel" data-tab="peer" style="display:none;"><div id="friendPanel"></div></div>
-                <div class="rel-tab-panel" data-tab="marriage" style="display:none;"><div class="rel-coming">婚姻 規劃中</div></div>
+                <div class="rel-tab-panel" data-tab="marriage" style="display:none;"><div id="marriagePanel"></div></div>
             `;
             document.getElementById('relativesOutput').innerHTML = wrapAccordion('👥 我的人際圈', relBody, false);
         } catch (e) {
@@ -5369,8 +5551,9 @@
         try {
             const mePct = {};
             Object.keys(elementCount).forEach(el => mePct[el] = totalElements > 0 ? elementCount[el] / totalElements * 100 : 0);
-            window.__friendCtx = { dayElement, strengthLabel, totalScore, mePct };
+            window.__friendCtx = { dayElement, strengthLabel, totalScore, mePct, dg, dz, gender, pillars: baseGans.map((g, i) => g + baseZhis[i]).join(' ') };
             renderFriendsTab();
+            renderMarriageTab();
         } catch (e) { console.warn('朋友分頁計算失敗:', e); }
         
         // 得勢（傳統：只看天干比劫/印星黨助，不含地支，避免與「得地」重複計算）
