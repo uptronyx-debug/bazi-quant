@@ -3416,29 +3416,27 @@
      * 滿分 2.0（干支皆純財，如金日主乙卯）→ 換算 0–100
      */
     function computeLiuriWealth(dGan, dZhi, dayGan, dayElement) {
-        const T = WEALTH_DAY_TABLE[dayElement];
+        // 依原則掃描（不查表）：財星 1.0、食傷 0.5（食傷生財）；地支依量化系統藏干比重加總
         const caiEl = wuxingRel[dayElement].ke, ssEl = wuxingRel[dayElement].sheng;
         const val = g => ganElementMap[g] === caiEl ? 1.0 : (ganElementMap[g] === ssEl ? 0.5 : 0);
-        const ganOK = T.gan.includes(dGan), zhiOK = T.zhi.includes(dZhi), avoid = T.avoid.includes(dZhi);
-        let ganE = ganOK ? val(dGan) : 0, zhiE = 0;
-        const zhiParts = [];
-        if (zhiOK) {
-            const hw = zhiHiddenWeights[dZhi] || {};
-            Object.keys(hw).forEach(hg => {
-                const v = val(hg) * hw[hg];
-                if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${elementColors[ganElementMap[hg]]}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
-            });
-        }
-        // 財星是否出現（天干為財，或地支藏干含財）——量化系統：主要看財星，只有食傷能量較弱
-        const hasCai = ganElementMap[dGan] === caiEl || Object.keys(zhiHiddenWeights[dZhi] || {}).some(hg => ganElementMap[hg] === caiEl);
-        let score = Math.round((ganE + zhiE) / 2 * 100);
-        // 教材組合為舉例（包含但不限於）：天干、地支皆在清單內，且有財星出現，即為財旺日
-        const isWangDay = ganOK && zhiOK && hasCai;
-        let tier = isWangDay ? '財旺日' : ((ganOK || zhiOK) ? '半財' : '平');
-        // 避開地支（比劫奪財）待破財條件完整後再啟用；目前不另外標示
-        const ganTxt = ganOK ? `天干<b style="color:${elementColors[ganElementMap[dGan]]}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
-        const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : (avoid ? `地支${dZhi}含比劫，需避開` : '');
-        return { score: Math.max(0, Math.min(100, score)), tier, ganOK, zhiOK, avoid, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
+        const C = g => elementColors[ganElementMap[g]];
+        const ganOK = val(dGan) > 0;
+        let zhiE = 0; const zhiParts = [];
+        const hw = zhiHiddenWeights[dZhi] || {};
+        Object.keys(hw).forEach(hg => {
+            const v = val(hg) * hw[hg];
+            if (v > 0) { zhiE += v; zhiParts.push(`<b style="color:${C(hg)}">${hg}${getPreciseTenGod(hg, dayGan)}</b>${Math.round(hw[hg] * 100)}%`); }
+        });
+        // 地支只有零星餘氣（財食合計 <0.15，如寅中戊土 10%）不算進入財氣
+        const zhiOK = zhiE >= 0.15;
+        if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
+        // 當天要有財星（天干為財，或地支藏干含財）才算財旺日；只有食傷屬於生財之源，力量較弱
+        const hasCai = ganElementMap[dGan] === caiEl || (zhiOK && Object.keys(hw).some(hg => ganElementMap[hg] === caiEl));
+        const score = Math.max(0, Math.min(100, Math.round((val(dGan) + zhiE) / 2 * 100)));
+        const tier = (ganOK && zhiOK && hasCai) ? '財旺日' : ((ganOK || zhiOK) ? '半財' : '平');
+        const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
+        const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
+        return { score, tier, ganOK, zhiOK, avoid: false, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
     }
 
     /**
@@ -3633,13 +3631,9 @@
                 if (effect) out.push({ name, kind: ju.kind, from, members: ju.zhi, ...effect });
                 return;
             }
+            // 三合／三會只當加分項：財局、食傷局（比劫局、印局、官殺局暫不判破財）
             if (ju.el === caiEl) effect = { type: 'boost', label: '財局', bonus: strong ? 30 : 25 };
             else if (ju.el === ssEl) effect = { type: 'boost', label: '食傷局', bonus: strong ? 15 : 12 };
-            else if (ju.el === dayElement) effect = { type: 'po', label: '比劫局', txt: `${name}成比劫局，比劫奪財` };
-            else {
-                const caiMembers = used.filter(u => u.natal && Object.keys(zhiHiddenWeights[u.zhi] || {}).some(hg => ganElementMap[hg] === caiEl));
-                if (caiMembers.length) effect = { type: 'po', label: (ju.el === wuxingRel[caiEl].sheng ? '官殺局' : '印局'), txt: `${name}，${caiMembers.map(u => u.from + u.zhi).join('、')}財星被化走` };
-            }
             if (effect) out.push({ name, kind: ju.kind, from, members: ju.zhi, ...effect });
         });
         return out;
