@@ -378,6 +378,7 @@
         .lw-vbtn { font-size:12px; padding:4px 12px; color:#777; cursor:pointer; user-select:none; transition: background .2s, color .2s; }
         .lw-vbtn.on { background:rgba(0,210,255,.15); color:#00d2ff; font-weight:bold; }
         .lw-po { animation: peFade .4s ease-out both; animation-delay: .9s; }
+        .lw-po-act { display:block; font-style:normal; color:#e0a050; font-size:10.5px; margin-top:2px; }
         .lw-po-line .lw-chip { color:#ff6b6b; border-color:#ff5252; background:rgba(255,82,82,.1); }
         #lwCal { max-width: 640px; margin: 0 auto; }
         .lc-head { display:flex; align-items:center; justify-content:space-between; margin:4px 0 10px; }
@@ -5132,7 +5133,7 @@
                             <div class="lw-line lw-${dday.wealthTier}"><span class="lw-chip">${dday.wealthTier}${dday.wealthTier !== '平' ? ' ' + dday.wealth : ''}</span><span>${dday.wealthDetail || '—'}</span></div>
                             ${dday.juList.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
                             ${dday.career ? `<div class="lw-line lw-zh-line ${dday.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${dday.career.score}</span><span>流年${dday.career.yGZ}（${dday.career.y}/2）・流月${dday.career.mGZ}（${dday.career.m}/2）${dday.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
-                            ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}</span></div>` : ''}
+                            ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}<em class="lw-po-act">可主動破財：捐款、累積長期投資</em></span></div>` : ''}
                         </div>
                     `;
                 });
@@ -5156,7 +5157,7 @@
                         ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財</span>` : ''}
                         <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
                     </div>
-                    ${topic === 'ren' ? `<div class="lw-tip">比劫旺的日子人際交集多、容易節外生枝。小人與貴人一線之隔：<b>謹言慎行、少說多聽</b>，避免在這天做重大表態。</div>` : ''}
+                    ${topic === 'ren' ? `<div class="lw-tip">小人與貴人一線之隔：<b>謹言慎行、少說多聽</b>，避免在這天做重大表態。</div>` : ''}
                     <div class="lw-pane" data-v="d10">
                     <div class="liuri-chart-wrap lw-scroll">${svg}</div>
                     <div id="liuriCard"></div>
@@ -5241,7 +5242,7 @@
                             <div class="lw-line lw-${info.w.tier}"><span class="lw-chip">${info.w.tier}${info.w.tier !== '平' ? ' ' + info.w.score : ''}</span><span>${info.w.detail || '—'}</span></div>
                             ${info.ju.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
                             ${info.career ? `<div class="lw-line lw-zh-line ${info.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${info.career.score}</span><span>流年${info.career.yGZ}（${info.career.y}/2）・流月${info.career.mGZ}（${info.career.m}/2）${info.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
-                            ${info.po.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${info.po.map(h => h.txt).join('；')}</span></div>` : ''}
+                            ${info.po.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${info.po.map(h => h.txt).join('；')}<em class="lw-po-act">可主動破財：捐款、累積長期投資</em></span></div>` : ''}
                         </div>`;
                     }
                     document.getElementById('lwCal').innerHTML = `
@@ -6151,9 +6152,6 @@ ${data.pureSiku}
 ■ 過去 6 個月與未來 1 年流月戰術掃描 (感情/事業/財庫/健康/家庭)：
 ${data.pure12Month}
 
-■ 流日速覽（過去 3 日＋今日起未來 7 日，共 10 天，含日柱十神、與原局沖合關係、每日量化整體運勢與財運強弱）：
-${data.pureLiuri}
-
 【4. 六親人際：子女星偵測（系統只做條件觸發，未解讀）】
 ${data.childScan || '（無資料）'}
 
@@ -6164,18 +6162,17 @@ ${data.siblingScan || '（無資料）'}
 ${data.parentScan || '（無資料）'}
 
 【你的分析任務】
-請絕對不要重複列印、覆述或解釋上述數據的定義本身。請直接發揮專業命理師的功力，將「通根、透干、沖刑、合絆、開庫、流月、流日」這些量化化學反應，轉化為對命主現實生活的演繹，輸出約 1200-1800 字的深度解析：
+請絕對不要重複列印、覆述或解釋上述數據的定義本身。請直接發揮專業命理師的功力，將「通根、透干、沖刑、合絆、開庫、流月」這些量化化學反應，轉化為對命主現實生活的演繹，輸出約 1200-1800 字的深度解析：
 
 0. 格局定調（先講結論再展開）：直接引用系統給出的格局定式與成格／破格標籤（見【1】），說明此格局的高低清濁——成格代表結構上的優勢與天賦出路，破格代表結構缺陷與需防範之處；若未見任何組合，說明格局平淡時該如何看待。作為後面所有分析的立論基礎，不需要重新推算。
 1. 核心性格與天賦盲點（直觀）：結合日主底氣與通根透干排名，直接點出他最顯性與最隱性的雙重性格特質與致命盲點，並以十神生剋制化與格局成敗去解釋「為什麼」。
 2. 原生家庭與底層安全感（溯源）：剖析年月柱（父母宮位）的十神交互作用與刑沖合害，精準解構原生家庭給予的是「實質庇蔭」還是「隱性消耗（如情感勒索、資源吸附）」。觀察財星與印星的狀態，點出家庭背景如何形塑他潛意識中的金錢觀與安全感模型，並給予如何從家族羈絆中實現「精神與現實雙重獨立」的戰術建議。
 3. 事業與資源配置（細部）：根據原局結構與透干十神，給出精準的職涯環境建議，並指出他在金錢理財策略、重大決策上應該防範哪種十神帶來的風險陷阱（例如比劫奪財、官殺壓制），若與【1】的破格標籤對應要明講。
 4. 近一年與近期的變動（核心破題，必須極度直觀）：請高度聚焦在「去年回顧」、「本年動態」、「動態開庫」與「近18個月流月戰術」。直接、具體地推斷出近一年內（或今年/接下來幾個月）最可能發生的現實大事（包含利用過去6個月的流月特徵進行驗證，以及預測如：職涯劇烈轉換、大筆資金重分配、人際感情危機），並給予具體的行動戰術建議，建議要能對應到格局成敗（引動成格組合的時機宜把握，引動破格組合的時機宜防範）。
-5. 近 10 日流日精推（過去驗證＋未來行動，需具體到「日」）：利用【流日速覽】裡「過去 3 日」的日柱十神與沖合資料，回頭驗證這幾天命主可能實際感受到的具體徵兆（例如某天沖動配偶宮、某天財星透干進財），藉此證明系統判斷的準確度；接著針對「未來 7 日」逐日或分段給出具體到日期的行動建議（哪幾天適合簽約談判、哪幾天該保守避險、哪幾天財運或整體運勢特別突出或特別低落），建議需可執行，不要籠統帶過。
-6. 子女緣分（依【4】標籤解讀）：[子女緣強] 說明子女緣深厚的表現；[子女緣分輕薄] 說明緣分深淺與可能原因（可包含晚得子女、子女較早獨立、聚少離多，或命主本身不想生育、無子女等可能，請以多種可能並列呈現，勿單一斷定）；[推斷子女個性] 依「子女個性判讀柱」干支本身的五行陰陽推斷子女性格特質（勿用命主十神）；[推斷突發事件或變動] 對照時間點說明子女相關的變動（含過去時間點的驗證）；[推斷得子時機] 指出較可能的時間窗口。系統不分兒女、不論胎數，請勿推斷性別或胎數。
-7. 兄弟手足（依【5】標籤解讀）：說明比劫星（兄弟姊妹、同輩手足）在原局的強弱與狀態（通根、透干、坐支）；對每個 [推斷兄弟手足變動] 時間點，說明比劫坐支被沖或刑可能對應的手足變動（例如分離、搬遷、關係起伏、手足有狀況），已過的時間點請用來驗證，未來的時間點請給提醒。比劫對命主是助力還是競爭消耗，請依原局結構與格局成敗（例如是否構成比劫奪財）說明，不要自行宣告喜忌。
-8. 父母（依【6】標籤解讀）：說明母星（印）、父星（財）在原局的位置與狀態；父母緣分深淺請依原局自行判讀（父母有各自命盤，且向上關係命主可自行經營，勿下負面斷語）；對每個觸發時間點，依「家人星該柱地支被大運／流年沖刑」的規則提醒：相沖或驛馬刑（寅申巳亥）[推斷家人出入安全] → 跌倒、車關、突發疾病、意外受傷，提醒出入安全；四庫刑（辰戌丑未）[推斷家人健康檢查] → 結石、腫瘤、息肉、慢性病、憂鬱等累積型問題，提醒做健康檢查。已過的時間點用來驗證，未來的給提醒；語氣以「提醒留意」為主，勿下斷言。
-9. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
+5. 子女緣分（依【4】標籤解讀）：[子女緣強] 說明子女緣深厚的表現；[子女緣分輕薄] 說明緣分深淺與可能原因（可包含晚得子女、子女較早獨立、聚少離多，或命主本身不想生育、無子女等可能，請以多種可能並列呈現，勿單一斷定）；[推斷子女個性] 依「子女個性判讀柱」干支本身的五行陰陽推斷子女性格特質（勿用命主十神）；[推斷突發事件或變動] 對照時間點說明子女相關的變動（含過去時間點的驗證）；[推斷得子時機] 指出較可能的時間窗口。系統不分兒女、不論胎數，請勿推斷性別或胎數。
+6. 兄弟手足（依【5】標籤解讀）：說明比劫星（兄弟姊妹、同輩手足）在原局的強弱與狀態（通根、透干、坐支）；對每個 [推斷兄弟手足變動] 時間點，說明比劫坐支被沖或刑可能對應的手足變動（例如分離、搬遷、關係起伏、手足有狀況），已過的時間點請用來驗證，未來的時間點請給提醒。比劫對命主是助力還是競爭消耗，請依原局結構與格局成敗（例如是否構成比劫奪財）說明，不要自行宣告喜忌。
+7. 父母（依【6】標籤解讀）：說明母星（印）、父星（財）在原局的位置與狀態；對每個觸發時間點，依「家人星該柱地支被大運／流年沖刑」的規則提醒：相沖或驛馬刑（寅申巳亥）[推斷家人出入安全] → 跌倒、車關、突發疾病、意外受傷，提醒出入安全；四庫刑（辰戌丑未）[推斷家人健康檢查] → 結石、腫瘤、息肉、慢性病、憂鬱等累積型問題，提醒做健康檢查。已過的時間點用來驗證，未來的給提醒；語氣以「提醒留意」為主，勿下斷言。
+8. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
 
 【最後提醒】全文分析請完全建立在上方系統給出的排盤與量化數據之上，不要自行推定用神忌神，也不要更動任何排盤結果；你的角色是「解讀者」，不是「排盤者」。`;
 
