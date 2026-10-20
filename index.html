@@ -1892,8 +1892,14 @@
         }
         window.addEventListener('scroll', hide, true);
     })();
-    function pillarTagsHtml(g, z) {
-        return pillarTags(g, z).map(x => `<span class="pt-tag${x.el ? '' : ' pt-k'}" data-tip="${ptTitle[x.k]}" style="${x.el ? '--c:' + elementColors[x.el] : ''}">${x.t}</span>`).join('');
+    // onlyEl：只保留跟該五行有關的標籤（流日分頁用：財運看財、工作看官殺、人際看比劫）
+    function pillarTagsHtml(g, z, onlyEl) {
+        let L = pillarTags(g, z);
+        if (onlyEl) {
+            const hw = zhiHiddenWeights[z] || {}, zE = ganElementMap[Object.keys(hw).sort((a, b) => hw[b] - hw[a])[0]];
+            L = L.filter(x => x.el ? x.el === onlyEl : (ganElementMap[g] === onlyEl || zE === onlyEl));
+        }
+        return L.map(x => `<span class="pt-tag${x.el ? '' : ' pt-k'}" data-tip="${ptTitle[x.k]}" style="${x.el ? '--c:' + elementColors[x.el] : ''}">${x.t}</span>`).join('');
     }
 
     // ===== 干支互動掃描引擎（原局／大運／流年／流月共用） =====
@@ -4870,6 +4876,7 @@
                     ? { c: '#c792ea', c2: '#8a5fb0', c3: '#e3c4f7', rgb: '199,146,234', hot: '慎言日', mark: '慎', energy: '比劫能量', hotShort: '慎言' }
                     : { c: '#ffb347', c2: '#c98a3a', c3: '#ffcf7a', rgb: '255,179,71', hot: '財旺日', mark: '旺', energy: '財星能量', hotShort: '財旺' };
                 const isHot = t => t === T.hot;
+                const topicEl = topic === 'work' ? Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement) : topic === 'ren' ? dayElement : wuxingRel[dayElement].ke;
                 if (typeof Solar === 'undefined') { document.getElementById('liuriOutput').innerHTML = ''; return; }
                 const todayD = new Date();
                 const weekChar = ['日', '一', '二', '三', '四', '五', '六'];
@@ -5128,12 +5135,12 @@
                                     <span style="color:${dday.cZhi}">${dday.zhi}</span><span class="liuri-advice-tg">${zhiTgShort || '-'}</span>
                                 </span>
                             </div>
-                            ${pillarTagsHtml(dday.gan, dday.zhi) ? `<div class="lw-line pt-line">${pillarTagsHtml(dday.gan, dday.zhi)}</div>` : ''}
+                            ${pillarTagsHtml(dday.gan, dday.zhi, topicEl) ? `<div class="lw-line pt-line">${pillarTagsHtml(dday.gan, dday.zhi, topicEl)}</div>` : ''}
                             ${tgGuardHtml(dday.gan, dday.zhi, baseZhis, '')}
                             <div class="lw-line lw-${dday.wealthTier}"><span class="lw-chip">${dday.wealthTier}${dday.wealthTier !== '平' ? ' ' + dday.wealth : ''}</span><span>${dday.wealthDetail || '—'}</span></div>
                             ${dday.juList.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
                             ${dday.career ? `<div class="lw-line lw-zh-line ${dday.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${dday.career.score}</span><span>流年${dday.career.yGZ}（${dday.career.y}/2）・流月${dday.career.mGZ}（${dday.career.m}/2）${dday.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
-                            ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}<em class="lw-po-act">可主動破財：捐款、累積長期投資</em></span></div>` : ''}
+                            ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}</span></div>` : ''}
                         </div>
                     `;
                 });
@@ -5141,7 +5148,7 @@
                 const body = `
                     <div class="lw-bar-top">
                     <div class="lw-topics">
-                        <span class="lw-topic ${topic === 'cai' ? 'on' : ''}" onclick="lwTopic('cai')">💰 財</span>
+                        <span class="lw-topic ${topic === 'cai' ? 'on' : ''}" onclick="lwTopic('cai')">💰 財運</span>
                         <span class="lw-topic ${topic === 'work' ? 'on' : ''}" onclick="lwTopic('work')">💼 工作</span>
                         <span class="lw-topic ${topic === 'ren' ? 'on' : ''}" onclick="lwTopic('ren')">🤝 人際</span>
                         <span class="lw-topic off" title="規劃中">🌸 桃花</span>
@@ -5154,7 +5161,7 @@
                     </div>
                     <div class="liuri-legend">
                         <span><span class="liuri-legend-dot" style="background:${T.c}; border-radius:50%; box-shadow:0 0 6px ${T.c};"></span>${T.hot}</span>
-                        ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財</span>` : ''}
+                        ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財（主動破財）</span>` : ''}
                         <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
                     </div>
                     ${topic === 'ren' ? `<div class="lw-tip">小人與貴人一線之隔：<b>謹言慎行、少說多聽</b>，避免在這天做重大表態。</div>` : ''}
@@ -5242,7 +5249,7 @@
                             <div class="lw-line lw-${info.w.tier}"><span class="lw-chip">${info.w.tier}${info.w.tier !== '平' ? ' ' + info.w.score : ''}</span><span>${info.w.detail || '—'}</span></div>
                             ${info.ju.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
                             ${info.career ? `<div class="lw-line lw-zh-line ${info.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${info.career.score}</span><span>流年${info.career.yGZ}（${info.career.y}/2）・流月${info.career.mGZ}（${info.career.m}/2）${info.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
-                            ${info.po.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${info.po.map(h => h.txt).join('；')}<em class="lw-po-act">可主動破財：捐款、累積長期投資</em></span></div>` : ''}
+                            ${info.po.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${info.po.map(h => h.txt).join('；')}</span></div>` : ''}
                         </div>`;
                     }
                     document.getElementById('lwCal').innerHTML = `
