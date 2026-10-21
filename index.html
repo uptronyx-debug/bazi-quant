@@ -165,8 +165,11 @@
         .act-row .act-btn { grid-column: auto; }
         .act-btn { background: #333; color: var(--accent); border: 1px solid var(--accent); font-weight: bold; margin-top: 0; }
         @keyframes actIn { from { opacity: 0; transform: translateY(-4px); } }
-        #copyPromptBtn { background: #333; color: var(--accent); border: 1px solid var(--accent); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
-        #copyPromptBtn:hover { background: #444; transform: translateY(-2px); }
+        .act-row3 { grid-template-columns: repeat(3, 1fr); }
+        .act-row3 .act-btn { font-size: 13.5px; padding-left: 4px; padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .copy-prompt-btn.copied { background:#2ed573 !important; color:#000 !important; }
+        .copy-prompt-btn { background: #333; color: var(--accent); border: 1px solid var(--accent); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
+        .copy-prompt-btn:hover { background: #444; transform: translateY(-2px); }
 
         /* 新增：得令得地得勢 區塊樣式 */
         .dash-status-row {
@@ -1159,9 +1162,10 @@
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
         <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
     </div>
-    <div class="act-row" id="aiBtnContainer" style="display:none;">
+    <div class="act-row act-row3" id="aiBtnContainer" style="display:none;">
         <button onclick="saveCurrentChartPrompt()" class="act-btn">💾 儲存命盤</button>
-        <button id="copyPromptBtn" class="act-btn" onclick="copyPromptForAI()">📋 一鍵提詞</button>
+        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('pro', this)">📋 命師提詞</button>
+        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)">📋 白話提詞</button>
     </div>
 
     <div class="result-box" id="resultBox">
@@ -1741,6 +1745,16 @@
         if (sh) out.push({ k: 'he', t: '三合' + sh });
         if (withLan && ((ge === y.spouse && ze === y.de) || (ge === y.de && ze === y.spouse))) out.push({ k: 'lan', t: '爛桃花' });
         return out;
+    }
+    function yyPromptText(ctx) {
+        const y = yyCtx(ctx), Y0 = new Date().getFullYear(), out = [];
+        for (let i = 0; i < 10; i++) {
+            const yr = Y0 + i, gz = iaYearGZ(yr), dy = (ctx.daYunData || []).find(d => yr >= d.startYear && yr < d.startYear + 10);
+            const sig = yySignals(gz.gan, gz.zhi, y, y.zhis.slice(1).concat(dy ? [dy.zhi] : []), true);
+            const dyStar = dy && (ganElementMap[dy.gan] === y.spouse || yyMainEl(dy.zhi) === y.spouse);
+            if (sig.length || dyStar) out.push(`- ${yr} ${gz.gan}${gz.zhi}${dy ? `（${dy.gan}${dy.zhi}運${dyStar ? '・大運走到夫妻星' : ''}）` : ''}：${sig.map(x => x.t).join('、') || '無流年訊號'}`);
+        }
+        return out.length ? out.join('\n') : '- 未來 10 年無姻緣訊號';
     }
     const YY_TIP = { yin: '夫妻星', he: '年支三合', lan: '夫妻星＋比劫同柱' };
     function yyChip(s) { return `<span class="yy-chip yy-${s.k}" data-tip="${YY_TIP[s.k]}">${s.t}</span>`; }
@@ -4917,7 +4931,7 @@ ${hpTxt}
 
         const months = [], ev = [];
         const addTactic = (cat, monthStr, badge, desc, kind, mi) => {
-            ev.push({ cat, kind, mi, desc });
+            ev.push({ cat, kind, mi, desc, badge });
             tactics[cat].push(`
                 <tr class="lm-month-row"><td colspan="2"><span class="lm-month-chip">📅 ${monthStr}</span></td></tr>
                 <tr class="lm-event-row">
@@ -4944,7 +4958,7 @@ ${hpTxt}
                 : `${y}年${m}月`; // 節氣資料抓取失敗時的備援顯示
             // 時間格式比照六親分頁：過去＝深藍、現在＝亮藍＋「現在」標記；干支依五行上色
             const gzHtml = `<span style="color:${elementColors[ganElementMap[mGan]]}">${mGan}</span><span style="color:${elementColors[zhiElementMap[mZhi]]}">${mZhi}</span>`;
-            months.push({ i, m, gan: mGan, zhi: mZhi, start: jieRange ? jieRange.startLabel : `${m}月` });
+            months.push({ i, m, gan: mGan, zhi: mZhi, start: jieRange ? jieRange.startLabel : `${m}月`, time: timeText });
             const mi = months.length - 1;
             let monthStr = `<span class="lm-time${i < 0 ? ' is-past' : ''}">${timeText}</span> <span class="lm-gz">${gzHtml}</span>`
                 + (i === 0 ? ' <span class="rel-now">現在</span>' : (i < 0 ? '<span class="lm-past-note">（已過）</span>' : ''));
@@ -5016,6 +5030,19 @@ ${hpTxt}
             ['family', '家庭', '#a29bfe', '觀測年柱', '無']
         ];
         // 每格的記號：沖＝紅點、刑＝粉點、庫＝金菱、合＝青環、十神引動＝主題色方塊（同格多件以優先序顯示並標件數）
+        // 提詞用純文字（依主題、依月份合併）
+        {
+            const strip = t => String(t).replace(/<[^>]*>/g, '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️]/gu, '').replace(/\s+/g, ' ').trim();
+            const CATS = [['love', '感情（日支夫妻宮、配偶星）'], ['career', '事業（月柱、官殺食傷）'], ['wealth', '財運（時柱、比劫財星）'], ['health', '健康（日月支逢沖刑）'], ['family', '家庭（年柱）']];
+            window.__lmPromptText = CATS.map(([k, n]) => {
+                const rows = months.map((o, mi) => {
+                    const L = ev.filter(e => e.cat === k && e.mi === mi);
+                    if (!L.length) return '';
+                    return `- ${o.time} ${o.gan}${o.zhi}${o.i < 0 ? '（已過）' : (o.i === 0 ? '（現在）' : '')}：` + L.map(e => strip(e.desc) + (e.kind === 'yin' ? `（${strip(e.badge)}）` : '')).join('；');
+                }).filter(Boolean);
+                return `${n}：\n${rows.length ? rows.join('\n') : '- 無'}`;
+            }).join('\n');
+        }
         const KIND = { sanhe: ['★', '#ff7eb6'], chong: ['●', '#ff5252'], xing: ['●', '#ff4fa3'], ku: ['◆', '#ffd166'], he: ['○', '#00d2ff'], yin: ['■', null] };
         const cellOf = (cat, mi, col) => {
             const L = ev.filter(e => e.cat === cat && e.mi === mi);
@@ -6567,19 +6594,40 @@ ${hpTxt}
         return str.replace(/<[^>]*>/g, '').replace(/&emsp;/g, ' ').replace(/&nbsp;/g, ' ').trim() || '無明顯反應';
     }
 
+    // 提詞用：把畫面卡片轉成一行一筆的純文字（去 emoji、去多餘空白）
+    const ptxt = t => String(t || '').replace(/➔/g, '：').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️]/gu, '')
+        .replace(/\s+/g, ' ').replace(/\s*：\s*/g, '：').replace(/([有弱]) 根/g, '$1根').replace(/隱 藏/g, '隱藏').replace(/(SSS|S|A|B|C) 級/g, '$1級').replace(/元[男女]/g, '日主').trim();
+    function promptRows(id) {
+        const root = document.getElementById(id); if (!root) return '無';
+        const out = [];
+        root.querySelectorAll('div, b').forEach(el => {
+            if (el.tagName === 'B') { if (/^【/.test(el.textContent.trim()) && !el.closest('div[style*="flex"]')) out.push(ptxt(el.textContent)); return; }
+            if (el.style.display !== 'flex' || (el.parentElement && el.parentElement.style.display === 'flex')) return;
+            const cells = [...el.children].map(c => ptxt(c.textContent).replace(/：$/, '')).filter(Boolean);
+            if (cells.length) out.push('- ' + (cells.length > 1 ? cells.slice(0, -1).join(' ') + '｜' : '') + cells[cells.length - 1].replace(/ ：/g, '：'));
+        });
+        return out.length ? out.join('\n') : '無';
+    }
+    function promptPlain(id) {
+        const root = document.getElementById(id); if (!root) return '無';
+        const body = root.querySelector('.acc-body') || root;
+        const lines = body.innerHTML.replace(/<br\s*\/?>/gi, '\n').replace(/<\/(div|p|li)>/gi, '\n').replace(/<[^>]*>/g, '').replace(/&nbsp;|&emsp;/g, ' ').split('\n').map(ptxt).filter(Boolean);
+        return lines.length ? lines.join('\n') : '無';
+    }
+
     const calculateBazi = function() {
         calculateBaziCore(); 
         
         const baziData = window.currentBaziDataForAI;
         if (baziData) {
-            baziData.pureTonggen = cleanHtmlToPureText(document.getElementById('tonggenOutput').innerHTML);
-            baziData.pureTougan = cleanHtmlToPureText(document.getElementById('touganOutput').innerHTML);
-            baziData.pureDynamic = cleanHtmlToPureText(document.getElementById('dynamicTonggenTouganOutput').innerHTML);
-            baziData.pureSiku = cleanHtmlToPureText(document.getElementById('sikuOutput').innerHTML);
-            baziData.pureHeban = (window.__iaPromptText || {}).heban || '無明顯反應';
-            baziData.pureChongxing = (window.__iaPromptText || {}).chong || '無明顯反應';
-            baziData.pure12Month = cleanHtmlToPureText((document.querySelector('#monthlyTacticsOutput .lm-lists') || document.getElementById('monthlyTacticsOutput')).innerHTML);
-            baziData.pureLiuri = cleanHtmlToPureText(document.getElementById('liuriOutput').innerHTML);
+            baziData.pureTonggen = promptRows('tonggenOutput');
+            baziData.pureTougan = promptRows('touganOutput');
+            baziData.pureDynamic = promptRows('dynamicTonggenTouganOutput');
+            baziData.pureSiku = promptPlain('sikuOutput');
+            baziData.pureHeban = (window.__iaPromptText || {}).heban || '無';
+            baziData.pureChongxing = (window.__iaPromptText || {}).chong || '無';
+            baziData.pure12Month = window.__lmPromptText || '無';
+            try { baziData.yinyuan = window.__friendCtx ? yyPromptText(window.__friendCtx) : ''; } catch (e) { baziData.yinyuan = ''; }
         }
 
         setTimeout(() => {
@@ -6587,117 +6635,153 @@ ${hpTxt}
         }, 100);
     };
 
-    function copyPromptForAI() {
-        if (!window.currentBaziDataForAI || !window.currentBaziDataForAI.pureTonggen) {
-            alert('請先點擊「執行運算」產生完整的精算數據！');
-            return;
-        }
+    function buildPromptData(d) {
+        const t = new Date();
+        return `# 命盤資料（今天日期：${t.getFullYear()}/${t.getMonth() + 1}/${t.getDate()}）
 
+【1. 命盤基礎】
+- 性別：${d.gender.replace('元', '')}
+- 八字（年 月 日 時）：${d.pillars}
+- 日主：${d.dayMaster}
+- 量化身強弱：${d.strength}（量化總分 ${d.totalScore} 分${d.autoStrength && d.autoStrength !== d.strength ? '；使用者手動調整，系統原判定為' + d.autoStrength : ''}）
+- 五行比例：木 ${d.elements['木']}%、火 ${d.elements['火']}%、土 ${d.elements['土']}%、金 ${d.elements['金']}%、水 ${d.elements['水']}%
+- 傳統格局定式：${d.geJu}（${d.geJuNote}）
+- 傳統身強弱（只用於成格判斷）：${d.tradStrength}
+- 格局成敗：
+${d.geJuCombos}
+- 當前大運：${d.currentDaYun}
+- 今年流年：${d.currentYear}
+
+【2. 原局結構】
+2-1 天干通根：
+${d.pureTonggen}
+2-2 藏干透干：
+${d.pureTougan}
+2-3 合絆與三合三會（原局＋歲運）：
+${d.pureHeban}
+2-4 刑沖害破（原局＋歲運）：
+${d.pureChongxing}
+
+【3. 歲運】
+3-1 歲運引透與得根（大運、去年、今年、明年）：
+${d.pureDynamic}
+3-2 四庫開庫：
+${d.pureSiku}
+3-3 流月掃描（過去 6 個月＋未來 12 個月）：
+${d.pure12Month}
+
+【4. 子女】
+${d.childScan || '無'}
+
+【5. 兄弟】
+${d.siblingScan || '無'}
+
+【6. 父母】
+${d.parentScan || '無'}
+
+【7. 婚姻】
+${d.spouseScan || '無'}
+姻緣時機（未來 10 年）：
+${d.yinyuan || '無'}`;
+    }
+
+    const PROMPT_RULES = `# 使用規則（請先讀完再開始）
+1. 下方資料由量化八字系統精算完成，包含排盤、十神、通根透干、格局、刑沖會合、歲運觸發。請直接採用，不要重新排盤，也不要修改或質疑任何數據。你是解讀者，不是排盤者。
+2. 不要推定或宣告用神、忌神、喜神；以十神生剋制化、格局成敗、宮位互動來論述。
+3. 「量化身強弱」與「傳統格局定式／傳統身強弱」是兩套獨立方法，不要互相解釋；兩者結論不同屬正常，可當作交叉參考。
+4. 標「已過」的時間點用來驗證，寫成「這段期間可能發生過…，可對照看看」；未來的時間點給提醒。每個推斷給 2～3 種可能情境，不要編造具體情節。
+5. 家人安全、健康相關只用「提醒留意、建議檢查」的語氣，不下斷言。
+6. 不要重抄資料本身，也不要解釋資料的定義。
+
+# 判讀規則（系統依此產出資料，解讀時請沿用）
+- 宮位：年柱＝根基、祖上、父母宮；月柱＝事業宮、父母、兄弟；日支＝夫妻宮、自身；時柱＝子女宮、晚運。
+- 通根強度：月令強根（通月支本氣）＞自坐強根（通自己坐下的本氣）＞有根（通他柱本氣）＞弱根（只通中氣或餘氣）＞虛浮無根。
+- 藏干透干等級：SSS＝月令本氣透出；S＝月令中餘氣透出；A＝同柱本氣透出；B＝異柱本氣透出；C＝中餘氣透出；隱藏＝未透干。
+- 歲運引透：歲運天干引出原局地支藏干，等級同上（月支本氣最強）。歲運得根：原局天干在歲運地支取得根氣，A＝本氣根、B＝中氣根、C＝餘氣根。
+- 合沖：天干五合、地支六合一律視為「合絆」（雙方互相牽制、作用減弱），不論合化。三合、三會要三字齊全才成局；只有兩字為半合，只是傾向、力量較弱；三合首尾兩字（缺中間）為暗拱，力道更弱。
+- 大運：前五年天干、地支並看（以地支為主），後五年以地支為主；地支是十年的底色。地支若屬削弱命主的五行，即使能生天干也視為拖累，不能用相生抵銷；地支雖屬幫扶命主的五行，但若轉生削弱命主的五行（如金生水），整步運仍視為削弱。
+- 六親星：夫妻星＝男看財、女看官殺；子女星＝男看官殺、女看食傷；母＝印、父＝財（不分正偏）；兄弟＝比劫。取星：天干全取，天干不足 2 顆才以地支主氣補到 2 顆，都沒有才取中氣或餘氣 1 顆。
+- 通關／制化（原局盲點的改善方向）：兩股力量相剋時，用「剋方所生、又能生被剋方」的五行通關，或用剋制過旺一方的五行制化。
+  比劫奪財 → 食傷通關（比劫生食傷、食傷生財），或官殺制比劫；
+  財多壞印（貪財壞印）→ 官殺通關（財生官殺、官殺生印），或比劫制財；
+  官殺攻身 → 印通關（官殺生印、印生身），或食傷制殺；
+  傷官見官 → 財通關（傷官生財、財生官），或印制傷官；
+  梟神奪食 → 比劫通關（梟印生比劫、比劫生食神），或財制梟印；
+  其他相剋組合依同一原則類推；只指出通關或制化的十神與五行，不宣告用神、喜神。
+- 家人星所在柱的地支被歲運沖、或驛馬刑（寅申巳亥）→ 提醒出入安全；被四庫刑（辰戌丑未）→ 提醒健康檢查。
+- 姻緣時機：「姻緣」＝流年天干或地支本氣為夫妻星；「三合」＝原局年支（生肖）＋流年＋原局其他地支或大運地支，湊成完整三合；「爛桃花」＝同一柱夫妻星與比劫並見。`;
+
+    const PROMPT_TASK_PRO = `# 你的任務：命師版深度解析
+角色：你是精通子平八字的命理師，熟悉《子平真詮》《滴天髓》《三命通會》的論命邏輯。請以繁體中文回答，語氣客觀、直接，風險與盲點要明講。
+
+寫作要求：
+- 每個論點都寫出「結論 → 依據 → 現實對應」。依據要引用資料編號與內容，例如「依據：【3-1】大運丙引透時支午本氣正官（A級）」。
+- 講因果鏈，不只複述十神字義，例如「七殺無食傷制，故決斷快但易衝動」。
+- 談刑沖合會時，點出動到哪個宮位、現實上對應什麼。
+- 可用命理術語，但每個術語第一次出現時用一句白話補充。
+- 用「## 0. 標題」分段，每段第一句先講結論。
+
+請依序完成：
+0. 格局定調：引用【1】格局定式與成格／破格標籤，說明格局高低清濁；成格是優勢與出路，破格是缺陷與要防的地方；若無組合，說明格局平淡時如何看待。
+1. 性格與天賦盲點：結合日主強弱、【2-1】通根、【2-2】透干排名，點出顯性與隱性性格、最大盲點，並用十神生剋與格局成敗說明原因。
+   接著針對原局最大盲點寫「改善方式」：依判讀規則的通關／制化對照，說明此盲點用哪個十神（五行）通關或制化；若【1】格局成敗已標出通關，直接引用並說明原局本身已有的化解力量；最後轉成現實上可執行的做法（行為習慣、工作方式、合作對象、環境選擇），每個做法對應到它代表的十神。
+2. 原生家庭：從年月柱的十神互動與刑沖合害，看家庭給的是支持還是消耗；從印星與財星的狀態，看金錢觀與安全感如何形成。
+3. 事業與財務：依原局結構與透干十神，給職涯環境建議；指出理財與重大決策上要防的十神風險（如比劫奪財、官殺壓身），對應【1】的破格標籤要明講。
+4. 近期動態（重點）：用【3-1】去年、今年、明年的引透得根，【3-2】開庫，【3-3】流月。先挑 2～3 個已過月份做驗證，再列出未來 6～12 個月最需要注意的月份，每個月份寫可能情境與行動建議；引動成格組合的時機宜把握，引動破格組合的時機宜防範。
+5. 子女（【4】）：依標籤解讀子女緣深淺（緣分輕薄時並列多種可能：晚得、子女早獨立、聚少離多、本人不想生育等）；子女個性只用「子女個性判讀柱」干支本身的五行陰陽推斷，不用命主十神；列出變動與得子時間窗口。不推斷性別、胎數。
+6. 兄弟（【5】）：比劫星在原局的強弱與狀態；每個觸發時間點對應的手足變動；比劫對命主是助力還是消耗，依原局結構說明，不宣告喜忌。
+7. 父母（【6】）：母星、父星的位置與狀態；每個觸發時間點依規則提醒出入安全或健康檢查。
+8. 婚姻（【7】）：夫妻星位置（年齡差、距離日主）與通根；原局夫妻宮與夫妻星所在柱的刑沖害代表的感情模式；歲運觸發與姻緣時機中最值得注意的年份與月份。
+9. 深度追問：依命盤中尚未解開的庫或刑沖，提出 2 個最值得命主補充現實資訊、再進一步追問的問題。
+
+篇幅：約 3000～4500 字。若一次寫不完，先完成 0～4，結尾寫「回覆『繼續』完成 5～9」。`;
+
+    const PROMPT_TASK_PLAIN = `# 你的任務：白話版解析
+角色：你是把八字講成白話的命理顧問，讀者完全沒有命理背景。請以繁體中文回答，像朋友聊天一樣清楚、溫和但直接。
+
+寫作要求：
+- 正文不要出現命理術語（十神名稱、通根、透干、格局名、干支組合等）。真的需要時，括號附一句白話即可。
+- 每段第一句先講結論，再用生活上的例子說明。
+- 不要寫推論過程，也不要列依據。
+- 用「## 標題」分段，條列為主，避免長段落。
+
+請依序完成：
+1. 你是什麼樣的人：3 個最大的優勢、2 個最容易吃虧的盲點。
+   針對最大的盲點，寫「怎麼改善」：依判讀規則的通關／制化對照找出化解的力量，但用生活語言寫成 2～3 個具體做法（例如養成什麼習慣、用什麼方式工作、找什麼樣的人合作），不要出現術語。
+2. 工作與賺錢：適合的工作環境與賺錢方式；要避開的地雷。
+3. 感情與婚姻：容易吸引的伴侶類型、相處上要注意的地方；未來幾年感情較有機會、或需要多留意的年份。
+4. 家人：父母、兄弟姊妹、子女，只講需要留意的時間點與一句提醒。
+5. 接下來 12 個月：先用 2～3 個已過的月份讓讀者對照看準不準；再用表格列出未來 12 個月（月份｜主題｜一句建議），沒有特別事件的月份可以合併。
+6. 現在就能做的 3 件事。
+
+篇幅：約 1500～2500 字。`;
+
+    function copyPromptForAI(mode, btn) {
         const data = window.currentBaziDataForAI;
-        
-        const prompt = `你是一位精通子平八字命理的專業命理師，深諳《滴天髓》《子平真詮》《三命通會》等命理經典的論命邏輯與術語，行文兼具命理專業的精準度與白話文的可讀性，語氣客觀、溫暖、一針見血，不打模糊仗、不說模稜兩可的安全話術。
+        if (!data || !data.pureTonggen) { alert('請先點擊「執行運算」產生完整的精算數據！'); return; }
+        const prompt = `${mode === 'plain' ? PROMPT_TASK_PLAIN : PROMPT_TASK_PRO}
 
-【重要前提：排盤數據以下方系統精算結果為唯一依據，不得重新推算】
-以下所有八字排盤、十神歸屬、通根透干強弱、格局強弱量化總分、刑沖會合、開庫引動、流月戰術等數據，皆由使用者自建的量化八字系統精算產出，排盤與運算已經完成。你不需要、也「不應該」重新排八字、質疑或修改任何一項數據（包括日主強弱判定、歲運干支、刑沖會合結果等）——這些以系統給出的結果為準。你的任務只有一個：**基於這份已完成的精算報告，站在專業命理師的角度進行解讀與白話演繹**，不要另起爐灶用你自己的方式重新推算或覆蓋這份排盤。
+${PROMPT_RULES}
 
-【命理師的論命規範，請務必遵守】
-- 格局定式與成格／破格標籤已由系統依傳統子平精算完成（見下方【1】），直接引用即可，不需要重新判斷或推翻，但要用一到兩句話把判斷依據轉成白話。
-- 用神／忌神由命主自行訂定，本報告刻意不提供；請「不要」自行推定或宣告用神、忌神、喜神，論述時以十神生剋制化、格局成敗與原局結構為主。
-- 【1】中「身強身弱（量化系統）」與「傳統子平格局定式」是兩套獨立系統、各自獨立判斷，請勿混為一談、勿互相解釋成因、也不要說其中一個是另一個的依據——兩者可能結論一致，也可能不一致，若不一致屬正常現象，如有需要可以簡單向讀者說明這是兩套不同方法的交叉參考，不用強行調和。
-- 論性格、事業、財運、感情時，具體點出「十神生剋制化」的因果鏈（例如「七殺無食傷制化，故決斷力強但易衝動犯險」），而非只複述十神字面意義。
-- 論刑沖會合時，說明「動的是哪個宮位」（年柱＝根基／祖蔭，月柱＝事業／父母，日支＝配偶／自身，時柱＝子女／晚運），並解釋動了之後對應到現實中的什麼狀況。
-- 可使用命理專業術語（如：得令、得地、得勢、通根、透干、清透、雜氣、財官印食傷比劫、墓庫、調候、格局、成格、破格），但每次專有名詞出現後，請用一句白話立即補充說明，讓非命理背景的讀者也能看懂，不要整段堆術語。
-- 該直言的風險、盲點、警訊要直接點出來，不需要為了安慰人而模糊焦點。
+${buildPromptData(data)}
 
-【1. 命盤基礎與能量佔比】
-- 性別：${data.gender}
-- 八字原局：${data.pillars}
-- 日主元神：${data.dayMaster}
-- 身強身弱（量化系統，非傳統子平格局）：${data.strength} (量化總分：${data.totalScore} 分${data.autoStrength && data.autoStrength !== data.strength ? '；使用者手動調整，量化原判定為' + data.autoStrength : ''})
-- 五行比例：木 ${data.elements['木']}%、火 ${data.elements['火']}%、土 ${data.elements['土']}%、金 ${data.elements['金']}%、水 ${data.elements['水']}%
-- 傳統子平格局定式（獨立判斷，與上一行的量化分數系統無關，請勿混用或互相解釋）：${data.geJu}（${data.geJuNote}）
-- 傳統身強弱（僅供成格判斷使用，與上方量化分數為不同系統）：${data.tradStrength}
-- 格局成敗（傳統子平《子平真詮》成格／破格）：
-${data.geJuCombos}
-- 當前大運：${data.currentDaYun}
-- 今年流年：${data.currentYear}
-
-【2. 原局底氣與結構深度拆解報告】
-■ 天干通根解析（各十神在現實中的真實底氣強度）：
-${data.pureTonggen}
-
-■ 藏干透干解析（潛能爆發排名與隱藏特質）：
-${data.pureTougan}
-
-■ 原局與歲運的會合、刑沖害破（標明互動柱位）：
-（判讀規則：天干五合、地支六合一律視為「合絆」——雙方互相牽制、各自作用減弱，不可當作合化；三合、三會須三字齊全才算三合局、三會局，會合出新的五行能量；未齊者為半合，僅為局勢傾向、力量較弱；三合首尾兩字（生＋墓，缺中間帝旺）為暗拱，力道又更弱，計算身強身弱仍有納入，但判讀上較少討論。）
-${data.pureHeban}
-${data.pureChongxing}
-
-【3. 歲運交感與動態變數引動雷達】
-（大運判讀規則：前五年天干、地支並看（地支為主），後五年以地支為主；地支是整個十年的底色。地支若屬削弱命主的五行，即使能生天干，也視為拖累，不可用相生抵銷；地支雖屬幫扶五行，但若生助天干的削弱五行（如金生水），喜神轉生忌神，整步運視為削弱。）
-■ 大運/流年天干「引透」與地支「得根」動態監測：
-${data.pureDynamic}
-
-■ 命局四庫（辰戌丑未）動態開庫引動偵測：
-${data.pureSiku}
-
-■ 過去 6 個月與未來 1 年流月戰術掃描 (感情/事業/財庫/健康/家庭)：
-${data.pure12Month}
-
-【4. 六親人際：子女星偵測（系統只做條件觸發，未解讀）】
-${data.childScan || '（無資料）'}
-
-【5. 六親人際：兄弟星（比劫）偵測（系統只做條件觸發，未解讀）】
-${data.siblingScan || '（無資料）'}
-
-【6. 六親人際：父母星偵測（系統只做條件觸發，未解讀）】
-${data.parentScan || '（無資料）'}
-
-【7. 六親人際：夫妻星與夫妻宮偵測（系統只做條件觸發，未解讀）】
-${data.spouseScan || '（無資料）'}
-
-【你的分析任務】
-請絕對不要重複列印、覆述或解釋上述數據的定義本身。請直接發揮專業命理師的功力，將「通根、透干、沖刑、合絆、開庫、流月」這些量化化學反應，轉化為對命主現實生活的演繹，輸出約 1200-1800 字的深度解析：
-
-0. 格局定調（先講結論再展開）：直接引用系統給出的格局定式與成格／破格標籤（見【1】），說明此格局的高低清濁——成格代表結構上的優勢與天賦出路，破格代表結構缺陷與需防範之處；若未見任何組合，說明格局平淡時該如何看待。作為後面所有分析的立論基礎，不需要重新推算。
-1. 核心性格與天賦盲點（直觀）：結合日主底氣與通根透干排名，直接點出他最顯性與最隱性的雙重性格特質與致命盲點，並以十神生剋制化與格局成敗去解釋「為什麼」。
-2. 原生家庭與底層安全感（溯源）：剖析年月柱（父母宮位）的十神交互作用與刑沖合害，精準解構原生家庭給予的是「實質庇蔭」還是「隱性消耗（如情感勒索、資源吸附）」。觀察財星與印星的狀態，點出家庭背景如何形塑他潛意識中的金錢觀與安全感模型，並給予如何從家族羈絆中實現「精神與現實雙重獨立」的戰術建議。
-3. 事業與資源配置（細部）：根據原局結構與透干十神，給出精準的職涯環境建議，並指出他在金錢理財策略、重大決策上應該防範哪種十神帶來的風險陷阱（例如比劫奪財、官殺壓制），若與【1】的破格標籤對應要明講。
-4. 近一年與近期的變動（核心破題，必須極度直觀）：請高度聚焦在「去年回顧」、「本年動態」、「動態開庫」與「近18個月流月戰術」。直接、具體地推斷出近一年內（或今年/接下來幾個月）最可能發生的現實大事（包含利用過去6個月的流月特徵進行驗證，以及預測如：職涯劇烈轉換、大筆資金重分配、人際感情危機），並給予具體的行動戰術建議，建議要能對應到格局成敗（引動成格組合的時機宜把握，引動破格組合的時機宜防範）。
-5. 子女緣分（依【4】標籤解讀）：[子女緣強] 說明子女緣深厚的表現；[子女緣分輕薄] 說明緣分深淺與可能原因（可包含晚得子女、子女較早獨立、聚少離多，或命主本身不想生育、無子女等可能，請以多種可能並列呈現，勿單一斷定）；[推斷子女個性] 依「子女個性判讀柱」干支本身的五行陰陽推斷子女性格特質（勿用命主十神）；[推斷突發事件或變動] 對照時間點說明子女相關的變動（含過去時間點的驗證）；[推斷得子時機] 指出較可能的時間窗口。系統不分兒女、不論胎數，請勿推斷性別或胎數。
-6. 兄弟手足（依【5】標籤解讀）：說明比劫星（兄弟姊妹、同輩手足）在原局的強弱與狀態（通根、透干、坐支）；對每個 [推斷兄弟手足變動] 時間點，說明比劫坐支被沖或刑可能對應的手足變動（例如分離、搬遷、關係起伏、手足有狀況），已過的時間點請用來驗證，未來的時間點請給提醒。比劫對命主是助力還是競爭消耗，請依原局結構與格局成敗（例如是否構成比劫奪財）說明，不要自行宣告喜忌。
-7. 父母（依【6】標籤解讀）：說明母星（印）、父星（財）在原局的位置與狀態；對每個觸發時間點，依「家人星該柱地支被大運／流年沖刑」的規則提醒：相沖或驛馬刑（寅申巳亥）[推斷家人出入安全] → 跌倒、車關、突發疾病、意外受傷，提醒出入安全；四庫刑（辰戌丑未）[推斷家人健康檢查] → 結石、腫瘤、息肉、慢性病、憂鬱等累積型問題，提醒做健康檢查。已過的時間點用來驗證，未來的給提醒；語氣以「提醒留意」為主，勿下斷言。
-8. 婚姻（依【7】標籤解讀）：說明夫妻星的位置（年齡差、距離日主）與通根狀態；原局夫妻宮與夫妻星所在柱的刑沖害代表的感情模式（夫妻宮相刑：易口角需磨合；夫妻宮相沖：易晚婚或對象在外地認識；夫妻星與鄰柱相沖：易遠距離）；對每個歲運觸發時間點，已過的用來驗證，未來的給提醒。直接解讀，不要說教。
-9. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
-
-【最後提醒】全文分析請完全建立在上方系統給出的排盤與量化數據之上，不要自行推定用神忌神，也不要更動任何排盤結果；你的角色是「解讀者」，不是「排盤者」。`;
-
-        try {
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = prompt;
-            tempTextArea.style.position = 'absolute';
-            tempTextArea.style.left = '-9999px';
-            document.body.appendChild(tempTextArea);
-            tempTextArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempTextArea);
-
-            const btn = document.getElementById('copyPromptBtn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '✅ 複製成功';
-            btn.style.background = '#2ed573';
-            btn.style.color = '#000';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.background = '#333';
-                btn.style.color = 'var(--accent)';
-            }, 3000);
-        } catch (err) {
-            console.error('複製失敗:', err);
-            alert('複製失敗，請檢查瀏覽器權限或換個瀏覽器試試。');
-        }
+# 再次提醒
+以上資料為系統精算結果，請直接解讀，不要重新排盤，不要推定用神忌神。請依「你的任務」開始撰寫。`;
+        const done = () => {
+            if (!btn) return;
+            const original = btn.innerHTML;
+            btn.innerHTML = '✅ 已複製'; btn.classList.add('copied');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2500);
+        };
+        const fallback = () => {
+            try {
+                const ta = document.createElement('textarea');
+                ta.value = prompt; ta.style.position = 'absolute'; ta.style.left = '-9999px';
+                document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done();
+            } catch (err) { console.error('複製失敗:', err); alert('複製失敗，請檢查瀏覽器權限或換個瀏覽器試試。'); }
+        };
+        window.__lastPrompt = prompt;
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(prompt).then(done, fallback); else fallback();
     }
 
 </script>
