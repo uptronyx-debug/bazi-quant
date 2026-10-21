@@ -404,6 +404,14 @@
         .lc-tags { display:flex; gap:1px; min-height:13px; flex-wrap:wrap; justify-content:center; }
         .lc-tags i { font-style:normal; font-size:9px; font-weight:bold; width:13px; height:13px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; }
         .lc-wang { background:#ffb347; color:#000; box-shadow:0 0 5px #ffb347; }
+        .lc-xing { background:#2a0d14; color:#ff7ea3; border:1px solid #ff5c8a; box-sizing:border-box; }
+        .lc-dong { background:transparent !important; font-style:normal; }
+        .lw-dong { fill:#ffe08a; }
+        .lw-dong-line .lw-chip { color:#ffe08a; border-color:rgba(255,224,138,.5); background:rgba(255,224,138,.08); }
+        .lw-xing-line .lw-chip { color:#ff7ea3; border-color:#ff5c8a; background:rgba(255,92,138,.1); }
+        .lw-he { fill:#ffd1e6; }
+        .lw-he-line .lw-chip { color:#2a0d1a; background:#ff9ec7; border-color:#ff9ec7; font-weight:bold; }
+        .lc-he { color:#2a0d1a !important; background:#ff9ec7 !important; }
         .lc-po { background:#2a0d0d; color:#ff6b6b; border:1px solid #ff5252; box-sizing:border-box; }
         .lc-detail { margin-top:10px; padding:10px 12px; border-radius:10px; border:1px solid #333; background:#1a1a1a; }
         .lc-hint { text-align:center; font-size:11px; color:#666; border-style:dashed; }
@@ -418,6 +426,12 @@
         .lw-半官 .lw-chip { color:#7fb8ea; border-color:#3a6fa8; }
         .lw-topic { cursor:pointer; }
         .lw-topic.off { cursor:default; }
+        .topic-tao .lw-topic.on { color:#ff7eb6; border-color:#ff7eb6; background:rgba(255,126,182,.12); box-shadow:0 0 8px rgba(255,126,182,.35); }
+        .topic-tao .lc-cell { background: linear-gradient(180deg, rgba(255,126,182,var(--a)), rgba(255,126,182,calc(var(--a) * .35))), #121212; }
+        .topic-tao .lc-cell.wang { border-color:rgba(255,126,182,.7); box-shadow:0 0 8px rgba(255,126,182,.25); }
+        .topic-tao .lc-wang { background:#ff7eb6; box-shadow:0 0 5px #ff7eb6; }
+        .lw-桃花日 .lw-chip { color:#000; background:#ff7eb6; border-color:#ff7eb6; box-shadow:0 0 6px rgba(255,126,182,.6); }
+        .lw-半桃花 .lw-chip { color:#ffb0d2; border-color:#b0527f; }
         .topic-ren .lw-topic.on { color:#c792ea; border-color:#c792ea; background:rgba(199,146,234,.12); box-shadow:0 0 8px rgba(199,146,234,.35); }
         .topic-ren .lc-cell { background: linear-gradient(180deg, rgba(199,146,234,var(--a)), rgba(199,146,234,calc(var(--a) * .35))), #121212; }
         .topic-ren .lc-cell.wang { border-color:rgba(199,146,234,.7); box-shadow:0 0 8px rgba(199,146,234,.25); }
@@ -634,7 +648,8 @@
         }
 
         /* ===== 流日面板：單一長條圖，一行顯示10天趨勢 ===== */
-        .liuri-legend { display: flex; gap: 16px; font-size: 11px; color: #ccc; margin-bottom: 8px; }
+        .liuri-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 11px; color: #ccc; margin-bottom: 8px; }
+        .liuri-legend > span { white-space: nowrap; }
         .liuri-legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
         .liuri-chart-wrap { width: 100%; overflow: visible; }
         /* ===== 流日建議：整排寬度＝一天，每滑一次換下一天（滿版分頁式） ===== */
@@ -879,6 +894,35 @@
         .mg-sex { grid-column:1 / 2; }
         .mg-sex button { padding:7px; font-size:13px; }
         .mg-go { grid-column:auto; margin:0; padding:9px; font-size:14px; }
+        .yy-sub { font-weight:normal; color:#777; font-size:11px; margin-left:8px; }
+        .yy-list { display:flex; flex-direction:column; border:1px solid #2a2a2a; border-radius:10px; overflow:hidden; }
+        .yy-row { display:grid; grid-template-columns:40px 34px 58px 1fr; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid #222; cursor:pointer; font-size:12.5px; }
+        .yy-row:last-of-type { border-bottom:none; }
+        .yy-row.now { background:rgba(0,210,255,.06); }
+        .yy-row.hit .yy-y { color:#ff7eb6; font-weight:bold; }
+        .yy-y { color:#aaa; }
+        .yy-gz { font-size:14px; white-space:nowrap; }
+        .yy-dy { font-size:11px; color:#666; white-space:nowrap; }
+        .yy-dy.star { color:#ff7eb6; }
+        .yy-sig { display:flex; flex-wrap:wrap; gap:4px; }
+        .yy-chip { font-size:10.5px; padding:1px 7px; border-radius:999px; border:1px solid; white-space:nowrap; cursor:pointer; }
+        .yy-yin, .yy-he { color:#ff7eb6; border-color:rgba(255,126,182,.55); background:rgba(255,126,182,.08); }
+        .yy-he { color:#ffb0d2; }
+        .yy-lan { color:#000; background:#ff6b4a; border-color:#ff6b4a; font-weight:bold; }
+        .yy-months:empty { display:none; }
+        .yy-mgrid { display:grid; grid-template-columns:repeat(3, 1fr); gap:5px; padding:8px 10px 10px; background:#121212; border-bottom:1px solid #222; }
+        .yy-m { display:flex; flex-direction:column; align-items:flex-start; gap:2px; padding:5px 7px; border-radius:6px; border:1px solid #222; font-size:11px; }
+        .yy-m.hit { border-color:rgba(255,126,182,.5); }
+        .yy-mm { color:#777; font-size:10px; }
+        .mg-tabs { margin-bottom:12px; }
+        .hp-lamps { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 6px; }
+        .hp-lamps .gj-lamp { font-size:12px; padding:3px 9px 3px 4px; }
+        .hp-lamps .gj-lamp i { width:16px; height:16px; font-size:10px; }
+        .hp-lamps .gj-lamp.ok { color:#ff7eb6; border-color:#ff7eb6; background:rgba(255,126,182,.1); box-shadow:0 0 8px rgba(255,126,182,.45); }
+        .hp-lamps .gj-lamp.ok i { background:#ff7eb6; box-shadow:0 0 5px #ff7eb6; }
+        .hp-lamps .gj-lamp.hp-first.ok { font-size:13px; }
+        .hp-lamps .gj-lamp.hp-na { opacity:.6; border-style:dashed; }
+        .hp-meta { font-size:11.5px; color:#8fa3ad; margin-bottom:4px; }
         .mg-done { display:flex; align-items:center; font-size:12.5px; color:#8fa3ad; padding:4px 2px; }
         button.mg-del { width:auto; grid-column:auto; margin:0 0 0 auto; padding:6px 14px; font-size:12px; font-weight:normal; background:transparent; color:#888; border:1px solid #333; border-radius:999px; }
         button.mg-del:hover { background:#222; color:#ccc; transform:none; box-shadow:none; }
@@ -1620,7 +1664,7 @@
 
 
     // ===================================================================
-    // 婚姻分頁：由夫妻宮看伴侶特質＋輸入另一半命盤看個性與相處策略（資料存在本機瀏覽器）
+    // 婚姻分頁：夫妻星／夫妻宮偵測＋輸入另一半命盤產生相處提詞（資料存在本機瀏覽器）
     // ===================================================================
     const PARTNER_KEY = 'bazi_partner_v1';
     const GONG_TYPES = [
@@ -1629,26 +1673,11 @@
         { zhis: '辰戌丑未', tag: '四墓庫', traits: ['穩重踏實、話藏心中', '安靜內斂、富有內涵'] }
     ];
     const TG_PROFILE = {
-        '財': { pair: ['正財', '偏財'], color: '#ffd166',
-            trait: { 正財: ['誠實守信、任勞任怨', '保守拘謹、安於現狀'], 偏財: ['處事圓滑、人緣極佳', '生意頭腦佳、物慾高'] },
-            care: { 正財: '追求穩定、社會信譽', 偏財: '開心賺／花錢、高投報率的刺激感' },
-            tip: { 正財: ['鼓勵跨出舒適圈', '嘗試新思維'], 偏財: ['協助控管風險', '強迫偏財儲蓄'] } },
-        '官殺': { pair: ['正官', '七殺'], color: '#5ab0ff',
-            trait: { 正官: ['品格端正、責任心強', '墨守成規、優柔寡斷'], 七殺: ['堅毅果決、英雄主義', '過於強勢、同理心弱'] },
-            care: { 正官: '重視紀律、社會功名', 七殺: '追求突破、領導權' },
-            tip: { 正官: ['紓壓放鬆', '協助決策'], 七殺: ['提醒溝通放軟', '擔任「壓力緩衝區」'] } },
-        '食傷': { pair: ['食神', '傷官'], color: '#ff9f68',
-            trait: { 食神: ['溫和、享受美食生活', '富藝術氣息', '三分鐘熱度、過於安逸'], 傷官: ['反應靈敏、不甘平凡', '叛逆好勝、衝撞權威'] },
-            care: {},
-            tip: { 食神: ['排事務優先順序', '一同享樂、探索生活'], 傷官: ['避免正面衝突、多誇獎', '積極交流想法'] } },
-        '印': { pair: ['正印', '偏印'], color: '#b388ff',
-            trait: { 正印: ['待人寬厚、不喜爭權', '易被動、過於依賴、缺乏獨立思考'], 偏印: ['觀察敏銳、直覺強', '獨來獨往、悲觀負面'] },
-            care: { 正印: '重和諧、討厭衝突、喜歡被照顧', 偏印: '在意界線、不愛社交、喜鑽研興趣' },
-            tip: { 正印: ['帶領行動', '跨出舒適圈'], 偏印: ['引導正向思考', '多出門散心', '給予私人空間'] } },
-        '比劫': { pair: ['比肩', '劫財'], color: '#2ed573',
-            trait: { 比肩: ['強硬不服輸、重朋友', '固執己見、易意氣用事'], 劫財: ['反應靈敏、號召力強', '魯莽衝動、不善理財'] },
-            care: { 比肩: '愛面子、自尊心強', 劫財: '團體核心、領導權' },
-            tip: { 比肩: ['給足面子、大力稱讚', '留意朋友借貸'], 劫財: ['給足面子、大力稱讚', '留意朋友借貸'] } }
+        '財': { pair: ['正財', '偏財'], color: '#ffd166' },
+        '官殺': { pair: ['正官', '七殺'], color: '#5ab0ff' },
+        '食傷': { pair: ['食神', '傷官'], color: '#ff9f68' },
+        '印': { pair: ['正印', '偏印'], color: '#b388ff' },
+        '比劫': { pair: ['比肩', '劫財'], color: '#2ed573' }
     };
     const TG_CAT_OF = { 比肩: '比劫', 劫財: '比劫', 食神: '食傷', 傷官: '食傷', 正財: '財', 偏財: '財', 正官: '官殺', 七殺: '官殺', 正印: '印', 偏印: '印' };
 
@@ -1682,6 +1711,119 @@
         return { gans, zhis, hasHour, dg, cnt, ganStar, catN, cat, order, tops, top: tops[0], mainSubs, pillars: gans.map((g, i) => g + zhis[i]) };
     }
 
+
+    // ===================================================================
+    // 姻緣時機（婚姻分頁下半）：以流年為主，看天干＋地支本氣（不取中餘氣）；不分身強身弱
+    //  姻緣：流年走到夫妻星（男財、女官殺）
+    //  三合：原局年支＋流年地支，再加原局其他地支或大運地支，湊成完整三合（不算半合）
+    //  爛桃花：同一柱夫妻星＋比劫（不分天干地支先後）
+    //  流月：點年份展開，看干支皆為夫妻星的月、與年支＋流年湊成三合的月
+    // ===================================================================
+    const YY_SANHE = [['申', '子', '辰'], ['亥', '卯', '未'], ['寅', '午', '戌'], ['巳', '酉', '丑']];
+    function yyCtx(ctx) {
+        const de = ctx.dayElement;
+        const spouse = ctx.gender === 1 ? wuxingRel[de].ke : Object.keys(wuxingRel).find(k => wuxingRel[k].ke === de);
+        return { de, spouse, yz: ctx.baseZhis[0], zhis: ctx.baseZhis.filter(z => z && z !== '-') };
+    }
+    const yyMainEl = z => ganElementMap[zhiMainGan(z)];
+    // 原局年支＋pool 中的地支，是否湊成完整三合（pool 必須包含 newZ）
+    function yySanhe(yz, pool, newZ) {
+        const g = YY_SANHE.find(s => s.includes(yz) && s.includes(newZ) && yz !== newZ);
+        if (!g) return null;
+        const others = g.filter(z => z !== yz && z !== newZ);
+        return others.every(z => pool.includes(z)) ? g.join('') : null;
+    }
+    function yySignals(gan, zhi, y, pool, withLan) {
+        const ge = ganElementMap[gan], ze = yyMainEl(zhi), out = [];
+        // 流年：干或支走到夫妻星即算；流月較密集，干支都是夫妻星才標（避免每月都亮）
+        if (withLan ? (ge === y.spouse || ze === y.spouse) : (ge === y.spouse && ze === y.spouse)) out.push({ k: 'yin', t: '姻緣' });
+        const sh = yySanhe(y.yz, pool.concat([zhi]), zhi);
+        if (sh) out.push({ k: 'he', t: '三合' + sh });
+        if (withLan && ((ge === y.spouse && ze === y.de) || (ge === y.de && ze === y.spouse))) out.push({ k: 'lan', t: '爛桃花' });
+        return out;
+    }
+    const YY_TIP = { yin: '夫妻星', he: '年支三合', lan: '夫妻星＋比劫同柱' };
+    function yyChip(s) { return `<span class="yy-chip yy-${s.k}" data-tip="${YY_TIP[s.k]}">${s.t}</span>`; }
+    function renderYinyuanHtml(ctx) {
+        const y = yyCtx(ctx), Y0 = new Date().getFullYear();
+        const dyOf = yr => (ctx.daYunData || []).find(d => yr >= d.startYear && yr < d.startYear + 10);
+        let rows = '';
+        for (let i = 0; i < 10; i++) {
+            const yr = Y0 + i, gz = iaYearGZ(yr), dy = dyOf(yr);
+            const pool = y.zhis.slice(1).concat(dy ? [dy.zhi] : []);
+            const sig = yySignals(gz.gan, gz.zhi, y, pool, true);
+            const dyStar = dy && (ganElementMap[dy.gan] === y.spouse || yyMainEl(dy.zhi) === y.spouse);
+            rows += `<div class="yy-row ${sig.some(s => s.k === 'yin' || s.k === 'he') ? 'hit' : ''} ${i === 0 ? 'now' : ''}" onclick="yyToggle(${yr})">
+                <span class="yy-y">${yr}</span>
+                <span class="yy-gz"><b style="color:${elementColors[ganElementMap[gz.gan]]}">${gz.gan}</b><b style="color:${elementColors[zhiElementMap[gz.zhi]]}">${gz.zhi}</b></span>
+                <span class="yy-dy ${dyStar ? 'star' : ''}" data-tip="${dyStar ? '大運走到夫妻星' : '大運'}">${dy ? dy.gan + dy.zhi + '運' : ''}</span>
+                <span class="yy-sig">${sig.map(yyChip).join('')}</span>
+            </div><div class="yy-months" id="yyM${yr}"></div>`;
+        }
+        return `<div class="rel-ev-title" style="margin-top:16px;">💍 姻緣時機<span class="yy-sub">夫妻星：${ctx.gender === 1 ? '財' : '官殺'}（<b style="color:${elementColors[y.spouse]}">${y.spouse}</b>）・生肖 ${y.yz}</span></div>
+            <div class="yy-list">${rows}</div>`;
+    }
+    function yyToggle(yr) {
+        const box = document.getElementById('yyM' + yr), ctx = window.__friendCtx; if (!box || !ctx) return;
+        if (box.innerHTML) { box.innerHTML = ''; return; }
+        const y = yyCtx(ctx), gz = iaYearGZ(yr);
+        const dy = (ctx.daYunData || []).find(d => yr >= d.startYear && yr < d.startYear + 10);
+        const pool = y.zhis.slice(1).concat(dy ? [dy.zhi] : [], [gz.zhi]);
+        box.innerHTML = `<div class="yy-mgrid">${iaMonthsOf(yr).map(m => {
+            const sig = yySignals(m.gan, m.zhi, y, pool, false);
+            return `<div class="yy-m ${sig.length ? 'hit' : ''}"><span class="yy-mm">${m.jd || m.m + '月'}</span><span class="yy-gz"><b style="color:${elementColors[ganElementMap[m.gan]]}">${m.gan}</b><b style="color:${elementColors[zhiElementMap[m.zhi]]}">${m.zhi}</b></span>${sig.map(yyChip).join('')}</div>`;
+        }).join('')}</div>`;
+    }
+
+
+    // ===================================================================
+    // 合盤（婚姻 → 合盤）：五個條件，達到就亮燈
+    //  1 互為夫妻星：男日主剋女日主（同性：任一方剋另一方）
+    //  2 夫妻星五行相同：兩人的夫妻星五行相同（共同姻緣五行）
+    //  3 五行互補：身強配對方「財／官殺」五行身強，或同五行身弱；身弱配對方「印」五行身強，或同五行身強
+    //             從強配同五行從弱／身弱；從弱配同五行從強／身強
+    //  4 五行相同：日柱干支五行相同，或兩人八字前兩大五行相同
+    //  5 生肖三合：兩人年支在同一組三合
+    //  對方強弱用量化系統計分；時辰不詳時取「無時柱」到「時柱全加分」的區間，區間跨類別則不判定
+    // ===================================================================
+    const HP_ITEMS = [['mutual', '互為夫妻星'], ['samestar', '夫妻星五行相同'], ['comp', '五行互補'], ['same', '五行相同'], ['sanhe', '生肖三合']];
+    const hpCat = s => s > 80 ? '從強格' : (s >= 45 ? '身強' : (s >= 20 ? '身弱' : '從弱格'));
+    const hpKe = el => wuxingRel[el].ke, hpKeBy = el => Object.keys(wuxingRel).find(k => wuxingRel[k].ke === el), hpYin = el => Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === el);
+    const hpSpouseEl = (el, g) => g === 1 ? hpKe(el) : hpKeBy(el);
+    function hpTop2(pct) { return Object.keys(pct).sort((a, b) => pct[b] - pct[a]).slice(0, 2).sort().join(''); }
+    function hepanCalc(ctx, p, r) {
+        const me = { el: ctx.dayElement, g: ctx.gender, cat: ctx.strengthLabel, yz: ctx.baseZhis[0], dg: ctx.dg, dz: ctx.dz };
+        const pg = p.gender != null ? p.gender : (me.g === 1 ? 0 : 1);
+        const map = { year: { gan: r.gans[0], zhi: r.zhis[0] }, month: { gan: r.gans[1], zhi: r.zhis[1] }, day: { gan: r.gans[2], zhi: r.zhis[2] }, time: { gan: r.hasHour ? r.gans[3] : '-', zhi: r.hasHour ? r.zhis[3] : '-' } };
+        const pel = ganElementMap[r.dg];
+        const lo = calculateQuantStrengthScore(map, pel), hi = r.hasHour ? lo : Math.min(100, lo + 15);
+        const pcat = hpCat(lo) === hpCat(hi) ? hpCat(lo) : null;
+        const strong = c => c === '身強' || c === '從強格', weak = c => c === '身弱' || c === '從弱格';
+        const res = {};
+        res.mutual = me.g !== pg ? (me.g === 1 ? hpKe(me.el) === pel : hpKe(pel) === me.el) : (hpKe(me.el) === pel || hpKe(pel) === me.el);
+        res.samestar = hpSpouseEl(me.el, me.g) === hpSpouseEl(pel, pg);
+        if (!pcat) res.comp = null;
+        else if (me.cat === '從強格') res.comp = pel === me.el && weak(pcat);
+        else if (me.cat === '從弱格') res.comp = pel === me.el && strong(pcat);
+        else if (me.cat === '身強') res.comp = ([hpKe(me.el), hpKeBy(me.el)].includes(pel) && strong(pcat)) || (pel === me.el && weak(pcat));
+        else res.comp = (pel === hpYin(me.el) && strong(pcat)) || (pel === me.el && strong(pcat));
+        // 對方五行分布（天干 1＋地支藏干比重）
+        const cnt = { 木: 0, 火: 0, 土: 0, 金: 0, 水: 0 };
+        r.gans.forEach(gn => cnt[ganElementMap[gn]] += 1);
+        r.zhis.forEach(z => { const w = zhiHiddenWeights[z] || {}; Object.keys(w).forEach(h => cnt[ganElementMap[h]] += w[h]); });
+        const sameDay = ganElementMap[me.dg] === pel && ganElementMap[zhiMainGan(me.dz)] === ganElementMap[zhiMainGan(r.zhis[2])];
+        res.same = sameDay || (ctx.mePct && hpTop2(ctx.mePct) === hpTop2(cnt));
+        res.sanhe = me.yz !== r.zhis[0] && YY_SANHE.some(s => s.includes(me.yz) && s.includes(r.zhis[0]));
+        return { res, pel, pg, assumedG: p.gender == null, lo, hi, pcat, sameDay, cnt };
+    }
+    function renderHepanLamps(h) {
+        return `<div class="hp-lamps">${HP_ITEMS.map(([k, n], i) => {
+            const v = h.res[k];
+            return `<span class="gj-lamp ${v ? 'ok' : ''} ${v === null ? 'hp-na' : ''} ${i === 0 ? 'hp-first' : ''}"><i>${v ? '✓' : (v === null ? '?' : '')}</i>${n}</span>`;
+        }).join('')}</div>
+        <div class="hp-meta">對方日主 <b style="color:${elementColors[h.pel]}">${h.pel}</b>・${h.pcat ? `${h.pcat}（${h.lo === h.hi ? h.lo : h.lo + '～' + h.hi}分）` : `強弱未定（${h.lo}～${h.hi}分，時辰不詳）`}${h.assumedG ? '・性別未選，以異性計' : ''}</div>`;
+    }
+
     function renderMarriageTab() {
         const panel = document.getElementById('marriagePanel');
         const ctx = window.__friendCtx;
@@ -1690,14 +1832,10 @@
         const p = getPartner();
         let r = null; try { r = p ? calcPartner(p) : null; } catch (e) { r = null; }
         const hourOpts = '<option value="">時辰不詳</option>' + Array.from({ length: 24 }, (_, h) => `<option value="${h}" ${p && String(p.hour) === String(h) ? 'selected' : ''}>${String(h).padStart(2, '0')} 時</option>`).join('');
+        const tab = window.__mgTab || 'gong';
+        let gongHtml = window.__spouseScan ? renderSpouseScanHtml(window.__spouseScan) : '';
+        try { gongHtml += renderYinyuanHtml(ctx); } catch (e) { console.warn('姻緣時機失敗', e); }
         let html = `
-            <div class="rel-ev-title">💞 由夫妻宮看伴侶特質</div>
-            <div class="mg-gong">
-                <span class="mg-gz" style="color:${elementColors[zhiElementMap[ctx.dz]]}">${ctx.dz}</span>
-                <div><div class="mg-tag">${g.tag}</div>
-                <div class="mg-traits">${g.traits.concat(g.sub && g.sub[ctx.dz] ? [g.sub[ctx.dz]] : []).map(t => `<span>${t}</span>`).join('')}</div></div>
-            </div>
-            <div class="rel-ev-title" style="margin-top:14px;">🧭 另一半命盤</div>
             <div class="mg-input">
                 <input type="date" id="partnerDate" value="${p ? p.date : ''}">
                 <select id="partnerHour">${hourOpts}</select>
@@ -1707,11 +1845,19 @@
         if (r) {
             html += `
                 <div class="mg-done">已排盤${r.hasHour ? '' : '（時辰不詳，以三柱計算）'}<button type="button" class="mg-del" id="partnerDel" onclick="clearPartner()">清除</button></div>
+                ${(() => { try { return renderHepanLamps(hepanCalc(ctx, p, r)); } catch (e) { console.warn('合盤失敗', e); return ''; } })()}
                 <button class="act-btn mg-prompt" id="partnerPromptBtn" onclick="copyPartnerPrompt()">📋 相處提詞</button>`;
         } else {
-            html += `<div class="rel-coming">輸入另一半的出生日期（時辰可不填），排盤後產生相處提詞</div>`;
+            html += `<div class="rel-coming">輸入另一半的出生日期（時辰可不填）</div>`;
         }
-        panel.innerHTML = html;
+        panel.innerHTML = `<div class="lm-tabs mg-tabs">
+                <button class="lm-tab ${tab === 'gong' ? 'on' : ''}" onclick="mgTab('gong')">夫妻宮</button>
+                <button class="lm-tab ${tab === 'hp' ? 'on' : ''}" onclick="mgTab('hp')">合盤</button>
+            </div>
+            <div style="${tab === 'gong' ? '' : 'display:none'}">${gongHtml}</div>
+            <div style="${tab === 'hp' ? '' : 'display:none'}">${html}</div>`;
+    }
+    function mgTab(t) { window.__mgTab = t; renderMarriageTab();
     }
     window.__partnerSex = null;
     function partnerSex(gd) { window.__partnerSex = gd; document.querySelectorAll('.mg-sex button').forEach(b => b.classList.toggle('on', +b.dataset.g === gd)); }
@@ -1733,6 +1879,7 @@
     function copyPartnerPrompt() {
         const ctx = window.__friendCtx, p = getPartner(); if (!ctx || !p) return;
         const r = calcPartner(p), g = gongTypeOf(ctx.dz);
+        let hpTxt = ''; try { const h = hepanCalc(ctx, p, r); hpTxt = HP_ITEMS.map(([k, n]) => `${n}：${h.res[k] === null ? '無法判定（時辰不詳）' : (h.res[k] ? '是' : '否')}`).join('；') + `\n對方量化強弱：${h.pcat ? h.pcat + '（' + (h.lo === h.hi ? h.lo : h.lo + '～' + h.hi) + ' 分）' : '時辰不詳，' + h.lo + '～' + h.hi + ' 分'}`; } catch (e) {}
         const dist = r.order.map(c => `${c} ${r.catN[c]} 個`).join('、');
         const sub = Object.keys(r.cnt).filter(k => r.cnt[k] > 0).sort((a, b) => r.cnt[b] - r.cnt[a]).map(k => `${k} ${r.cnt[k]}${r.ganStar[k] ? '（含天干主星）' : ''}`).join('、');
         // 另一半原局通透（只放提詞，不上版面）
@@ -1762,6 +1909,9 @@
 ${rootTxt}
 透干：${touTxt.length ? '\n' + touTxt.join('\n') : '無'}
 原局干支互動：${relTxt ? '\n' + relTxt : '無明顯刑沖合會'}
+
+【合盤條件】
+${hpTxt}
 
 
 【輸出要求】
@@ -3633,6 +3783,9 @@ ${rootTxt}
     const LIURI_ZHI_MIN = 0.15;
     // 干支權重（大運起一路到流日一致）：地支代表根基與實質力量約七成，天干代表外顯約三成
     const GZ_W = { gan: 0.3, zhi: 0.7 };
+    // 旺日門檻：當天有主星（財運＝財星、工作＝官殺、人際＝比劫），且分數（含三合三會加分）達 50 以上
+    // 用分數判定，旺日一定落在趨勢的高處，不會出現「旺日不在高峰」
+    const LIURI_HOT = 50;
     // 透干引動（流日表現層，不改藏干比重表）：天干與地支的餘氣同五行時，餘氣被引出，升級到該地支中氣的比重
     //  例：木日主遇辛巳，巳中庚金 10% → 升為 40%（巳的中氣戊土比重）；本氣、中氣不再加
     function liuriHiddenEff(gan, zhi) {
@@ -3660,10 +3813,10 @@ ${rootTxt}
         // 當天要有財星（天干為財，或地支藏干含財）才算財旺日；只有食傷屬於生財之源，力量較弱
         const hasCai = ganElementMap[dGan] === caiEl || (zhiOK && Object.keys(hw).some(hg => ganElementMap[hg] === caiEl));
         const score = Math.max(0, Math.min(100, Math.round((val(dGan) * GZ_W.gan + zhiE * GZ_W.zhi) * 100)));
-        const tier = (ganOK && zhiOK && hasCai) ? '財旺日' : ((ganOK || zhiOK) ? '半財' : '平');
+        const tier = (hasCai && score >= LIURI_HOT) ? '財旺日' : ((ganOK || zhiOK) ? '半財' : '平');
         const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
         const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
-        return { score, tier, ganOK, zhiOK, avoid: false, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
+        return { score, tier, hasMain: hasCai, ganOK, zhiOK, avoid: false, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
     }
 
     /**
@@ -3798,10 +3951,10 @@ ${rootTxt}
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
         const hasGS = ganElementMap[dGan] === gsEl || (zhiOK && Object.keys(hw).some(hg => ganElementMap[hg] === gsEl));
         const score = Math.max(0, Math.min(100, Math.round((val(dGan) * GZ_W.gan + zhiE * GZ_W.zhi) * 100)));
-        const tier = (ganOK && zhiOK && hasGS) ? '官旺日' : ((ganOK || zhiOK) ? '半官' : '平');
+        const tier = (hasGS && score >= LIURI_HOT) ? '官旺日' : ((ganOK || zhiOK) ? '半官' : '平');
         const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
         const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
-        return { score, tier, ganOK, zhiOK, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
+        return { score, tier, hasMain: hasGS, ganOK, zhiOK, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
     }
 
     /**
@@ -3823,10 +3976,10 @@ ${rootTxt}
         const zhiOK = zhiE >= LIURI_ZHI_MIN;
         if (!zhiOK) { zhiE = 0; zhiParts.length = 0; }
         const score = Math.max(0, Math.min(100, Math.round((val(dGan) * GZ_W.gan + zhiE * GZ_W.zhi) * 100)));
-        const tier = (ganOK && zhiOK) ? '慎言日' : ((ganOK || zhiOK) ? '人際活絡' : '平');
+        const tier = ((ganOK || zhiOK) && score >= LIURI_HOT) ? '慎言日' : ((ganOK || zhiOK) ? '人際活絡' : '平');
         const ganTxt = ganOK ? `天干<b style="color:${C(dGan)}">${dGan}${getPreciseTenGod(dGan, dayGan)}</b>` : '';
         const zhiTxt = zhiOK ? `地支${dZhi}含${zhiParts.join('、')}` : '';
-        return { score, tier, ganOK, zhiOK, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
+        return { score, tier, hasMain: ganOK || zhiOK, ganOK, zhiOK, detail: [ganTxt, zhiTxt].filter(Boolean).join('；') };
     }
 
     /**
@@ -3893,24 +4046,6 @@ ${rootTxt}
         return hits;
     }
 
-    /**
-     * 依當日十神屬性給出一句「可執行的」建議文字，取代單純的分數顯示。
-     */
-    function getLiuriSuggestion(ganTenGod) {
-        const map = {
-            '比肩': '人際互動旺，適合聚會交流，但避免合夥財務、借貸往來，防比肩奪利。',
-            '劫財': '破財訊號較明顯，大額消費、借貸出借宜謹慎，避免衝動決策。',
-            '食神': '心情較放鬆、表達力佳，適合創作、談合作、享受生活，忌過度耗費心神。',
-            '傷官': '想法多、易鋒芒外露，適合腦力激盪，但溝通宜收斂，避免與上司衝突。',
-            '正財': '利於穩健進財、記帳理財、簽訂長期契約，行動務實為佳。',
-            '偏財': '機會財、業外收入運較旺，適合投資評估、拓展人脈，但忌貪快求多。',
-            '正官': '責任感提升，適合處理公事、面談、簽約，行事宜按部就班守規矩。',
-            '七殺': '壓力與挑戰感較重，決策宜謹慎保守，避免衝突對抗或高風險操作。',
-            '正印': '適合學習、簽約用印、靜心規劃，貴人運佳，宜多請益前輩。',
-            '偏印': '適合獨處思考、專業鑽研，但社交互動易顯冷淡，避免過度多疑。'
-        };
-        return map[ganTenGod] || '今日五行氣場平順，依既定計畫行事即可。';
-    }
 
     // 全域版精確十神（含陰陽），供格局／用神判定使用（與 calculateBaziCore 內的 getSpecificShiShen 邏輯相同）
     // ===================================================================
@@ -3926,6 +4061,24 @@ ${rootTxt}
         return null;
     }
 
+    // 六親星統一取法：天干全取（日干除外，最多 3 顆）；天干不足 2 顆才以地支主氣補到 2 顆；
+    // 天干、地支主氣皆無，才往地支中氣→餘氣找 1 顆（同層取比重最高者）
+    function pickRelStars(el, baseGans, baseZhis, ganOrder, zhiOrder, extra) {
+        const hs = z => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
+        const out = [];
+        ganOrder.forEach(i => { if (i !== 2 && baseGans[i] && baseGans[i] !== '-' && ganElementMap[baseGans[i]] === el) out.push({ ...(extra || {}), gan: baseGans[i], pillarIdx: i, layer: '天干' }); });
+        zhiOrder.forEach(i => { if (out.length >= 2) return; const z = baseZhis[i]; if (!z || z === '-') return; const m = hs(z)[0]; if (m && ganElementMap[m] === el) out.push({ ...(extra || {}), gan: m, pillarIdx: i, layer: '地支主氣' }); });
+        if (!out.length) {
+            for (const [pos, layerName] of [[1, '地支中氣'], [2, '地支餘氣']]) {
+                let best = null;
+                zhiOrder.forEach(i => { const z = baseZhis[i]; if (!z || z === '-') return; const hg = hs(z)[pos];
+                    if (hg && ganElementMap[hg] === el && (!best || zhiHiddenWeights[z][hg] > best.w)) best = { i, hg, w: zhiHiddenWeights[z][hg] }; });
+                if (best) { out.push({ ...(extra || {}), gan: best.hg, pillarIdx: best.i, layer: layerName }); break; }
+            }
+        }
+        return out;
+    }
+
     function scanChildStars(ctx) {
         const { dg, dayElement, gender, baseGans, baseZhis, pNames, daYunData, currentYear } = ctx;
         const childEl = gender === 1
@@ -3934,30 +4087,8 @@ ${rootTxt}
         const childCatName = gender === 1 ? '官殺' : '食傷';
         const palaceZhi = baseZhis[3];
 
-        // ---- 二、子女星定位與擷取（最大容量 3，依優先順序） ----
-        const stars = [];
-        const push = (s) => { if (stars.length < 3) stars.push(s); };
-        // Priority 1：天干（日干為日主本身，略過）
-        baseGans.forEach((g, i) => {
-            if (i === 2 || g === '-' || ganElementMap[g] !== childEl) return;
-            push({ gan: g, pillarIdx: i, layer: '天干' });
-        });
-        // Priority 2：地支主氣
-        baseZhis.forEach((z, i) => {
-            if (z === '-') return;
-            const w = zhiHiddenWeights[z] || {};
-            const sorted = Object.keys(w).sort((a, b) => w[b] - w[a]);
-            if (sorted[0] && ganElementMap[sorted[0]] === childEl) push({ gan: sorted[0], pillarIdx: i, layer: '地支主氣' });
-        });
-        // Priority 3：地支中氣／餘氣
-        baseZhis.forEach((z, i) => {
-            if (z === '-') return;
-            const w = zhiHiddenWeights[z] || {};
-            const sorted = Object.keys(w).sort((a, b) => w[b] - w[a]);
-            sorted.slice(1).forEach((hg, k) => {
-                if (ganElementMap[hg] === childEl) push({ gan: hg, pillarIdx: i, layer: k === 0 ? '地支中氣' : '地支餘氣' });
-            });
-        });
+        // ---- 二、子女星擷取：天干全取；不足 2 顆以地支主氣補；皆無才取中氣／餘氣 1 顆（子女宮時柱優先） ----
+        const stars = pickRelStars(childEl, baseGans, baseZhis, [3, 1, 0], [3, 2, 1, 0]);
 
         // ---- 三、狀態屬性判定 ----
         const dayHourChong = baseZhis[2] !== '-' && zhiChongMap[baseZhis[2]] === baseZhis[3];
@@ -4166,7 +4297,7 @@ ${rootTxt}
 
     function renderRelEventBlocks(events) {
         const evRow = (e) => {
-            const tags = e.clash.map(c => `<span class="tag ${c.type === '沖' ? 'tag-chong' : 'tag-xing'}">${c.name}・${c.target}</span>`)
+            const tags = e.clash.map(c => `<span class="tag ${c.type === '沖' ? 'tag-chong' : c.type === '害' ? 'tag-hai' : 'tag-xing'}">${c.name}・${c.target}</span>`)
                 .concat(e.arrive.map(a => `<span class="tag tag-star">${a}</span>`))
                 .concat((e.he || []).map(h => `<span class="tag tag-sanhe">${h.name}</span>`)).join(' ');
             return `
@@ -4186,8 +4317,117 @@ ${rootTxt}
             + evBlock('🗓️ 流月（前 6 月＋後 12 月）', events.liuyue, '此區間無觸發');
     }
 
+
+    // ===================================================================
+    // 夫妻星／夫妻宮偵測（婚姻分頁）：夫妻星＝男財（我剋）、女官殺（剋我）；夫妻宮＝日支
+    // 天干全取（月→時→年）；天干不足 2 顆才以地支主氣補到 2 顆（日→月→時→年）；不取中氣、餘氣
+    // 原局：夫妻宮、夫妻星所在柱地支 與鄰近地支的刑沖害
+    // 歲運：大運／流年／流月地支 刑沖害 夫妻宮與夫妻星坐支
+    // ===================================================================
+    const SPOUSE_AGE = ['年紀差距 10～20 歲，或異國、遠距離', '年紀差距 2～10 歲', '年紀差距 ±2 歲', '年紀小 2～10 歲'];
+    function scanSpouseStars(ctx) {
+        const { dg, dayElement, gender, baseGans, baseZhis, pNames, daYunData, currentYear } = ctx;
+        const el = gender === 1 ? wuxingRel[dayElement].ke : Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement);
+        const catName = gender === 1 ? '財' : '官殺';
+        const mainOf = z => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a])[0]; };
+        // 以天干為主：天干有幾顆取幾顆（月→時→年，不限顆數）；天干不足 2 顆時，才以地支主氣補到 2 顆（日→月→時→年）
+        const stars = [];
+        [1, 3, 0].forEach(i => { if (baseGans[i] && baseGans[i] !== '-' && ganElementMap[baseGans[i]] === el) stars.push({ gan: baseGans[i], pillarIdx: i, layer: '天干' }); });
+        [2, 1, 3, 0].forEach(i => { if (stars.length >= 2) return; const m = mainOf(baseZhis[i]); if (m && ganElementMap[m] === el) stars.push({ gan: m, pillarIdx: i, layer: '地支主氣' }); });
+        const distOf = i => { const d = Math.abs(i - 2); return d === 0 ? '坐夫妻宮' : (d === 1 ? '緊貼日主' : (d === 2 ? '隔一柱' : '遙隔')); };
+        stars.forEach(st => {
+            st.tenGod = getPreciseTenGod(st.gan, dg); st.pillarName = pNames[st.pillarIdx]; st.sittingBranch = baseZhis[st.pillarIdx];
+            st.age = SPOUSE_AGE[st.pillarIdx]; st.dist = distOf(st.pillarIdx);
+            if (st.layer === '天干') { const r = getTraditionalRoots(st.gan, st.pillarIdx, baseZhis, pNames); st.tonggenLabel = r.roots.length ? r.label : '無根'; }
+            else st.tonggenLabel = '地支主氣';
+        });
+        const palace = baseZhis[2];
+        const ZHI_ORDER = '子丑寅卯辰巳午未申酉戌亥';
+        const pairName = (a, b) => ZHI_ORDER.indexOf(a) <= ZHI_ORDER.indexOf(b) ? a + b : b + a;
+        const relOf = (a, b) => {
+            const out = [];
+            if (zhiChongMap[a] === b) out.push({ type: '沖', name: `${pairName(a, b)}沖` });
+            const x = getXingType(a, b);
+            if (x === '自刑') out.push({ type: '刑', name: `${a}${b}自刑` });
+            else if (x && zhiChongMap[a] !== b) out.push({ type: '刑', name: `${pairName(a, b)}刑` });
+            if (zhiHaiMap[a] === b) out.push({ type: '害', name: `${pairName(a, b)}害` });
+            return out;
+        };
+        // 原局：與鄰近地支（左右兩柱）
+        const natal = [];
+        const neigh = i => [i - 1, i + 1].filter(j => j >= 0 && j < 4 && baseZhis[j] && baseZhis[j] !== '-');
+        neigh(2).forEach(j => relOf(palace, baseZhis[j]).forEach(r => natal.push({ ...r, who: '夫妻宮', with: `${pNames[j]}支${baseZhis[j]}` })));
+        const starIdx = [...new Set(stars.map(s => s.pillarIdx))].filter(i => i !== 2);
+        starIdx.forEach(i => neigh(i).forEach(j => relOf(baseZhis[i], baseZhis[j]).forEach(r => {
+            if (natal.some(n => n.name === r.name && (n.with.includes(baseZhis[i]) || n.with.includes(baseZhis[j])))) return;
+            natal.push({ ...r, who: `夫妻星（${pNames[i]}柱）`, with: `${pNames[j]}支${baseZhis[j]}` });
+        })));
+        // 歲運
+        const targets = [{ idx: 2, zhi: palace, label: `夫妻宮(${palace})` }];
+        starIdx.forEach(i => { if (!targets.some(t => t.zhi === baseZhis[i])) targets.push({ idx: i, zhi: baseZhis[i], label: `夫妻星(${baseZhis[i]})` }); });
+        const checkClash = z => { const hits = []; targets.forEach(t => relOf(z, t.zhi).forEach(r => hits.push({ type: r.type === '害' ? '刑' : r.type, name: r.name, target: t.label }))); return hits; };
+        const events = { dayun: [], liunian: [], liuyue: [] };
+        (daYunData || []).forEach((dy, idx) => {
+            const endYear = daYunData[idx + 1] ? daYunData[idx + 1].startYear - 1 : dy.startYear + 9;
+            const clash = checkClash(dy.zhi);
+            if (clash.length) events.dayun.push({ time: `${dy.startYear}–${endYear}（${dy.startAge}歲起）`, ganZhi: dy.ganZhi, isCurrent: currentYear >= dy.startYear && currentYear <= endYear, isPast: endYear < currentYear, clash, arrive: [] });
+        });
+        for (let y = currentYear - 3; y <= currentYear + 3; y++) {
+            const gz = Solar.fromYmd(y, 7, 1).getLunar().getEightChar().getYear();
+            const clash = checkClash(gz.charAt(1));
+            if (clash.length) events.liunian.push({ time: `${y}`, ganZhi: gz, isCurrent: y === currentYear, isPast: y < currentYear, clash, arrive: [] });
+        }
+        const now = new Date();
+        for (let i = -6; i <= 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 15);
+            const solar = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 15), bz = solar.getLunar().getEightChar();
+            const clash = checkClash(bz.getMonthZhi()); if (!clash.length) continue;
+            const r = getJieQiRange(solar);
+            events.liuyue.push({ time: r ? `${r.startLabel} ~ ${r.endLabel}` : `${d.getFullYear()}/${d.getMonth() + 1}`, ganZhi: bz.getMonthGan() + bz.getMonthZhi(), isCurrent: i === 0, isPast: i < 0, clash, arrive: [] });
+        }
+        const zuoGong = ganElementMap[mainOf(palace)] === el; // 夫妻星坐夫妻宮：日支主氣即夫妻星（不受取星順序影響）
+        return { el, catName, stars, palace, natal, events, dg, baseGans, baseZhis, zuoGong };
+    }
+    function renderSpouseScanHtml(scan) {
+        const RING = '#ff7eb6', marks = [{ type: 'zhi', idx: 2, gan: null, color: '#00d2ff' }];
+        scan.stars.forEach(st => {
+            if (st.layer === '天干') marks.push({ type: 'gan', idx: st.pillarIdx, gan: null, color: RING });
+            else marks.push({ type: 'zhi', idx: st.pillarIdx, gan: st.gan, color: RING });
+        });
+        let html = `<div class="rel-summary">
+                <span>夫妻星 <b style="color:${elementColors[scan.el]}">${scan.catName}（${scan.el}）</b></span>
+                <span>夫妻宮 <b style="color:#00d2ff">日支 ${scan.palace}</b></span>
+                ${scan.zuoGong ? '<span class="tag tag-star">夫妻星坐夫妻宮</span>' : ''}
+            </div>` + renderMarkedChart(scan.baseGans, scan.baseZhis, scan.dg, marks);
+        html += scan.stars.length ? `<div class="rel-star-grid">` + scan.stars.map(st => `
+                <div class="rel-star-card">
+                    <div class="rel-star-head"><span class="rel-star-gan" style="color:${elementColors[ganElementMap[st.gan]]}">${st.gan}<small>${st.tenGod}</small></span><span class="rel-star-pos">${st.pillarName}・${st.layer}</span></div>
+                    <div class="rel-star-row"><span>距日主</span><b>${st.dist}</b></div>
+                    <div class="rel-star-row"><span>通根</span><b class="${st.tonggenLabel === '無根' ? 'ng' : 'ok'}">${st.tonggenLabel}</b></div>
+                </div>`).join('') + `</div>`
+            : `<div class="rel-empty"><span class="tag tag-neutral">原局天干、地支主氣不見夫妻星</span></div>`;
+        html += `<div class="rel-ev-block"><div class="rel-ev-title">🏠 原局刑沖害</div>${scan.natal.length ? scan.natal.map(n => `
+                <div class="rel-ev-row"><div class="rel-ev-time">${n.who}</div><div class="rel-ev-tags"><span class="tag ${n.type === '沖' ? 'tag-chong' : n.type === '害' ? 'tag-hai' : 'tag-xing'}">${n.name}・${n.with}</span></div></div>`).join('')
+            : '<div class="rel-ev-empty">無</div>'}</div>`;
+        html += renderRelEventBlocks(scan.events);
+        return html;
+    }
+    function buildSpouseScanPromptText(scan) {
+        let t = `夫妻星＝${scan.catName}（${scan.el}），天干全取，天干不足 2 顆才以地支主氣補到 2 顆；夫妻宮＝日支「${scan.palace}」。\n`;
+        t += `柱位對應：時柱＝年紀小 2～10 歲；日支＝±2 歲；月柱＝差 2～10 歲；年柱＝差 10～20 歲或異國、遠距離。\n`;
+        if (!scan.stars.length) t += '原局夫妻星：天干、地支主氣皆無（緣分看大運是否補足此五行）\n';
+        if (scan.zuoGong) t += '夫妻星坐夫妻宮：是（日支主氣為夫妻星）\n';
+        scan.stars.forEach((st, i) => { t += `夫妻星${i + 1}：${st.gan}（${st.tenGod}）位於${st.pillarName}柱${st.layer}，${st.dist}，${st.age}；通根：${st.tonggenLabel}\n`; });
+        t += '原局刑沖害：\n' + (scan.natal.length ? scan.natal.map(n => `- ${n.who}：${n.name}（與${n.with}）`).join('\n') : '- 無') + '\n';
+        const fmt = (e) => `- ${e.time} ${e.ganZhi}${e.isCurrent ? '（現在）' : (e.isPast ? '（已過，供驗證）' : '')}：${e.clash.map(c => c.name + '・' + c.target).join('、')}`;
+        t += '大運觸發：\n' + (scan.events.dayun.length ? scan.events.dayun.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流年觸發：\n' + (scan.events.liunian.length ? scan.events.liunian.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流月觸發：\n' + (scan.events.liuyue.length ? scan.events.liuyue.map(fmt).join('\n') : '- 無');
+        return t;
+    }
+
     function buildChildScanPromptText(scan) {
-        let t = `子女宮：時支「${scan.palaceZhi}」；子女星＝${scan.childCatName}（${scan.childEl}），不分兒女、不論胎數。\n`;
+        let t = `子女宮：時支「${scan.palaceZhi}」；子女星＝${scan.childCatName}（${scan.childEl}），不分兒女、不論胎數；天干全取；天干不足 2 顆才以地支主氣補到 2 顆；皆無才取地支中氣或餘氣 1 顆。\n`;
         t += `日支與時支相沖：${scan.dayHourChong ? '是' : '否'}\n`;
         t += scan.affinity === 'strong'
             ? `整體子女緣：[子女緣強]（${scan.strongReasons.join('、')}）\n`
@@ -4223,24 +4463,8 @@ ${rootTxt}
         const el = dayElement;
         const hiddenOf = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
 
-        // 擷取規則同父母星：天干有比劫必取 1 顆；地支主氣有比劫必取 1 顆；
-        // 兩者皆無，才往地支中氣→餘氣找 1 顆（同層取比重最高）。順序：月→年→日→時（月柱為兄弟宮）
-        const stars = [];
-        const ORDER = [1, 0, 2, 3];
-        const gi = ORDER.find(i => i !== 2 && baseGans[i] !== '-' && ganElementMap[baseGans[i]] === el);
-        if (gi !== undefined) stars.push({ gan: baseGans[gi], pillarIdx: gi, layer: '天干' });
-        const zi = ORDER.find(i => baseZhis[i] !== '-' && ganElementMap[hiddenOf(baseZhis[i])[0]] === el);
-        if (zi !== undefined) stars.push({ gan: hiddenOf(baseZhis[zi])[0], pillarIdx: zi, layer: '地支主氣' });
-        if (!stars.length) {
-            for (const [pos, layerName] of [[1, '地支中氣'], [2, '地支餘氣']]) {
-                let best = null;
-                ORDER.forEach(i => {
-                    const z = baseZhis[i], hg = hiddenOf(z)[pos];
-                    if (hg && ganElementMap[hg] === el && (!best || zhiHiddenWeights[z][hg] > best.w)) best = { i, hg, w: zhiHiddenWeights[z][hg] };
-                });
-                if (best) { stars.push({ gan: best.hg, pillarIdx: best.i, layer: layerName }); break; }
-            }
-        }
+        // 擷取：天干全取；不足 2 顆以地支主氣補；皆無才取中氣／餘氣 1 顆。順序：月→年→日→時（月柱為兄弟宮）
+        const stars = pickRelStars(el, baseGans, baseZhis, [1, 0, 3], [1, 0, 2, 3]);
 
         stars.forEach(st => {
             st.tenGod = getPreciseTenGod(st.gan, dg);
@@ -4346,7 +4570,7 @@ ${rootTxt}
     }
 
     function buildSiblingScanPromptText(scan) {
-        let t = `兄弟星＝比劫（${scan.el}，與日主同五行），天干有取 1 顆、地支主氣有取 1 顆；兩者皆無才取地支中氣或餘氣 1 顆（用於提醒手足安危）。\n`;
+        let t = `兄弟星＝比劫（${scan.el}，與日主同五行），天干全取；天干不足 2 顆才以地支主氣補到 2 顆；皆無才取地支中氣或餘氣 1 顆（用於提醒手足安危）。\n`;
         if (scan.stars.length === 0) t += '原局比劫星：無\n';
         scan.stars.forEach((st, i) => {
             t += `比劫星${i + 1}：${st.gan}（${st.tenGod}）位於${st.pillarName}柱${st.layer}，坐支「${st.sittingBranch}」；通根：${st.tonggenLabel}；透干：${st.touganLabel}\n`;
@@ -4360,7 +4584,7 @@ ${rootTxt}
 
     // ===================================================================
     // 父母星偵測 (Parent_Star_Scanner)：母＝印星（生我者）、父＝財星（我剋者），不分正偏
-    // 每位家人最多 2 顆：天干 1 顆（月→年→時）＋地支 1 顆（主氣優先；無主氣則取藏干比重最高者）
+    // 天干全取；天干不足 2 顆才以地支主氣補到 2 顆；皆無才取中氣／餘氣 1 顆
     // 掃描：父母星所在柱的地支，被大運／流年／流月沖刑（依教材「家人星該柱地支」）
     // ===================================================================
     const YIMA_ZHI = '寅申巳亥', SIKU_ZHI = '辰戌丑未';
@@ -4371,24 +4595,9 @@ ${rootTxt}
         const PILLAR_ORDER = [1, 0, 2, 3]; // 父母以月、年柱優先
         const hiddenSorted = (z) => { const w = zhiHiddenWeights[z] || {}; return Object.keys(w).sort((a, b) => w[b] - w[a]); };
 
-        // 擷取規則（依藏干表的主氣／中氣／餘氣排列）：
-        // 天干有就取 1 顆；地支主氣有就取 1 顆；兩者都沒有，才往地支中氣→餘氣找 1 顆（同層取比重最高者）
+        // 擷取：天干全取；不足 2 顆以地支主氣補；皆無才取中氣／餘氣 1 顆（月、年柱優先）
         const pickStars = (el, who) => {
-            const picked = [];
-            const gi = PILLAR_ORDER.find(i => i !== 2 && baseGans[i] !== '-' && ganElementMap[baseGans[i]] === el);
-            if (gi !== undefined) picked.push({ who, gan: baseGans[gi], pillarIdx: gi, layer: '天干' });
-            const zi = PILLAR_ORDER.find(i => baseZhis[i] !== '-' && ganElementMap[hiddenSorted(baseZhis[i])[0]] === el);
-            if (zi !== undefined) picked.push({ who, gan: hiddenSorted(baseZhis[zi])[0], pillarIdx: zi, layer: '地支主氣' });
-            if (!picked.length) {
-                for (const [pos, layerName] of [[1, '地支中氣'], [2, '地支餘氣']]) {
-                    let best = null;
-                    PILLAR_ORDER.forEach(i => {
-                        const z = baseZhis[i], hg = hiddenSorted(z)[pos];
-                        if (hg && ganElementMap[hg] === el && (!best || zhiHiddenWeights[z][hg] > best.w)) best = { i, hg, w: zhiHiddenWeights[z][hg] };
-                    });
-                    if (best) { picked.push({ who, gan: best.hg, pillarIdx: best.i, layer: layerName }); break; }
-                }
-            }
+            const picked = pickRelStars(el, baseGans, baseZhis, [1, 0, 3], PILLAR_ORDER, { who });
             picked.forEach(st => {
                 st.tenGod = getPreciseTenGod(st.gan, dg);
                 st.pillarName = pNames[st.pillarIdx];
@@ -4523,7 +4732,7 @@ ${rootTxt}
     }
 
     function buildParentScanPromptText(scan) {
-        let t = `母星＝印星（${scan.motherEl}），父星＝財星（${scan.fatherEl}），不分正偏。天干有取 1 顆、地支主氣有取 1 顆；兩者皆無才取地支中氣或餘氣 1 顆。\n`;
+        let t = `母星＝印星（${scan.motherEl}），父星＝財星（${scan.fatherEl}），不分正偏。天干全取；天干不足 2 顆才以地支主氣補到 2 顆；皆無才取地支中氣或餘氣 1 顆。\n`;
         const line = (arr, who) => arr.length
             ? arr.map(st => `${who}星：${st.gan}（${st.tenGod}）位於${st.pillarName}柱${st.layer}，該柱地支「${st.sittingBranch}」`).join('\n') + '\n'
             : `${who}星：原局無\n`;
@@ -4695,7 +4904,7 @@ ${rootTxt}
         };
     }
 
-    function generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender) {
+    function generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender, daYunData) {
         const today = new Date();
         let currentYear = today.getFullYear();
         let currentMonth = today.getMonth(); 
@@ -4769,6 +4978,9 @@ ${rootTxt}
             const xingBadge = (target) => `<b style="color:var(--color-xing); font-size:11px;">🌀${target}自刑</b>`;
 
 
+            { const dyM = (daYunData || []).find(x => y >= x.startYear && y < x.startYear + 10);
+              const shM = yySanhe(yz, [dyM ? dyM.zhi : '', bazi.getYearZhi(), mZhi], mZhi);
+              if (shM) addTactic('love', monthStr, `<b style="color:#ff7eb6; font-size:11px;">★生肖三合</b>`, `${shM}三合・生肖${yz}`, 'sanhe', mi); }
             if (zhiChongMap[dz] === mZhi) addTactic('love', monthStr, clashBadge('日支'), `沖動夫妻宮 (${dz}${mZhi}沖)`, 'chong', mi);
             if (zhiHeMap[dz] === mZhi) addTactic('love', monthStr, combineBadge('日支'), `合動夫妻宮 (${dz}${mZhi}合)`, 'he', mi);
             if ((gender === 1 && isWealth) || (gender === 0 && isGuanSha)) addTactic('love', monthStr, originBadge, `✨ 配偶星「${mGan}」${actionDesc}`, 'yin', mi);
@@ -4797,18 +5009,18 @@ ${rootTxt}
 
         const formatList = (list, emptyMsg) => list.length > 0 ? `<table class="lm-table">${list.join('')}</table>` : `<div style="font-size:13px; color:#888; margin-top:5px; padding-left:10px;">${emptyMsg}</div>`;
         const TOPICS = [
-            ['love', '感情', '#ff9800', '觀測日支與配偶星', '此週期感情宮位無明顯劇烈引動'],
-            ['career', '事業', '#2ed573', '觀測月柱與官殺食傷', '此週期事業宮位無明顯劇烈引動'],
-            ['wealth', '財運', '#00d2ff', '觀測時柱與比劫財星', '此週期無明顯財庫沖動或破財徵兆'],
-            ['health', '健康', '#ff5252', '觀測日月支逢沖刑', '此週期根基穩固，無重大沖刑'],
-            ['family', '家庭', '#a29bfe', '觀測年柱', '此週期家庭宮位平順']
+            ['love', '感情', '#ff9800', '觀測日支與配偶星', '無'],
+            ['career', '事業', '#2ed573', '觀測月柱與官殺食傷', '無'],
+            ['wealth', '財運', '#00d2ff', '觀測時柱與比劫財星', '無'],
+            ['health', '健康', '#ff5252', '觀測日月支逢沖刑', '無'],
+            ['family', '家庭', '#a29bfe', '觀測年柱', '無']
         ];
         // 每格的記號：沖＝紅點、刑＝粉點、庫＝金菱、合＝青環、十神引動＝主題色方塊（同格多件以優先序顯示並標件數）
-        const KIND = { chong: ['●', '#ff5252'], xing: ['●', '#ff4fa3'], ku: ['◆', '#ffd166'], he: ['○', '#00d2ff'], yin: ['■', null] };
+        const KIND = { sanhe: ['★', '#ff7eb6'], chong: ['●', '#ff5252'], xing: ['●', '#ff4fa3'], ku: ['◆', '#ffd166'], he: ['○', '#00d2ff'], yin: ['■', null] };
         const cellOf = (cat, mi, col) => {
             const L = ev.filter(e => e.cat === cat && e.mi === mi);
             if (!L.length) return '<i class="lm-dot0"></i>';
-            const pri = ['chong', 'xing', 'ku', 'he', 'yin'].find(k => L.some(e => e.kind === k));
+            const pri = ['sanhe', 'chong', 'xing', 'ku', 'he', 'yin'].find(k => L.some(e => e.kind === k));
             const [ch, c] = KIND[pri];
             return `<b class="lm-mk" style="color:${c || col}" data-tip="${months[mi].gan}${months[mi].zhi}（${months[mi].start}起）：${L.map(e => e.desc).join('；')}">${ch}${L.length > 1 ? `<sup>${L.length}</sup>` : ''}</b>`;
         };
@@ -4817,9 +5029,9 @@ ${rootTxt}
             <div class="lm-grid-wrap"><table class="lm-grid">
                 <tr><th class="lm-rl"></th>${months.map(o => `<th class="${colCls(o)}"><span style="color:${elementColors[ganElementMap[o.gan]]}">${o.gan}</span><span style="color:${elementColors[zhiElementMap[o.zhi]]}">${o.zhi}</span><small>${o.m}月</small></th>`).join('')}</tr>
                 ${TOPICS.map(([k, n, col]) => `<tr><td class="lm-rl" style="color:${col}" onclick="lmTab('${k}')">${n}</td>${months.map((o, mi) => `<td class="${colCls(o)}">${cellOf(k, mi, col)}</td>`).join('')}</tr>`).join('')}
-                <tr class="lm-sum"><td class="lm-rl">變動</td>${months.map((o, mi) => { const n = ev.filter(e => e.mi === mi && e.kind !== 'yin').length; return `<td class="${colCls(o)}">${n ? `<span class="lm-bar" style="height:${Math.min(4, n) * 4 + 2}px"></span>` : ''}</td>`; }).join('')}</tr>
+                <tr class="lm-sum"><td class="lm-rl">變動</td>${months.map((o, mi) => { const n = ev.filter(e => e.mi === mi && e.kind !== 'yin' && e.kind !== 'sanhe').length; return `<td class="${colCls(o)}">${n ? `<span class="lm-bar" style="height:${Math.min(4, n) * 4 + 2}px"></span>` : ''}</td>`; }).join('')}</tr>
             </table></div>
-            <div class="lm-legend"><span><b style="color:#ff5252">●</b>沖</span><span><b style="color:#ff4fa3">●</b>刑</span><span><b style="color:#ffd166">◆</b>庫</span><span><b style="color:#00d2ff">○</b>合</span><span><b>■</b>十神引動</span><span class="lm-legend-r">淡＝已過・框＝本月</span></div>`;
+            <div class="lm-legend"><span><b style="color:#ff5252">●</b>沖</span><span><b style="color:#ff4fa3">●</b>刑</span><span><b style="color:#ffd166">◆</b>庫</span><span><b style="color:#00d2ff">○</b>合</span><span><b>■</b>十神引動</span><span><b style="color:#ff7eb6">★</b>生肖三合</span><span class="lm-legend-r">淡＝已過・框＝本月</span></div>`;
         const upcoming = k => ev.filter(e => e.cat === k && months[e.mi].i >= 0).length;
         return `
             <div class="lm-wrap">
@@ -5128,13 +5340,17 @@ ${rootTxt}
         window.__renderLiuri = function renderLiuriPanel() {
             try {
                 const topic = window.__lwTopic || 'cai';
-                const T = topic === 'work'
+                // 桃花：夫妻星＝男看財（副食傷）、女看官殺（副財）；邏輯分別沿用財運、工作的掃法，不分身強身弱
+                const taoBase = gender === 1 ? 'cai' : 'work';
+                const T = topic === 'tao'
+                    ? { c: '#ff7eb6', c2: '#b0527f', c3: '#ffc2dd', rgb: '255,126,182', hot: '桃花日', mark: '桃', energy: '夫妻星能量', hotShort: '桃花' }
+                    : topic === 'work'
                     ? { c: '#5ab0ff', c2: '#3a6fa8', c3: '#a8d4ff', rgb: '90,176,255', hot: '官旺日', mark: '旺', energy: '官殺能量', hotShort: '官旺' }
                     : topic === 'ren'
                     ? { c: '#c792ea', c2: '#8a5fb0', c3: '#e3c4f7', rgb: '199,146,234', hot: '慎言日', mark: '慎', energy: '比劫能量', hotShort: '慎言' }
                     : { c: '#ffb347', c2: '#c98a3a', c3: '#ffcf7a', rgb: '255,179,71', hot: '財旺日', mark: '旺', energy: '財星能量', hotShort: '財旺' };
                 const isHot = t => t === T.hot;
-                const topicEl = topic === 'work' ? Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement) : topic === 'ren' ? dayElement : wuxingRel[dayElement].ke;
+                const topicEl = topic === 'tao' ? (gender === 1 ? wuxingRel[dayElement].ke : Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement)) : topic === 'work' ? Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement) : topic === 'ren' ? dayElement : wuxingRel[dayElement].ke;
                 if (typeof Solar === 'undefined') { document.getElementById('liuriOutput').innerHTML = ''; return; }
                 const todayD = new Date();
                 const weekChar = ['日', '一', '二', '三', '四', '五', '六'];
@@ -5150,17 +5366,28 @@ ${rootTxt}
                 // 財星能量＋三合三會加權＋破財
                 const fullDay = (bz, year) => {
                     const g = bz.getDayGan(), z = bz.getDayZhi();
-                    const w = topic === 'work' ? computeLiuriWork(g, z, dayGan, dayElement) : topic === 'ren' ? computeLiuriRen(g, z, dayGan, dayElement) : computeLiuriWealth(g, z, dayGan, dayElement);
-                    const ju = detectLiuriJu(z, juSources(bz, year), dayElement, topic);
+                    const tk = topic === 'tao' ? taoBase : topic;
+                    const w = tk === 'work' ? computeLiuriWork(g, z, dayGan, dayElement) : tk === 'ren' ? computeLiuriRen(g, z, dayGan, dayElement) : computeLiuriWealth(g, z, dayGan, dayElement);
+                    if (topic === 'tao') w.tier = w.tier === '平' ? '平' : (w.tier.endsWith('旺日') ? '桃花日' : '半桃花');
+                    const ju = detectLiuriJu(z, juSources(bz, year), dayElement, tk);
                     const bonus = ju.filter(j => j.type === 'boost').reduce((a, j) => a + j.bonus, 0);
                     if (bonus) w.score = Math.min(100, w.score + bonus);
+                    if (w.hasMain && w.score >= LIURI_HOT) w.tier = T.hot;
                     // 三合／三會成局（加強）時，局內的六合被局取代，不再視為合絆破財
                     const boostMembers = ju.filter(j => j.type === 'boost').flatMap(j => j.members);
                     const po = topic !== 'cai' ? [] : detectPoCai(g, z, baseGans, baseZhis, dayGan, dayElement)
                         .filter(h => !(h.liuheZhi && boostMembers.includes(h.liuheZhi)))
                         .concat(ju.filter(j => j.type === 'po').map(j => ({ type: j.kind, txt: j.txt })));
                     const career = null; // 轉職改以「轉職」檢視（月為單位）呈現，不與流日重疊
-                    return { g, z, w, ju, po, career };
+                    // 桃花：流日地支沖夫妻宮＝變動（中性）、刑夫妻宮＝刑（內心糾結、口角）
+                    let tao = null;
+                    if (topic === 'tao') { const pal = baseZhis[2], xt = getXingType(z, pal);
+                        tao = { dong: zhiChongMap[z] === pal ? `${z}${pal}沖・夫妻宮` : '', xing: xt ? `${z}${pal}${xt === '自刑' ? '自刑' : '刑'}・夫妻宮` : '', he: '' };
+                        // 生肖三合：原局年支＋流日地支，再由大運／流年／流月地支湊齊完整三合 → 滿分
+                        const dy = daYunData.find(x => year >= x.startYear && year < x.startYear + 10);
+                        const sh = yySanhe(baseZhis[0], [dy ? dy.zhi : '', bz.getYearZhi(), bz.getMonthZhi(), z], z);
+                        if (sh) { tao.he = `${sh}三合・生肖${baseZhis[0]}`; w.score = 100; w.hasMain = true; w.tier = T.hot; } }
+                    return { g, z, w, ju, po, career, tao };
                 };
                 const dayInfo = (d) => fullDay(Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0).getLunar().getEightChar(), d.getFullYear());
                 window.__liuriDayInfo = dayInfo;
@@ -5186,7 +5413,7 @@ ${rootTxt}
                         isToday: offset === 0,
                         dateShort: `${d.getMonth() + 1}/${d.getDate()}`,
                         weekLabel: weekChar[d.getDay()],
-                        wealth: wealthDay.score, wealthTier: wealthDay.tier, wealthDetail: wealthDay.detail, poCai, juList, career: fd.career,
+                        wealth: wealthDay.score, wealthTier: wealthDay.tier, wealthDetail: wealthDay.detail, poCai, juList, career: fd.career, tao: fd.tao,
                         chongXingBadges, hejuBadges
                     });
                 }
@@ -5244,6 +5471,9 @@ ${rootTxt}
                         ${pt.d.career && pt.d.career.ok ? `<g class="lw-zhuan"><rect x="${(pt.x - 9).toFixed(1)}" y="${(pt.y - (wang ? 45 : 30)).toFixed(1)}" width="18" height="16" rx="4" fill="#2ed573"/><text x="${pt.x.toFixed(1)}" y="${(pt.y - (wang ? 45 : 30) + 12.5).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">轉</text></g>` : ''}
                         ${pt.d.juList.some(j => j.type === 'boost') ? `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="11" fill="none" stroke="#b388ff" stroke-width="1.6" stroke-dasharray="3 2.5" class="lw-ju-ring"/>` : ''}
                         ${pt.d.poCai.length ? `<g class="lw-po"><circle cx="${pt.x.toFixed(1)}" cy="${(Math.min(baseY - 12, pt.y + 18)).toFixed(1)}" r="9.5" fill="#2a0d0d" stroke="#ff5252" stroke-width="1.4"/><text x="${pt.x.toFixed(1)}" y="${(Math.min(baseY - 12, pt.y + 18) + 4.3).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff6b6b">破</text></g>` : ''}
+                        ${pt.d.tao && pt.d.tao.xing ? `<g class="lw-po"><circle cx="${pt.x.toFixed(1)}" cy="${(Math.min(baseY - 12, pt.y + 18)).toFixed(1)}" r="9.5" fill="#2a0d14" stroke="#ff5c8a" stroke-width="1.4"/><text x="${pt.x.toFixed(1)}" y="${(Math.min(baseY - 12, pt.y + 18) + 4.3).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff7ea3">刑</text></g>` : ''}
+                        ${pt.d.tao && pt.d.tao.he ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y + 22).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" class="lw-he">★</text>` : ''}
+                        ${pt.d.tao && pt.d.tao.dong ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y - (wang ? 30 : 14)).toFixed(1)}" text-anchor="middle" font-size="13" class="lw-dong">⚡</text>` : ''}
                         <title>${pt.d.dateShort}（${pt.d.weekLabel}）${pt.d.gan}${pt.d.zhi}｜${pt.d.wealth}</title>
                     </g>`;
                     svg += `<text class="lw-xl" data-i="${pt.i}" x="${pt.x}" y="${h - padB + 15}" text-anchor="middle" font-size="9" fill="${pt.d.isToday ? 'var(--accent)' : '#888'}" font-weight="${pt.d.isToday ? 'bold' : 'normal'}">${pt.d.dateShort}</text>`;
@@ -5371,9 +5601,14 @@ ${rootTxt}
                     const swatches = (els, big) => { const seen = new Set(); return els.map(el => `<div class="cc-grp"><div class="cc-el" style="color:${elementColors[el]}">補${el}</div><div class="cc-sw">${CHARGE_COLORS[el].filter(([n, c]) => !seen.has(c) && seen.add(c)).map(([n, c]) => `<span class="cc-chip ${big ? 'big' : ''}"><i style="background:${c}"></i>${big ? `<em>${n}</em>` : ''}</span>`).join('')}</div></div>`).join(''); };
                     const curDy = daYunData.find(x => Y0 >= x.startYear && Y0 < x.startYear + 10);
                     const cur = computeChargeContext(strengthLabel, totalScore, dayElement, curDy, baseGans, baseZhis);
+                    // 桃花：女命把「補財」換成補夫妻星官殺；男命同財運（補財，不用食傷）
+                    if (topic === 'tao' && gender !== 1 && cur.els.length === 1 && cur.els[0] === wuxingRel[dayElement].ke) {
+                        const gsEl = Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement);
+                        cur.els = [gsEl]; cur.basis = cur.basis.replace(/補財$/, '補官殺（夫妻星）');
+                    }
                     return `<div class="cc-wrap">
                         <div class="cc-now">
-                            <div class="zh-head"><span>財旺日充能</span><span class="zh-basis">${cur.basis}</span></div>
+                            <div class="zh-head"><span>${topic === 'tao' ? '桃花日充能' : '財旺日充能'}</span><span class="zh-basis">${cur.basis}</span></div>
                             <div class="cc-big">${swatches(cur.els, true)}</div>
                         </div>
                     </div>`;
@@ -5399,6 +5634,9 @@ ${rootTxt}
                             ${dday.juList.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
                             ${dday.career ? `<div class="lw-line lw-zh-line ${dday.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${dday.career.score}</span><span>流年${dday.career.yGZ}（${dday.career.y}/2）・流月${dday.career.mGZ}（${dday.career.m}/2）${dday.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
                             ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}</span></div>` : ''}
+                            ${dday.tao && dday.tao.he ? `<div class="lw-line lw-he-line"><span class="lw-chip">生肖三合</span><span>${dday.tao.he}</span></div>` : ''}
+                            ${dday.tao && dday.tao.dong ? `<div class="lw-line lw-dong-line"><span class="lw-chip">⚡ 變動</span><span>${dday.tao.dong}</span></div>` : ''}
+                            ${dday.tao && dday.tao.xing ? `<div class="lw-line lw-xing-line"><span class="lw-chip">刑</span><span>${dday.tao.xing}</span></div>` : ''}
                         </div>
                     `;
                 });
@@ -5409,17 +5647,18 @@ ${rootTxt}
                         <span class="lw-topic ${topic === 'cai' ? 'on' : ''}" onclick="lwTopic('cai')">💰 財運</span>
                         <span class="lw-topic ${topic === 'work' ? 'on' : ''}" onclick="lwTopic('work')">💼 工作</span>
                         <span class="lw-topic ${topic === 'ren' ? 'on' : ''}" onclick="lwTopic('ren')">🤝 人際</span>
-                        <span class="lw-topic off" title="規劃中">🌸 桃花</span>
+                        <span class="lw-topic ${topic === 'tao' ? 'on' : ''}" onclick="lwTopic('tao')">🌸 桃花</span>
                     </div>
                     <div class="lw-view">
                         <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
                         <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
-                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : topic === 'cai' ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>` : `<span class="lw-vbtn" data-v="fr" onclick="lwView('fr')">朋友</span>`}
+                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : (topic === 'cai' || topic === 'tao') ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>` : `<span class="lw-vbtn" data-v="fr" onclick="lwView('fr')">朋友</span>`}
                     </div>
                     </div>
                     <div class="liuri-legend">
                         <span><span class="liuri-legend-dot" style="background:${T.c}; border-radius:50%; box-shadow:0 0 6px ${T.c};"></span>${T.hot}</span>
                         ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財（主動破財）</span>` : ''}
+                        ${topic === 'tao' ? `<span><span class="liuri-legend-dot" style="background:#2a0d14; border:1px solid #ff5c8a; border-radius:50%;"></span>刑夫妻宮</span><span>⚡ 沖夫妻宮</span><span style="color:#ffd1e6">★ 生肖三合</span>` : ''}
                         <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
                     </div>
                     ${topic === 'ren' ? `<div class="lw-tip">小人與貴人一線之隔：<b>謹言慎行、少說多聽</b>，避免在這天做重大表態。</div>` : ''}
@@ -5428,7 +5667,7 @@ ${rootTxt}
                     <div id="liuriCard"></div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
-                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : topic === 'cai' ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : `<div class="lw-pane" data-v="fr" style="display:none;"><div id="friendPanel"></div></div>`}
+                    ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : (topic === 'cai' || topic === 'tao') ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : `<div class="lw-pane" data-v="fr" style="display:none;"><div id="friendPanel"></div></div>`}
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('⚡ 流日動能', body, true);
                 document.getElementById('liuriOutput').className = 'topic-' + topic;
@@ -5455,7 +5694,7 @@ ${rootTxt}
                     window.__lwTopic = t;
                     const keepView = window.__lwViewCur || 'd10';
                     window.__renderLiuri();
-                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work') || (keepView === 'cc' && t === 'cai') || (keepView === 'fr' && t === 'ren')) window.lwView(keepView);
+                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work') || (keepView === 'cc' && (t === 'cai' || t === 'tao')) || (keepView === 'fr' && t === 'ren')) window.lwView(keepView);
                 };
                 window.lwView = (v) => {
                     window.__lwViewCur = v;
@@ -5498,10 +5737,10 @@ ${rootTxt}
                                 style="--a:${a}; --d:${(dn * 0.012).toFixed(3)}s;" onclick="lwCalPick('${key}')">
                             <span class="lc-n">${dn}</span>
                             <span class="lc-gz"><b style="color:${elementColors[ganElementMap[info.g]]}">${info.g}</b><b style="color:${elementColors[zhiElementMap[info.z]]}">${info.z}</b></span>
-                            <span class="lc-tags">${wang ? `<i class="lc-wang">${T.mark}</i>` : ''}${info.ju.some(j => j.type === 'boost') ? '<i class="lc-ju">局</i>' : ''}${info.career && info.career.ok ? '<i class="lc-zh">轉</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}</span>
+                            <span class="lc-tags">${wang ? `<i class="lc-wang">${T.mark}</i>` : ''}${info.ju.some(j => j.type === 'boost') ? '<i class="lc-ju">局</i>' : ''}${info.career && info.career.ok ? '<i class="lc-zh">轉</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}${info.tao && info.tao.he ? '<i class="lc-he">合</i>' : ''}${info.tao && info.tao.xing ? '<i class="lc-xing">刑</i>' : ''}${info.tao && info.tao.dong ? '<i class="lc-dong">⚡</i>' : ''}</span>
                         </div>`;
                     }
-                    let detail = `<div class="lc-detail lc-hint">${topic === 'work' ? '點選日期查看官殺星細節' : topic === 'ren' ? '點選日期查看比劫細節' : '點選日期查看財星與破財細節'}</div>`;
+                    let detail = `<div class="lc-detail lc-hint">${topic === 'work' ? '點選日期查看官殺星細節' : topic === 'ren' ? '點選日期查看比劫細節' : topic === 'tao' ? '點選日期查看夫妻星細節' : '點選日期查看財星與破財細節'}</div>`;
                     if (sel) {
                         const { d, info } = sel;
                         detail = `<div class="lc-detail">
@@ -5510,6 +5749,9 @@ ${rootTxt}
                             ${info.ju.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
                             ${info.career ? `<div class="lw-line lw-zh-line ${info.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${info.career.score}</span><span>流年${info.career.yGZ}（${info.career.y}/2）・流月${info.career.mGZ}（${info.career.m}/2）${info.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
                             ${info.po.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${info.po.map(h => h.txt).join('；')}</span></div>` : ''}
+                            ${info.tao && info.tao.he ? `<div class="lw-line lw-he-line"><span class="lw-chip">生肖三合</span><span>${info.tao.he}</span></div>` : ''}
+                            ${info.tao && info.tao.dong ? `<div class="lw-line lw-dong-line"><span class="lw-chip">⚡ 變動</span><span>${info.tao.dong}</span></div>` : ''}
+                            ${info.tao && info.tao.xing ? `<div class="lw-line lw-xing-line"><span class="lw-chip">刑</span><span>${info.tao.xing}</span></div>` : ''}
                         </div>`;
                     }
                     document.getElementById('lwCal').innerHTML = `
@@ -5536,7 +5778,7 @@ ${rootTxt}
         window.__renderLiuri();
 
         // ===== 六親人際：子女星專屬偵測 =====
-        let childScanPromptText = '', siblingScanPromptText = '', parentScanPromptText = '';
+        let childScanPromptText = '', siblingScanPromptText = '', parentScanPromptText = '', spouseScanPromptText = '';
         try {
             const childScan = scanChildStars({ dg, dayElement, gender, baseGans, baseZhis, pNames, daYunData, currentYear });
             childScanPromptText = buildChildScanPromptText(childScan);
@@ -5544,6 +5786,7 @@ ${rootTxt}
             siblingScanPromptText = buildSiblingScanPromptText(siblingScan);
             const parentScan = scanParentStars({ dg, dayElement, baseGans, baseZhis, pNames, daYunData, currentYear });
             parentScanPromptText = buildParentScanPromptText(parentScan);
+            try { window.__spouseScan = scanSpouseStars({ dg, dayElement, gender, baseGans, baseZhis, pNames, daYunData, currentYear }); spouseScanPromptText = buildSpouseScanPromptText(window.__spouseScan); } catch (e) { window.__spouseScan = null; console.warn('夫妻星偵測失敗', e); }
             const relBody = `
                 <div class="rel-tabs">
                     <div class="rel-tab-btn active" data-tab="parents" onclick="switchRelTab('parents')">父母</div>
@@ -5582,7 +5825,7 @@ ${rootTxt}
         try {
             const mePct = {};
             Object.keys(elementCount).forEach(el => mePct[el] = totalElements > 0 ? elementCount[el] / totalElements * 100 : 0);
-            window.__friendCtx = { dayElement, strengthLabel, totalScore, mePct, dg, dz, gender, pillars: baseGans.map((g, i) => g + baseZhis[i]).join(' ') };
+            window.__friendCtx = { dayElement, strengthLabel, totalScore, mePct, dg, dz, gender, baseZhis, daYunData, pillars: baseGans.map((g, i) => g + baseZhis[i]).join(' ') };
             renderFriendsTab();
             renderMarriageTab();
         } catch (e) { console.warn('朋友分頁計算失敗:', e); }
@@ -5750,21 +5993,6 @@ ${rootTxt}
         else if (tempScore >= -40) { tempLabel = "偏寒"; tempColor = "#00d2ff"; }
         else { tempLabel = "過寒"; tempColor = "#3498db"; }
 
-        let motherEl = Object.keys(wuxingRel).find(k => wuxingRel[k].sheng === dayElement);
-        let keMeEl = Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement);
-        let meKeEl = wuxingRel[dayElement].ke;
-        let meShengEl = wuxingRel[dayElement].sheng;
-        let badElements = isStrong ? [dayElement, motherEl] : [keMeEl, meKeEl, meShengEl];
-
-        let rxText = "";
-        if (tempScore <= -15) { 
-            rxText = badElements.includes('火') ? "用木/燥土" : "建議用火";
-        } else if (tempScore >= 15) { 
-            rxText = badElements.includes('水') ? "用金/濕土" : "建議用水";
-        } else {
-            rxText = "溫度適中";
-        }
-
         // ---- 體力＋調候：汽車儀表面板 ----
         const rootScore = dayMasterRootsEval.score || 0;
         const rootLabelFull = dayMasterRootsEval.label === '虛浮無根' ? '無根' : dayMasterRootsEval.label;
@@ -5794,7 +6022,7 @@ ${rootTxt}
             majors: [-100, -50, 0, 50, 100], minorStep: 10,
             labels: [{ v: -100, text: '寒', color: '#3498db', size: 11 }, { v: -50, text: '-50' }, { v: 0, text: '0', color: '#2ed573' }, { v: 50, text: '+50' }, { v: 100, text: '熱', color: '#ff5252', size: 11 }],
             status: tempLabel, statusColor: tempColor,
-            detail: `<span style="color:${dryWetColor}; font-weight:bold;">${dryWetLabel}</span> · ${rxText}`
+            detail: `<span style="color:${dryWetColor}; font-weight:bold;">${dryWetLabel}</span>`
         });
         let cmdHtml = `
             <div class="pg-cluster" style="width:100%; flex:1; display:flex; flex-direction:column; justify-content:center;">
@@ -6296,7 +6524,7 @@ ${rootTxt}
         dlHtml += `</div>`;
         document.getElementById('dayunLiunianOutput').innerHTML = ''; // 大運流年時間軸已由歲運互動盤取代，不再顯示
 
-        const monthlyHtml = generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender);
+        const monthlyHtml = generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender, daYunData);
         document.getElementById('monthlyTacticsOutput').innerHTML = wrapAccordion('📅 流月趨勢掃描', monthlyHtml, false);
 
         window.currentBaziDataForAI = {
@@ -6320,7 +6548,8 @@ ${rootTxt}
             tradStrength: tradStrongText,
             childScan: childScanPromptText,
             siblingScan: siblingScanPromptText,
-            parentScan: parentScanPromptText
+            parentScan: parentScanPromptText,
+            spouseScan: spouseScanPromptText
         };
 
         document.getElementById('resultBox').style.display = 'block';
@@ -6425,6 +6654,9 @@ ${data.siblingScan || '（無資料）'}
 【6. 六親人際：父母星偵測（系統只做條件觸發，未解讀）】
 ${data.parentScan || '（無資料）'}
 
+【7. 六親人際：夫妻星與夫妻宮偵測（系統只做條件觸發，未解讀）】
+${data.spouseScan || '（無資料）'}
+
 【你的分析任務】
 請絕對不要重複列印、覆述或解釋上述數據的定義本身。請直接發揮專業命理師的功力，將「通根、透干、沖刑、合絆、開庫、流月」這些量化化學反應，轉化為對命主現實生活的演繹，輸出約 1200-1800 字的深度解析：
 
@@ -6436,7 +6668,8 @@ ${data.parentScan || '（無資料）'}
 5. 子女緣分（依【4】標籤解讀）：[子女緣強] 說明子女緣深厚的表現；[子女緣分輕薄] 說明緣分深淺與可能原因（可包含晚得子女、子女較早獨立、聚少離多，或命主本身不想生育、無子女等可能，請以多種可能並列呈現，勿單一斷定）；[推斷子女個性] 依「子女個性判讀柱」干支本身的五行陰陽推斷子女性格特質（勿用命主十神）；[推斷突發事件或變動] 對照時間點說明子女相關的變動（含過去時間點的驗證）；[推斷得子時機] 指出較可能的時間窗口。系統不分兒女、不論胎數，請勿推斷性別或胎數。
 6. 兄弟手足（依【5】標籤解讀）：說明比劫星（兄弟姊妹、同輩手足）在原局的強弱與狀態（通根、透干、坐支）；對每個 [推斷兄弟手足變動] 時間點，說明比劫坐支被沖或刑可能對應的手足變動（例如分離、搬遷、關係起伏、手足有狀況），已過的時間點請用來驗證，未來的時間點請給提醒。比劫對命主是助力還是競爭消耗，請依原局結構與格局成敗（例如是否構成比劫奪財）說明，不要自行宣告喜忌。
 7. 父母（依【6】標籤解讀）：說明母星（印）、父星（財）在原局的位置與狀態；對每個觸發時間點，依「家人星該柱地支被大運／流年沖刑」的規則提醒：相沖或驛馬刑（寅申巳亥）[推斷家人出入安全] → 跌倒、車關、突發疾病、意外受傷，提醒出入安全；四庫刑（辰戌丑未）[推斷家人健康檢查] → 結石、腫瘤、息肉、慢性病、憂鬱等累積型問題，提醒做健康檢查。已過的時間點用來驗證，未來的給提醒；語氣以「提醒留意」為主，勿下斷言。
-8. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
+8. 婚姻（依【7】標籤解讀）：說明夫妻星的位置（年齡差、距離日主）與通根狀態；原局夫妻宮與夫妻星所在柱的刑沖害代表的感情模式（夫妻宮相刑：易口角需磨合；夫妻宮相沖：易晚婚或對象在外地認識；夫妻星與鄰柱相沖：易遠距離）；對每個歲運觸發時間點，已過的用來驗證，未來的給提醒。直接解讀，不要說教。
+9. 深度追問引導（用於後續補充）：在文章最後，根據他命盤中尚未解開的庫、或是潛在的刑沖（如無恩三刑、恃勢三刑、六沖），提出 2 個最值得他接下來繼續向你請教補充的「核心深度問題」，引導他提供現實資訊來進行下階段的精準追問。
 
 【最後提醒】全文分析請完全建立在上方系統給出的排盤與量化數據之上，不要自行推定用神忌神，也不要更動任何排盤結果；你的角色是「解讀者」，不是「排盤者」。`;
 
