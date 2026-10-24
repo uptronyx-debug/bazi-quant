@@ -1001,8 +1001,14 @@
         .bn-item { grid-column:auto; width:auto; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 0 4px; margin:0; background:none !important; border:none; box-shadow:none !important;
             color:#7f8c92; font-size:11px; font-weight:600; letter-spacing:.5px; border-radius:14px; -webkit-tap-highlight-color:transparent; transform:none !important; }
         .bn-item .sec-ic { margin:0; width:22px; height:22px; color:#7f8c92; filter:none; }
-        .bn-item.on { color:var(--accent); background:rgba(0,210,255,.10) !important; }
-        .bn-item.on .sec-ic { color:var(--accent); filter:drop-shadow(0 0 4px rgba(0,210,255,.45)); }
+        .bn-item { --tc:#00d2ff; --tg:rgba(0,210,255,.10); --th:rgba(0,210,255,.45); transition:color .2s, background-color .2s; }
+        .bn-safe { --tc:#4fd88a; --tg:rgba(79,216,138,.12); --th:rgba(79,216,138,.5); }
+        .bn-luck { --tc:#ffb547; --tg:rgba(255,181,71,.12); --th:rgba(255,181,71,.5); }
+        .bn-home { --tc:#00d2ff; --tg:rgba(0,210,255,.10); --th:rgba(0,210,255,.45); }
+        .bn-pair { --tc:#ff7eb0; --tg:rgba(255,126,176,.12); --th:rgba(255,126,176,.5); }
+        .bn-pro  { --tc:#b68cff; --tg:rgba(182,140,255,.13); --th:rgba(182,140,255,.5); }
+        .bn-item.on { color:var(--tc); background:var(--tg) !important; }
+        .bn-item.on .sec-ic { color:var(--tc); filter:drop-shadow(0 0 4px var(--th)); }
         .bn-item:not(.on) .sec-ic * { animation:none !important; }
         body.has-bnav { padding-bottom:calc(96px + env(safe-area-inset-bottom)); }
         #resultBox.tabbed .acc-section > summary { display:none; }
@@ -1021,6 +1027,7 @@
         .hdr-ai { position:absolute; right:12px; top:12px; z-index:2; width:auto; margin:0; padding:5px 10px; align-items:center; gap:4px; font-size:12px; font-weight:600; letter-spacing:.5px; line-height:1;
             color:#e9d8ff; background:linear-gradient(135deg, rgba(150,90,255,.28), rgba(0,210,255,.18)) !important; border:1px solid rgba(170,120,255,.45); border-radius:999px; box-shadow:none !important; transform:none !important; }
         @media (max-width: 380px) { .hdr-ai { right:6px; padding:4px 8px; font-size:11px; } }
+        .who-it.who-save { color:#7fd8ef; border-top:1px solid #2a2f32; margin-top:4px; } .who-save + .who-new { border-top:none; margin-top:0; }
         .who-it.who-share small { display:block; font-size:10.5px; color:#778; margin-top:2px; }
         .who-menu { display:none; position:absolute; left:50%; top:calc(100% + 4px); transform:translateX(-50%); z-index:120; min-width:200px; max-width:86vw; max-height:50vh; overflow-y:auto; padding:6px;
             background:#1b1e20; border:1px solid #2f363a; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.6); line-height:1.4; }
@@ -7476,7 +7483,7 @@ ${d.safetyScan || '無'}`;
     window.__navTab = 'home'; window.__proSub = 'iaOutput';
     function navRender() {
         const bar = document.getElementById('bnav');
-        bar.innerHTML = NAV.map(t => `<button type="button" class="bn-item ${t.k === window.__navTab ? 'on' : ''}" onclick="navGo('${t.k}')">${NAV_IC[t.k]}<span>${t.n}</span></button>`).join('');
+        bar.innerHTML = NAV.map(t => `<button type="button" class="bn-item bn-${t.k} ${t.k === window.__navTab ? 'on' : ''}" onclick="navGo('${t.k}')">${NAV_IC[t.k]}<span>${t.n}</span></button>`).join('');
         const pro = NAV.find(t => t.k === 'pro');
         document.getElementById('proTabs').innerHTML = pro.sub.map(([id, n]) => `<button type="button" class="pro-tab ${id === window.__proSub ? 'on' : ''}" onclick="proGo('${id}')">${n}</button>`).join('');
     }
@@ -7521,7 +7528,8 @@ ${d.safetyScan || '無'}`;
         aiPopClose();
         const list = getSavedCharts();
         m.innerHTML = (list.length ? list.map((it, i) => `<button type="button" class="who-it ${it.name === window.__chartName ? 'on' : ''}" onclick="whoMenuClose(); loadSavedChart(${i})">👤 ${it.name}</button>`).join('')
-            : '<div class="who-empty">尚無儲存的命盤<br><small>在命盤裡按「儲存命盤」就會出現在這裡</small></div>')
+            : '<div class="who-empty">尚無儲存的命盤<br><small>按下方「儲存目前命盤」就會出現在這裡</small></div>')
+            + (window.__chartName ? '' : '<button type="button" class="who-it who-save" onclick="whoMenuClose(); saveCurrentChartPrompt()">💾 儲存目前命盤</button>')
             + '<button type="button" class="who-it who-new" onclick="whoMenuClose(); sheetOpen()">＋ 新排盤</button>';
         m.classList.add('on');
     }
