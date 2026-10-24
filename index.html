@@ -166,11 +166,13 @@
         .act-btn { background: #333; color: var(--accent); border: 1px solid var(--accent); font-weight: bold; margin-top: 0; }
         @keyframes actIn { from { opacity: 0; transform: translateY(-4px); } }
         .act-row3 { grid-template-columns: repeat(3, 1fr); }
-        .act-row3 .act-btn { font-size: 13.5px; padding-left: 4px; padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; line-height:1.2; }
-        .act-row3 .act-btn small { font-size:10px; font-weight:normal; color:#7f95a3; letter-spacing:0; }
+        .hp-prompt-row .act-btn, .act-row3 .act-btn { font-size: 13.5px; padding-left: 4px; padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; line-height:1.2; }
+        .hp-prompt-row .act-btn small, .act-row3 .act-btn small { font-size:10px; font-weight:normal; color:#7f95a3; letter-spacing:0; }
         .copy-prompt-btn.copied { background:#2ed573 !important; color:#000 !important; }
         .copy-prompt-btn.copied small { color:#0b3d22 !important; }
         .ai-go { margin:-8px 0 20px; padding:12px 14px; border:1px solid rgba(46,213,115,.45); border-radius:12px; background:rgba(46,213,115,.06); animation: actIn .25s ease-out; }
+        .hp-prompt-row { display:grid; grid-template-columns:1fr 1fr; margin:14px 0 0; }
+        .hp-prompt-row + .ai-go { margin:10px 0 0; }
         .ai-go-h { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:bold; color:#2ed573; }
         .ai-go-h i { font-style:normal; color:#777; cursor:pointer; padding:0 4px; }
         .ai-go-sub { font-size:11.5px; color:#8a9aa2; margin:4px 0 10px; }
@@ -737,14 +739,16 @@
         .share-opt input { width:16px; height:16px; margin:0; accent-color:var(--accent); cursor:pointer; flex:none; display:block; }
         .share-box { position:relative; display:inline-flex; border-radius:4px; flex:none; }
         .share-opt:not(.on) .share-box { animation: sharePulse 1.6s ease-in-out infinite; }
-        .share-opt:not(.on) > span:nth-child(2) { color:#cfe9f2; }
-        .share-opt.on > span:nth-child(2) { color:#6f8792; }
+        .share-opt:not(.on) .share-txt { color:#cfe9f2; }
+        .share-opt.on .share-txt { color:#6f8792; }
+        .share-q::after { content:''; position:absolute; inset:-10px; }
+        .share-lbl { display:flex; align-items:center; gap:7px; cursor:pointer; }
         @keyframes sharePulse {
             0%, 100% { box-shadow: 0 0 0 2px rgba(0,210,255,.95), 0 0 10px 2px rgba(0,210,255,.8); }
             50% { box-shadow: 0 0 0 2px rgba(0,210,255,.95), 0 0 0 10px rgba(0,210,255,0); }
         }
         @media (prefers-reduced-motion: reduce) { .share-opt:not(.on) .share-box { animation:none; box-shadow:0 0 0 2px rgba(0,210,255,.6); } }
-        .share-q { font-style:normal; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; border:1px solid #4a5a62; color:#6f8792; font-size:10px; cursor:pointer; flex:none; }
+        .share-q { font-style:normal; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; position:relative; border-radius:50%; border:1px solid #4a5a62; color:#6f8792; font-size:10px; cursor:pointer; flex:none; }
         .saved-charts-list { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
         .saved-charts-label { font-size: 12px; color: #888; margin-right: 2px; }
         .saved-charts-empty { font-size: 12px; color: #666; }
@@ -841,6 +845,32 @@
         .rel-star-row b.ok { color: #2ed573; }
         .rel-star-row b.ng { color: #ff5252; }
         .rel-ev-block { margin-top: 12px; }
+        /* ===== 事件清單統一風格：中性底色、只用小圓點標類型 ===== */
+        .ev-list { margin-top:10px; border-top:1px solid #262626; }
+        .ev-row { display:grid; grid-template-columns:76px 1fr; gap:10px; padding:9px 4px 9px 10px; border-bottom:1px solid #262626; border-left:3px solid transparent; }
+        .ev-row.now { border-left-color:var(--accent); background:rgba(0,210,255,.04); }
+        .ev-row.past { opacity:.42; }
+        .ev-when { display:flex; flex-direction:column; gap:1px; }
+        .ev-when b { font-size:12.5px; color:#d6dde0; font-weight:600; }
+        .ev-when span { font-size:12px; color:#8a9aa2; letter-spacing:1px; }
+        .ev-when em { font-style:normal; font-size:10px; color:var(--accent); }
+        .ev-items { display:flex; flex-direction:column; gap:4px; }
+        .ev-it { font-size:13px; color:#d8d8d8; line-height:1.45; padding-left:14px; position:relative; }
+        .ev-it::before { content:''; position:absolute; left:0; top:.5em; width:7px; height:7px; border-radius:50%; background:var(--dot, #9fb3bd); }
+        .ev-it small { color:#7d8b92; font-size:11px; margin-left:6px; }
+        .ev-chong { --dot:#ff6b6b; } .ev-xing { --dot:#ffa94d; } .ev-he { --dot:#5cc8e6; } .ev-ku { --dot:#e6c35c; } .ev-sanhe { --dot:#ff7eb6; } .ev-yin { --dot:#9fb3bd; }
+        /* 六親／平安的大運流年流月清單：套同一風格 */
+        .rel-ev-row { border-left:3px solid transparent; padding:8px 6px 8px 8px !important; }
+        .rel-ev-row.is-current { border-left-color:var(--accent); background:rgba(0,210,255,.04) !important; border-radius:0 !important; }
+        .rel-ev-row.is-past { opacity:.42; }
+        .rel-ev-time { color:#b8c2c7 !important; font-size:11.5px !important; }
+        .rel-ev-row.is-past .rel-ev-time { color:#b8c2c7 !important; }
+        .rel-ev-gz, .rel-ev-gz span, .sf-day .rel-ev-gz span { color:#e2e2e2 !important; font-weight:600; letter-spacing:1px; }
+        .rel-ev-tags, .sf-day .rel-ev-tags { gap:3px 12px !important; }
+        .rel-ev-tags .tag { background:none !important; padding:0 0 0 13px; position:relative; font-weight:normal; color:#d8d8d8 !important; font-size:12.5px; }
+        .rel-ev-tags .tag::before { content:''; position:absolute; left:0; top:.45em; width:7px; height:7px; border-radius:50%; background:var(--dot, #9fb3bd); }
+        .rel-ev-tags .tag-chong { --dot:#ff6b6b; } .rel-ev-tags .tag-xing { --dot:#ffa94d; } .rel-ev-tags .tag-hai { --dot:#b08968; }
+        .rel-ev-tags .tag-sanhe { --dot:#ff7eb6; } .rel-ev-tags .tag-star { --dot:#5cc8e6; }
         .rel-ev-title { font-size: 12px; color: #aaa; font-weight: bold; margin-bottom: 4px; }
         .rel-ev-row { display: grid; grid-template-columns: minmax(0, 1.4fr) 40px minmax(0, 2fr); gap: 8px; align-items: center; padding: 6px 6px; border-bottom: 1px solid #262626; font-size: 12px; }
         .rel-ev-row.is-current { background: rgba(0,210,255,0.08); border-radius: 4px; }
@@ -920,6 +950,80 @@
         .mg-sex { grid-column:1 / 2; }
         .mg-sex button { padding:7px; font-size:13px; }
         .mg-go { grid-column:auto; margin:0; padding:9px; font-size:14px; }
+        .sec-ic { width:20px; height:20px; margin-right:7px; color:var(--accent); flex:none; vertical-align:-4px; filter:drop-shadow(0 0 4px rgba(0,210,255,.45)); }
+        .ic-needle { transform-origin:12px 16.5px; animation: icNeedle 2.8s ease-in-out infinite; }
+        @keyframes icNeedle { 0%,100% { transform:rotate(-55deg); } 45% { transform:rotate(48deg); } 60% { transform:rotate(38deg); } 70% { transform:rotate(46deg); } }
+        .ic-pulse-run { stroke-dasharray:28 72; animation: icPulse 1.8s linear infinite; }
+        @keyframes icPulse { from { stroke-dashoffset:100; } to { stroke-dashoffset:0; } }
+        @media (prefers-reduced-motion: reduce) { .ic-needle, .ic-pulse-run { animation:none; } .ic-pulse-run { stroke-dasharray:none; } }
+        .ic-compass { transform-origin:12px 12px; animation: icCompass 3.2s ease-in-out infinite; }
+        @keyframes icCompass { 0%,100% { transform:rotate(-25deg); } 30% { transform:rotate(40deg); } 50% { transform:rotate(15deg); } 70% { transform:rotate(28deg); } }
+        .ic-radar { transform-origin:12px 12px; animation: icRadar 2.4s linear infinite; }
+        @keyframes icRadar { to { transform:rotate(360deg); } }
+        .ic-blip { animation: icBlip 2.4s ease-out infinite; }
+        @keyframes icBlip { 0%,10% { opacity:0; } 14% { opacity:1; } 60%,100% { opacity:0; } }
+        .ic-cal { opacity:.3; animation: icCal 3s steps(1) infinite; }
+        .ic-cal.c1 { animation-delay:.5s; } .ic-cal.c2 { animation-delay:1s; } .ic-cal.c3 { animation-delay:1.5s; } .ic-cal.c4 { animation-delay:2s; } .ic-cal.c5 { animation-delay:2.5s; }
+        @keyframes icCal { 0% { opacity:1; fill:#ffb347; } 16% { opacity:.3; fill:currentColor; } }
+        .ic-net { transform-box:fill-box; transform-origin:center; animation: icNet 2.1s ease-in-out infinite; }
+        .ic-net.n1 { animation-delay:.7s; } .ic-net.n2 { animation-delay:1.4s; }
+        @keyframes icNet { 0%,100% { transform:scale(.75); opacity:.55; } 20% { transform:scale(1.15); opacity:1; } 45% { transform:scale(.85); opacity:.7; } }
+        @media (prefers-reduced-motion: reduce) { .ic-compass, .ic-radar, .ic-blip, .ic-cal, .ic-net { animation:none; } .ic-cal { opacity:.6; } .ic-blip { opacity:1; } }
+        .ic-heart-in { transform-origin:12px 12.5px; animation: icHeart 1.3s ease-in-out infinite; }
+        @keyframes icHeart { 0%,100% { transform:scale(.75); opacity:.55; } 20% { transform:scale(1.05); opacity:1; } 40% { transform:scale(.85); } 55% { transform:scale(1); opacity:.9; } }
+        .ic-shield-ck { stroke-dasharray:100; animation: icShield 2.6s ease-in-out infinite; }
+        @keyframes icShield { 0% { stroke-dashoffset:100; } 40%,80% { stroke-dashoffset:0; } 100% { stroke-dashoffset:-100; } }
+        @media (prefers-reduced-motion: reduce) { .ic-heart-in, .ic-shield-ck { animation:none; } .ic-shield-ck { stroke-dasharray:none; } }
+        .zone-divider { display:flex; align-items:center; gap:10px; margin:26px 0 12px; color:#7f95a3; font-size:12px; letter-spacing:3px; }
+        .zone-divider::before, .zone-divider::after { content:''; flex:1; height:1px; background:linear-gradient(90deg, transparent, #3a4a52, transparent); }
+        .sf-tabs { margin-bottom:12px; }
+        .sf-grid { display:grid; gap:6px; }
+        .sf-grid5 { grid-template-columns:repeat(5, 1fr); }
+        .sf-grid4 { grid-template-columns:repeat(4, 1fr); }
+        .sf-cell { display:flex; flex-direction:column; align-items:center; gap:2px; padding:8px 2px; border-radius:9px; border:1px solid #2a2a2a; background:#161616; cursor:pointer; font-size:11px; -webkit-tap-highlight-color:transparent; }
+        .sf-cell.now { border-color:rgba(0,210,255,.45); }
+        .sf-cell.sel { outline:2px solid var(--accent); outline-offset:-1px; }
+        .sf-cell.fan { background:linear-gradient(180deg, rgba(255,82,82,.28), rgba(255,82,82,.08)); border-color:rgba(255,82,82,.65); }
+        .sf-cell.warn { background:linear-gradient(180deg, rgba(255,179,71,.24), rgba(255,179,71,.06)); border-color:rgba(255,179,71,.6); }
+        .sf-y { color:#888; font-size:10.5px; }
+        .sf-gz { font-size:15px; letter-spacing:1px; }
+        .sf-st { font-size:10.5px; font-weight:bold; color:#555; min-height:14px; }
+        .sf-cell.fan .sf-st { color:#ff6b6b; }
+        .sf-cell.yin .sf-st { color:#8a7f7f; font-weight:normal; }
+        .sf-cell.warn .sf-st { color:#ffb347; font-size:13px; }
+        .sf-det { margin-top:10px; padding:10px 12px; border:1px solid #2a2a2a; border-radius:10px; background:#141414; }
+        .sf-det-h { font-size:13px; font-weight:bold; margin-bottom:6px; color:#ddd; }
+        .sf-det-h small { font-weight:normal; color:#777; font-size:10.5px; margin-left:8px; }
+        .sf-line { display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; font-size:12.5px; color:#bbb; padding:3px 0; }
+        .sf-line b { font-size:11px; padding:1px 7px; border-radius:999px; border:1px solid #444; }
+        .sf-line em { font-style:normal; color:#888; font-size:11.5px; }
+        .sf-line.fan b { color:#ff6b6b; border-color:rgba(255,82,82,.6); background:rgba(255,82,82,.1); }
+        .sf-line.yin b { color:#9a8a8a; border-color:#3a3333; }
+        .sf-line.warn b { color:#ffb347; border-color:rgba(255,179,71,.6); background:rgba(255,179,71,.1); }
+        .sf-legend { display:flex; flex-direction:column; gap:3px; font-size:11px; color:#888; margin-top:8px; }
+        .sf-dot { display:inline-block; width:9px; height:9px; border-radius:3px; margin-right:6px; vertical-align:-1px; border:1px solid #444; }
+        .sf-dot.fan { background:rgba(255,82,82,.5); border-color:#ff5252; }
+        .sf-dot.yin { background:#2a2424; border-color:#5a4a4a; }
+        .sf-dot.warn { background:rgba(255,179,71,.5); border-color:#ffb347; }
+        .sf-natal { font-size:12px; color:#ffcf7a; background:rgba(255,179,71,.08); border:1px solid rgba(255,179,71,.3); border-radius:8px; padding:7px 10px; margin-bottom:10px; }
+        .sf-none { font-size:11px; color:#666; }
+        .sf-day { display:grid; grid-template-columns:44px 34px 1fr; align-items:center; gap:6px; padding:6px 2px; border-bottom:1px solid #222; font-size:12px; }
+        .sf-day:last-child { border-bottom:none; }
+        .sf-day-d { color:#b8c2c7; }
+        .sf-day .rel-ev-gz { font-size:14px; }
+        .sf-more { grid-column:auto; display:block; width:100%; margin:12px 0 4px; padding:8px; font-size:12px; background:transparent; color:#7f95a3; border:1px dashed #3a4a52; border-radius:8px; box-shadow:none; }
+        .sf-more:hover { background:rgba(255,255,255,.03); transform:none; }
+        .ts-row { display:grid; grid-template-columns:40px 34px 1fr; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid #222; font-size:12.5px; }
+        .ts-row:last-of-type { border-bottom:none; }
+        .ts-row.now { background:rgba(0,210,255,.06); }
+        .ts-row.fan .yy-y { color:#ff6b6b; font-weight:bold; }
+        .ts-sig { display:flex; flex-wrap:wrap; gap:4px; }
+        .ts-chip { font-size:10.5px; padding:1px 7px; border-radius:999px; border:1px solid; white-space:nowrap; }
+        .ts-chip.fan { color:#ff6b6b; border-color:rgba(255,82,82,.6); background:rgba(255,82,82,.1); font-weight:bold; }
+        .ts-chip.yin { color:#9a8a8a; border-color:#3a3333; }
+        .ts-legend { display:flex; flex-wrap:wrap; align-items:center; gap:4px 6px; font-size:10.5px; color:#777; margin-top:8px; }
+        .ts-legend > span { white-space:nowrap; margin-right:10px; }
+        .ts-head { margin-left:8px; font-size:11px; font-weight:bold; color:#ff6b6b; border:1px solid rgba(255,82,82,.6); border-radius:999px; padding:1px 8px; }
         .yy-sub { font-weight:normal; color:#777; font-size:11px; margin-left:8px; }
         .yy-list { display:flex; flex-direction:column; border:1px solid #2a2a2a; border-radius:10px; overflow:hidden; }
         .yy-row { display:grid; grid-template-columns:40px 34px 58px 1fr; align-items:center; gap:6px; padding:8px 10px; border-bottom:1px solid #222; cursor:pointer; font-size:12.5px; }
@@ -1184,7 +1288,7 @@
 
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
         <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
-        <label class="share-opt" id="shareOpt"><span class="share-box"><input type="checkbox" id="shareData" onchange="shareToggle(this)"></span><span>匿名分享功能使用次數，一起讓五行動能更好用</span><i class="share-q" data-tip="只記錄「哪個功能被點了幾次」，以及命盤的年齡層（例如 30–39 歲）與性別，用來了解不同族群最需要哪些功能。不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰；隨時可以取消勾選。">?</i></label>
+        <div class="share-opt" id="shareOpt"><label class="share-lbl"><span class="share-box"><input type="checkbox" id="shareData" onchange="shareToggle(this)"></span><span class="share-txt">匿名分享功能使用次數，一起讓五行動能更好用</span></label><i class="share-q" data-tip="只記錄「哪個功能被點了幾次」，以及命盤的年齡層（例如 30–39 歲）與性別，用來了解不同族群最需要哪些功能。不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰；隨時可以取消勾選。">?</i></div>
     </div>
     <div class="act-row act-row3" id="aiBtnContainer" style="display:none;">
         <button onclick="saveCurrentChartPrompt()" class="act-btn"><span class="ab-t">💾 儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
@@ -1192,7 +1296,7 @@
         <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)"><span class="ab-t">📋 白話提詞</span><small>不含術語的白話解析</small></button>
     </div>
     <div class="ai-go" id="aiGo" style="display:none;">
-        <div class="ai-go-h"><span id="aiGoTitle">✅ 已複製提詞</span><i onclick="aiGoClose()">✕</i></div>
+        <div class="ai-go-h"><span class="ai-go-title" id="aiGoTitle">✅ 已複製提詞</span><i onclick="aiGoClose()">✕</i></div>
         <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
         <div class="ai-go-btns">
             <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
@@ -1208,16 +1312,31 @@
         <!-- 2. 核心能量儀表板 (預設展開) -->
         <div id="energyDashboardOutput"></div>
 
-        <!-- 3. 流日速覽 (新增，預設展開) -->
+        <!-- 3. 流日動能 -->
         <div id="liuriOutput"></div>
 
-        <!-- 4. 原局結構拆解 (天地通透) -->
-                <details class="acc-section">
-            <summary class="acc-summary">☯️ 天地通透<span class="acc-chevron">▾</span></summary>
+        <!-- 平安曆（安太歲年曆／行車跌倒月曆） -->
+        <div id="safetyOutput"></div>
+
+        <!-- 合盤配對 -->
+        <details class="acc-section" id="hepanSection" open>
+            <summary class="acc-summary"><span style="display:inline-flex; align-items:center;"><svg class="sec-ic ic-heart" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z" fill="none" stroke="#ff7eb6" stroke-width="2" stroke-linejoin="round"/><path class="ic-heart-in" d="M12 16.5s-4-2.6-4-5.6a2.2 2.2 0 0 1 4-1.3 2.2 2.2 0 0 1 4 1.3c0 3-4 5.6-4 5.6z" fill="#ff7eb6"/></svg>合盤配對</span><span class="acc-chevron">▾</span></summary>
+            <div class="acc-body"><div id="hepanPanel"></div></div>
+        </details>
+
+        <!-- ===== 命師專區 ===== -->
+        <div class="zone-divider"><span>命師專區</span></div>
+
+        <div id="iaOutput"></div>
+
+        <!-- 自動偵測：通根透干／歲運引動／四庫 -->
+        <details class="acc-section">
+            <summary class="acc-summary"><span style="display:inline-flex; align-items:center;"><svg class="sec-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8" opacity=".55"/><circle cx="12" cy="12" r="5" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".35"/><g class="ic-radar"><path d="M12 12L12 3A9 9 0 0 1 19.8 7.5z" fill="currentColor" opacity=".35"/><line x1="12" y1="12" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></g><circle class="ic-blip" cx="16" cy="9" r="1.4" fill="#2ed573"/></svg>自動偵測</span><span class="acc-chevron">▾</span></summary>
             <div class="acc-body">
                 <div class="lm-tabs tt2-tabs">
-                    <button class="lm-tab on" data-k="nat" onclick="tt2Tab('nat')">原局通根透干</button>
+                    <button class="lm-tab on" data-k="nat" onclick="tt2Tab('nat')">通根透干</button>
                     <button class="lm-tab" data-k="dyn" onclick="tt2Tab('dyn')">歲運引動</button>
+                    <button class="lm-tab" data-k="siku" onclick="tt2Tab('siku')">四庫</button>
                 </div>
                 <div class="tt2-pane" data-k="nat">
                     <div id="tonggenOutput"></div>
@@ -1225,21 +1344,14 @@
                     <div id="touganOutput"></div>
                 </div>
                 <div class="tt2-pane" data-k="dyn" style="display:none;"><div id="dynamicTonggenTouganOutput"></div></div>
+                <div class="tt2-pane" data-k="siku" style="display:none;"><div id="sikuOutput"></div></div>
             </div>
         </details>
-        
-        <div id="iaOutput"></div>
-        <div id="sikuOutput"></div>
-        
-        <!-- 5. 歲運交感與引動 (動態時間軸) -->
-        <div id="dayunLiunianOutput"></div>
-        
-        <!-- 6. 落地戰術指南 -->
-        <div id="monthlyTacticsOutput"></div>
 
-        <!-- 我的人際圈（父母／兄弟／子女／朋友／婚姻）：放在命主資訊之後 -->
+        <div id="dayunLiunianOutput"></div>
+        <div id="monthlyTacticsOutput"></div>
         <div id="relativesOutput"></div>
-        
+
         <!-- 7. AI 深度總結（永遠常駐顯示，不放進手風琴） -->
     </div>
 
@@ -1873,9 +1985,9 @@
     }
 
     function renderMarriageTab() {
-        const panel = document.getElementById('marriagePanel');
+        const panel = document.getElementById('marriagePanel') || document.createElement('div');
         const ctx = window.__friendCtx;
-        if (!panel || !ctx) return;
+        if (!ctx) return;
         const g = gongTypeOf(ctx.dz);
         const p = getPartner();
         let r = null; try { r = p ? calcPartner(p) : null; } catch (e) { r = null; }
@@ -1894,16 +2006,24 @@
             html += `
                 <div class="mg-done">已排盤${r.hasHour ? '' : '（時辰不詳，以三柱計算）'}<button type="button" class="mg-del" id="partnerDel" onclick="clearPartner()">清除</button></div>
                 ${(() => { try { return renderHepanLamps(hepanCalc(ctx, p, r)); } catch (e) { console.warn('合盤失敗', e); return ''; } })()}
-                <button class="act-btn mg-prompt" id="partnerPromptBtn" onclick="copyPartnerPrompt()">📋 相處提詞</button>`;
+                <div class="act-row hp-prompt-row">
+                    <button class="act-btn copy-prompt-btn" onclick="copyPartnerPrompt('pro', this)"><span class="ab-t">📋 命師提詞</span><small>請 AI 說明判斷依據</small></button>
+                    <button class="act-btn copy-prompt-btn" onclick="copyPartnerPrompt('plain', this)"><span class="ab-t">📋 白話提詞</span><small>不含術語的白話解析</small></button>
+                </div>
+                <div class="ai-go" id="aiGoHp" style="display:none;">
+        <div class="ai-go-h"><span class="ai-go-title">✅ 已複製提詞</span><i onclick="this.closest('.ai-go').style.display='none'">✕</i></div>
+        <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
+        <div class="ai-go-btns">
+            <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
+            <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="aiGo('chatgpt')" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
+            <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
+        </div>
+    </div>`;
         } else {
             html += `<div class="rel-coming">輸入另一半的出生日期（時辰可不填）</div>`;
         }
-        panel.innerHTML = `<div class="lm-tabs mg-tabs">
-                <button class="lm-tab ${tab === 'gong' ? 'on' : ''}" onclick="mgTab('gong')">夫妻宮</button>
-                <button class="lm-tab ${tab === 'hp' ? 'on' : ''}" onclick="mgTab('hp')">合盤</button>
-            </div>
-            <div style="${tab === 'gong' ? '' : 'display:none'}">${gongHtml}</div>
-            <div style="${tab === 'hp' ? '' : 'display:none'}">${html}</div>`;
+        panel.innerHTML = gongHtml;
+        const hp = document.getElementById('hepanPanel'); if (hp) hp.innerHTML = html;
     }
     function mgTab(t) { window.__mgTab = t; renderMarriageTab();
     }
@@ -1924,7 +2044,7 @@
         setPartner(null); window.__partnerSex = null; renderMarriageTab();
     }
 
-    function copyPartnerPrompt() {
+    function copyPartnerPrompt(mode, btn) {
         const ctx = window.__friendCtx, p = getPartner(); if (!ctx || !p) return;
         const r = calcPartner(p), g = gongTypeOf(ctx.dz);
         let hpTxt = ''; try { const h = hepanCalc(ctx, p, r); hpTxt = HP_ITEMS.map(([k, n]) => `${n}：${h.res[k] === null ? '無法判定（時辰不詳）' : (h.res[k] ? '是' : '否')}`).join('；') + `\n對方量化強弱：${h.pcat ? h.pcat + '（' + (h.lo === h.hi ? h.lo : h.lo + '～' + h.hi) + ' 分）' : '時辰不詳，' + h.lo + '～' + h.hi + ' 分'}`; } catch (e) {}
@@ -1941,8 +2061,7 @@
             hs.forEach((h, k) => r.gans.forEach((g, gi) => { if (gi !== 2 && g === h) touTxt.push(`${PN[zi]}支${z}${['本氣', '中氣', '餘氣'][k] || ''}${h}${getPreciseTenGod(h, r.dg)} 透出${PN[gi]}干`); })); });
         let relTxt = '';
         try { relTxt = iaScan(iaPillars(r.gans, r.zhis, [])).map(x => '• ' + iaText(x)).join('\n'); } catch (e) { relTxt = ''; }
-        const txt = `你是子平八字命理師。請根據下列排盤資料，給命主具體可執行的建議：如何跟這位另一半建立關係、日常怎麼互動、衝突時怎麼處理。
-
+        const data = `# 合盤資料
 【命主】
 四柱：${ctx.pillars}（${ctx.gender === 1 ? '男' : '女'}命）
 日主：${ctx.dg}（${ctx.dayElement}）；量化身強弱：${ctx.strengthLabel}（${ctx.totalScore} 分）
@@ -1959,21 +2078,31 @@ ${rootTxt}
 原局干支互動：${relTxt ? '\n' + relTxt : '無明顯刑沖合會'}
 
 【合盤條件】
-${hpTxt}
-
-
-【輸出要求】
-1. 另一半的個性與在意的點：依十神數量與通根透干判讀（數量並列時以天干主星為主、月干最強；透干有根的十神最顯性），原局刑沖合會與命主夫妻宮特質為輔，點出他最在意什麼、最受不了什麼。
-2. 建立關係：命主該怎麼開場、怎麼讓對方有好感，具體到說話方式與行動。
-3. 日常互動：相處上的加分行為與地雷，各列 3 點。
-4. 衝突處理：對方生氣或冷戰時，命主該怎麼做。
-5. 雙方命盤的互補與摩擦點：從兩人日主五行與十神分布比較。
-直接給結論與做法，不要說教、不要空泛的心靈勵志語、不要重複上面的資料。`;
-        try {
-            const ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'absolute'; ta.style.left = '-9999px';
-            document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
-            const b = document.getElementById('partnerPromptBtn'); const o = b.innerHTML; b.innerHTML = '✅ 已複製'; setTimeout(() => b.innerHTML = o, 2500);
-        } catch (e) { alert('複製失敗，請換個瀏覽器試試。'); }
+${hpTxt}`;
+        const rules = `# 使用規則
+1. 資料由量化八字系統精算完成，請直接採用，不要重新排盤或修改數據；不要推定用神、忌神、喜神。
+2. 請以繁體中文回答，直接給結論與做法，不要說教、不要空泛的勵志語、不要重抄資料。
+3. 合盤條件定義：互為夫妻星＝男方日主剋女方日主（同性任一方剋另一方）；夫妻星五行相同＝兩人的夫妻星五行一樣；五行互補＝依命主身強弱，對方日主五行與強弱能補足命主；五行相同＝日柱干支五行相同，或八字前兩大五行相同；生肖三合＝兩人年支在同一組三合。符合越多，緣分與默契的基礎越好；不符合的項目代表需要經營的地方，不代表不合。
+4. 十神判讀：數量並列時以天干主星為主、月干最強；透干且有根的十神最顯性。`;
+        const taskPro = `# 你的任務：命師版合盤解析
+角色：你是精通子平八字的命理師，熟悉《子平真詮》《滴天髓》的論命邏輯。每個論點寫出「結論 → 依據（引用資料內容，例如：另一半月干七殺透干有根）→ 現實對應」；可用術語，但第一次出現時補一句白話。用「## 標題」分段。
+1. 合盤條件解讀：逐條說明五個條件符合或不符合代表什麼，整體緣分基礎如何。
+2. 另一半的個性與在意的點：依十神數量、通根透干判讀，原局刑沖合會與命主夫妻宮特質為輔，點出他最在意什麼、最受不了什麼。
+3. 雙方命盤的互補與摩擦點：從兩人日主五行、強弱與十神分布比較。
+4. 建立關係：命主怎麼開場、怎麼讓對方有好感，具體到說話方式與行動。
+5. 日常互動：加分行為與地雷各列 3 點，並寫出對應的十神依據。
+6. 衝突處理：對方生氣或冷戰時，命主該怎麼做。
+篇幅約 2000～3000 字。`;
+        const taskPlain = `# 你的任務：白話版合盤解析
+角色：你是會把八字講成白話的感情顧問，讀者沒有命理背景。正文不要出現命理術語（十神名稱、通根、透干、五行生剋等），不寫推論過程。每段第一句先講結論，用生活例子說明，條列為主。用「## 標題」分段。
+1. 你們合不合：用一段話說明兩人的緣分基礎與最大的默契、最需要磨合的地方。
+2. 對方是什麼樣的人：他最在意什麼、最受不了什麼。
+3. 怎麼拉近距離：說話方式與具體行動。
+4. 相處加分與地雷：各 3 點。
+5. 吵架或冷戰時怎麼辦。
+篇幅約 1200～2000 字。`;
+        const txt = `${mode === 'plain' ? taskPlain : taskPro}\n\n${rules}\n\n${data}\n\n# 再次提醒\n以上資料為系統精算結果，請直接解讀，不要重新排盤。請依「你的任務」開始撰寫。`;
+        copyWithAiGo(txt, btn, 'aiGoHp', `✅ 已複製${mode === 'plain' ? '白話' : '命師'}合盤提詞`);
     }
 
     const SAVED_CHARTS_KEY = 'bazi_saved_charts_v1';
@@ -2566,7 +2695,7 @@ ${hpTxt}
                 <div class="ia-list" id="iaList"></div>
             </div>
         </div>`;
-        document.getElementById('iaOutput').innerHTML = wrapAccordion('🧭 歲運互動盤', body, true);
+        document.getElementById('iaOutput').innerHTML = wrapAccordion('<span style="display:inline-flex; align-items:center;"><svg class="sec-ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><g class="ic-compass"><path d="M12 5.5l2.2 6.5h-4.4z" fill="#ff6b6b"/><path d="M12 18.5l-2.2-6.5h4.4z" fill="currentColor" opacity=".6"/></g><circle cx="12" cy="12" r="1.3" fill="#1a1a1a"/></svg>歲運互動盤</span>', body, false);
         const board = document.getElementById('iaBoard');
         board.classList.toggle('nat-only', S.scope === 'nat');
         iaRenderAll(true);
@@ -3750,6 +3879,7 @@ ${hpTxt}
     }
     
     const getTenGodForElement = (targetEl, dayEl) => {
+        if (!wuxingRel[targetEl] || !wuxingRel[dayEl]) return '';
         if (targetEl === dayEl) return '比劫';
         if (wuxingRel[dayEl].sheng === targetEl) return '食傷';
         if (wuxingRel[dayEl].ke === targetEl) return '財星';
@@ -3882,6 +4012,7 @@ ${hpTxt}
      *  每柱：天干、地支主氣各 1 分（0–2）；轉職分＝流年 40％＋流月 60％；≥60 標「轉」
      */
     function careerCatOf(el, dayElement) {
+        if (!el || !wuxingRel[el] || !wuxingRel[dayElement]) return null; // 未起運等無資料情況
         if (el === dayElement) return '比劫';
         if (wuxingRel[el].sheng === dayElement) return '印';
         if (wuxingRel[dayElement].sheng === el) return '食傷';
@@ -3901,6 +4032,7 @@ ${hpTxt}
         const zhuanSheng = (helpG) => !!dy && wuxingRel[dyEls[1]] && wuxingRel[dyEls[1]].sheng === dyEls[0] && !helpG;
         const zsNote = '・地支生天干削弱五行（轉生）';
         const weigh = (isHelpEl) => {
+            if (!dy) return { ok: false, zs: false }; // 未起運：沒有大運可判斷
             const hG = isHelpEl(dyEls[0]); let hZ = isHelpEl(dyEls[1]);
             const zs = hZ && zhuanSheng(hG); if (zs) hZ = false;
             return { ok: dy ? ((hG ? wG : 0) + (hZ ? wZ : 0)) >= 0.5 : false, zs };
@@ -4795,6 +4927,168 @@ ${hpTxt}
         return t;
     }
 
+
+    // ===================================================================
+    // 平安提醒：行車・跌倒（沖＋三刑湊齊）、安太歲（犯太歲＝生肖；太歲引動＝其他柱）
+    // ===================================================================
+    const SAN_XING = [['寅', '巳', '申'], ['丑', '戌', '未']];
+    const YIMA = '寅申巳亥';
+    const ZORD = '子丑寅卯辰巳午未申酉戌亥';
+    const zPair = (a, b) => ZORD.indexOf(a) <= ZORD.indexOf(b) ? a + b : b + a;
+    function scanSafety(ctx) {
+        const { baseZhis, pNames, daYunData, currentYear } = ctx;
+        const nz = baseZhis.map((z, i) => ({ z, i })).filter(o => o.z && o.z !== '-');
+        // ---- 原局 ----
+        const natal = [];
+        for (let a = 0; a < nz.length; a++) for (let b = a + 1; b < nz.length; b++)
+            if (zhiChongMap[nz[a].z] === nz[b].z) natal.push({ type: '沖', name: `${zPair(nz[a].z, nz[b].z)}沖`, with: `${pNames[nz[a].i]}支×${pNames[nz[b].i]}支` });
+        SAN_XING.forEach(g => { if (g.every(x => nz.some(o => o.z === x))) natal.push({ type: '刑', name: `${g.join('')}三刑`, with: '原局湊齊' }); });
+        const yima = nz.filter(o => YIMA.includes(o.z));
+        // ---- 歲運 ----
+        const hits = (z, pool) => {
+            const out = [];
+            nz.forEach(o => { if (zhiChongMap[z] === o.z) out.push({ type: '沖', name: `${zPair(z, o.z)}沖`, target: `${pNames[o.i]}支` }); });
+            SAN_XING.forEach(g => {
+                if (!g.includes(z)) return;
+                const all = nz.map(o => o.z).concat(pool, [z]);
+                if (g.every(x => all.includes(x)) && !g.every(x => nz.some(o => o.z === x))) out.push({ type: '刑', name: `${g.join('')}三刑`, target: '湊齊' });
+            });
+            return out;
+        };
+        const dyOf = y => (daYunData || []).find(d => y >= d.startYear && y < d.startYear + 10);
+        const ev = { dayun: [], liunian: [], liuyue: [] };
+        (daYunData || []).forEach((dy, idx) => {
+            const end = daYunData[idx + 1] ? daYunData[idx + 1].startYear - 1 : dy.startYear + 9;
+            const c = hits(dy.zhi, []);
+            if (c.length) ev.dayun.push({ time: `${dy.startYear}–${end}（${dy.startAge}歲起）`, ganZhi: dy.ganZhi || (dy.gan + dy.zhi), isCurrent: currentYear >= dy.startYear && currentYear <= end, isPast: end < currentYear, clash: c, arrive: [] });
+        });
+        for (let y = currentYear - 3; y <= currentYear + 3; y++) {
+            const gz = iaYearGZ(y), dy = dyOf(y);
+            const c = hits(gz.zhi, dy ? [dy.zhi] : []);
+            if (c.length) ev.liunian.push({ time: `${y}`, ganZhi: gz.gan + gz.zhi, isCurrent: y === currentYear, isPast: y < currentYear, clash: c, arrive: [] });
+        }
+        const now = new Date();
+        for (let i = -6; i <= 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 15);
+            const solar = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 15), bz = solar.getLunar().getEightChar();
+            const dy = dyOf(d.getFullYear());
+            const c = hits(bz.getMonthZhi(), (dy ? [dy.zhi] : []).concat([bz.getYearZhi()]));
+            if (!c.length) continue;
+            const r = getJieQiRange(solar);
+            ev.liuyue.push({ time: r ? `${r.startLabel} ~ ${r.endLabel}` : `${d.getFullYear()}/${d.getMonth() + 1}`, ganZhi: bz.getMonthGan() + bz.getMonthZhi(), isCurrent: i === 0, isPast: i < 0, clash: c, arrive: [] });
+        }
+        // ---- 月曆（本月起 12 個月，含未觸發月份）----
+        const cal = [];
+        for (let i = 0; i < 12; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 15);
+            const solar = Solar.fromYmd(d.getFullYear(), d.getMonth() + 1, 15), bz = solar.getLunar().getEightChar();
+            const dy = dyOf(d.getFullYear()), r = getJieQiRange(solar);
+            cal.push({ y: d.getFullYear(), m: d.getMonth() + 1, gan: bz.getMonthGan(), zhi: bz.getMonthZhi(), range: r ? `${r.startLabel} ~ ${r.endLabel}` : '',
+                clash: hits(bz.getMonthZhi(), (dy ? [dy.zhi] : []).concat([bz.getYearZhi()])), ln: hits(bz.getYearZhi(), dy ? [dy.zhi] : []) });
+        }
+        // ---- 安太歲（10 年）----
+        const yz = baseZhis[0], ts = [];
+        for (let k = 0; k < 10; k++) {
+            const y = currentYear + k, gz = iaYearGZ(y), l = gz.zhi, fan = [], yin = [];
+            if (yz && yz !== '-') {
+                if (l === yz) fan.push(getXingType(l, yz) === '自刑' ? `坐太歲・${yz}${l}自刑` : '坐太歲');
+                else if (zhiChongMap[l] === yz) fan.push(`沖太歲・${zPair(yz, l)}沖`);
+                else if (getXingType(l, yz)) fan.push(`刑太歲・${zPair(yz, l)}刑`);
+            }
+            nz.filter(o => o.i !== 0).forEach(o => {
+                if (zhiChongMap[l] === o.z) yin.push(`${pNames[o.i]}支${zPair(o.z, l)}沖`);
+                else { const x = getXingType(l, o.z); if (x) yin.push(`${pNames[o.i]}支${x === '自刑' ? o.z + l + '自刑' : zPair(o.z, l) + '刑'}`); }
+            });
+            ts.push({ y, gz, fan, yin });
+        }
+        return { natal, yima, ev, ts, yz, cal, hits, dyOf };
+    }
+    function renderSafetyHtml(sc) {
+        const tab = window.__sfTab || 'ts', sel = window.__sfSel || (window.__sfSel = { ts: 0, car: 0 }), more = !!window.__sfMore;
+        const gz = (g, z) => `<b style="color:${elementColors[ganElementMap[g]]}">${g}</b><b style="color:${elementColors[zhiElementMap[z]]}">${z}</b>`;
+        let body = '';
+        if (tab === 'ts') {
+            const cells = sc.ts.map((r, k) => {
+                const st = r.fan.length ? r.fan[0].split('・')[0] : (r.yin.length ? '引動' : '');
+                return `<div class="sf-cell ${r.fan.length ? 'fan' : (r.yin.length ? 'yin' : '')} ${k === sel.ts ? 'sel' : ''} ${k === 0 ? 'now' : ''}" onclick="sfPick('ts',${k})">
+                    <span class="sf-y">${r.y}</span><span class="sf-gz">${gz(r.gz.gan, r.gz.zhi)}</span><span class="sf-st">${st || '・'}</span></div>`;
+            }).join('');
+            const r = sc.ts[sel.ts];
+            const det = r.fan.length || r.yin.length
+                ? [...r.fan.map(t => `<div class="sf-line fan"><b>${t.split('・')[0]}</b><span>${t.split('・')[1] || '生肖' + sc.yz}</span><em>建議安太歲</em></div>`),
+                   ...r.yin.map(t => `<div class="sf-line yin"><b>太歲引動</b><span>${t}</span><em>影響較輕</em></div>`)].join('')
+                : '<div class="sf-line"><span>這一年沒有犯太歲</span></div>';
+            body = `<div class="sf-grid sf-grid5">${cells}</div>
+                <div class="sf-det"><div class="sf-det-h">${r.y} ${gz(r.gz.gan, r.gz.zhi)} 年</div>${det}</div>
+                <div class="sf-legend"><span><i class="sf-dot fan"></i>犯太歲（生肖 ${sc.yz} 被坐、沖、刑）</span><span><i class="sf-dot yin"></i>太歲引動（其他柱，影響較輕）</span></div>`;
+        } else {
+            const natalTxt = [...sc.natal.map(n => n.name), ...(sc.yima.length >= 2 ? [`驛馬 ${sc.yima.length} 個`] : [])];
+            const cells = sc.cal.map((c, k) => `<div class="sf-cell ${c.clash.length ? 'warn' : ''} ${k === sel.car ? 'sel' : ''} ${k === 0 ? 'now' : ''}" onclick="sfPick('car',${k})">
+                    <span class="sf-y">${c.m === 1 || k === 0 ? c.y + '/' : ''}${c.m}月</span><span class="sf-gz">${gz(c.gan, c.zhi)}</span><span class="sf-st">${c.clash.length ? '⚠' : '・'}</span></div>`).join('');
+            const c = sc.cal[sel.car];
+            const det = c.clash.length
+                ? c.clash.map(x => `<div class="sf-line warn"><b>${x.type === '沖' ? '相沖' : '三刑'}</b><span>${x.name}・${x.target}</span><em>開車、出遠門、長輩行走多注意</em></div>`).join('')
+                : '<div class="sf-line"><span>這個月沒有特別要注意的</span></div>';
+            body = (natalTxt.length ? `<div class="sf-natal">原局本身有 ${natalTxt.join('、')}，平時就較常奔波，行車多留意</div>` : '')
+                + `<div class="sf-grid sf-grid4">${cells}</div>
+                <div class="sf-det"><div class="sf-det-h">${c.y}/${c.m}月 ${gz(c.gan, c.zhi)}<small>${c.range}</small></div>${det}</div>
+                <div class="sf-legend"><span><i class="sf-dot warn"></i>⚠ 開車、長輩跌倒多注意（地支相沖或三刑湊齊）</span></div>
+                <button class="sf-more" onclick="sfMore()">${more ? '收起命師詳細 ▴' : '命師詳細（大運・流年・流月）▾'}</button>
+                ${more ? sfDetailHtml(sc, c, natalTxt) : ''}`;
+        }
+        return `<div class="lm-tabs sf-tabs">
+                <button class="lm-tab ${tab === 'ts' ? 'on' : ''}" onclick="sfTab('ts')">🧧 安太歲</button>
+                <button class="lm-tab ${tab === 'car' ? 'on' : ''}" onclick="sfTab('car')">🚗 行車・跌倒</button>
+            </div>${body}`;
+    }
+    function sfDetailHtml(sc, c, natalTxt) {
+        const row = (time, gzs, clash, cur) => `<div class="rel-ev-row${cur ? ' is-current' : ''}">
+                <div class="rel-ev-time">${time}${cur ? ' <span class="rel-now">現在</span>' : ''}</div>
+                <div class="rel-ev-gz">${gzs.split('').map(x => `<span style="color:${elementColors[ganElementMap[x] || zhiElementMap[x]]}">${x}</span>`).join('')}</div>
+                <div class="rel-ev-tags">${clash.length ? clash.map(x => `<span class="tag ${x.type === '沖' ? 'tag-chong' : 'tag-xing'}">${x.name}・${x.target}</span>`).join(' ') : '<span class="sf-none">無觸發</span>'}</div></div>`;
+        const block = (title, inner) => `<div class="rel-ev-block"><div class="rel-ev-title">${title}</div>${inner}</div>`;
+        const now = new Date(), soon = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
+        // 大運：目前；6 個月內換運則加下一步
+        const dys = (window.__friendCtx && window.__friendCtx.daYunData) || [];
+        const ci = dys.findIndex(d => now.getFullYear() >= d.startYear && now.getFullYear() < d.startYear + 10);
+        const dyList = ci >= 0 ? [dys[ci]].concat(dys[ci + 1] && dys[ci + 1].startYear <= soon.getFullYear() ? [dys[ci + 1]] : []) : [];
+        const dyHtml = dyList.length ? dyList.map((d, k) => row(`${d.startYear}–${d.startYear + 9}（${d.startAge}歲起）`, d.ganZhi || d.gan + d.zhi, sc.hits(d.zhi, []), k === 0)).join('') : '<div class="rel-ev-empty">無</div>';
+        // 流年：目前（以立春分年）；6 個月內過立春則加下一年
+        const yNow = Solar.fromDate(now).getLunar().getEightChar(), ySoon = Solar.fromDate(soon).getLunar().getEightChar();
+        const y0 = now.getFullYear() - (now.getMonth() === 0 || (now.getMonth() === 1 && now.getDate() < 5) ? 1 : 0); // 立春前算前一年
+        const lnList = [{ gz: yNow.getYearGan() + yNow.getYearZhi(), y: y0 }];
+        if (ySoon.getYearZhi() !== yNow.getYearZhi()) lnList.push({ gz: ySoon.getYearGan() + ySoon.getYearZhi(), y: y0 + 1 });
+        const lnHtml = lnList.map((o, k) => { const dy = sc.dyOf(o.y); return row(`${o.y}`, o.gz, sc.hits(o.gz[1], dy ? [dy.zhi] : []), k === 0); }).join('');
+        // 流月：點選的月份
+        const lmHtml = row(c.range || `${c.y}/${c.m}`, c.gan + c.zhi, c.clash, false);
+        // 流日：該節氣月內每一天
+        const dy = sc.dyOf(c.y), days = [];
+        for (let k = -25; k <= 25; k++) {
+            const d = new Date(c.y, c.m - 1, 15 + k), bz = Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0).getLunar().getEightChar();
+            if (bz.getMonthZhi() !== c.zhi || bz.getMonthGan() !== c.gan) continue;
+            const h = sc.hits(bz.getDayZhi(), (dy ? [dy.zhi] : []).concat([bz.getYearZhi(), bz.getMonthZhi()]));
+            if (h.length) days.push(`<div class="sf-day"><span class="sf-day-d">${d.getMonth() + 1}/${d.getDate()}</span><span class="rel-ev-gz">${(bz.getDayGan() + bz.getDayZhi()).split('').map(x => `<span style="color:${elementColors[ganElementMap[x] || zhiElementMap[x]]}">${x}</span>`).join('')}</span><span class="rel-ev-tags">${h.map(x => `<span class="tag ${x.type === '沖' ? 'tag-chong' : 'tag-xing'}">${x.name}・${x.target}</span>`).join(' ')}</span></div>`);
+        }
+        const natalHtml = natalTxt.length ? `<div class="rel-ev-row"><div class="rel-ev-tags">${[...sc.natal.map(n => `<span class="tag ${n.type === '沖' ? 'tag-chong' : 'tag-xing'}">${n.name}・${n.with}</span>`), ...(sc.yima.length >= 2 ? [`<span class="tag tag-xing">驛馬 ${sc.yima.length} 個・${sc.yima.map(o => o.z).join('')}</span>`] : [])].join(' ')}</div></div>` : '<div class="rel-ev-empty">無</div>';
+        return block('🏠 原局', natalHtml) + block('🌊 大運', dyHtml) + block('📆 流年', lnHtml)
+            + block(`🗓️ 流月（${c.y}/${c.m}月）`, lmHtml) + block(`📍 流日（${c.y}/${c.m}月，共 ${days.length} 天）`, days.length ? days.join('') : '<div class="rel-ev-empty">本月無觸發</div>');
+    }
+    function sfRerender() { const b = document.getElementById('safetyBody'); if (b && window.__safetyScan) b.innerHTML = renderSafetyHtml(window.__safetyScan); }
+    function sfTab(t) { window.__sfTab = t; sfRerender(); }
+    function sfPick(k, i) { (window.__sfSel = window.__sfSel || { ts: 0, car: 0 })[k] = i; sfRerender(); }
+    function sfMore() { window.__sfMore = !window.__sfMore; sfRerender(); }
+    function buildSafetyPromptText(sc) {
+        let t = '行車・跌倒（含長輩跌倒）：歲運地支沖原局任一柱，或與原局／大運／流年／流月湊齊三刑（寅巳申、丑戌未）。\n';
+        t += '原局：' + ([...sc.natal.map(n => `${n.name}（${n.with}）`), ...(sc.yima.length >= 2 ? [`驛馬 ${sc.yima.length} 個（${sc.yima.map(o => o.z).join('')}）`] : [])].join('、') || '無') + '\n';
+        const fmt = e => `- ${e.time} ${e.ganZhi}${e.isCurrent ? '（現在）' : (e.isPast ? '（已過，供驗證）' : '')}：${e.clash.map(c => c.name + '・' + c.target).join('、')}`;
+        t += '大運觸發：\n' + (sc.ev.dayun.length ? sc.ev.dayun.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流年觸發：\n' + (sc.ev.liunian.length ? sc.ev.liunian.map(fmt).join('\n') : '- 無') + '\n';
+        t += '流月觸發：\n' + (sc.ev.liuyue.length ? sc.ev.liuyue.map(fmt).join('\n') : '- 無') + '\n';
+        t += `安太歲（生肖 ${sc.yz}；犯太歲＝年支坐、沖、刑；引動＝月日時支沖、刑）：\n`;
+        t += sc.ts.map(r => `- ${r.y} ${r.gz.gan}${r.gz.zhi}：${r.fan.length ? '犯太歲（' + r.fan.join('、') + '）' : '未犯太歲'}${r.yin.length ? '；引動：' + r.yin.join('、') : ''}`).join('\n');
+        return t;
+    }
+
     function switchRelTab(name) {
         document.querySelectorAll('.rel-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
         document.querySelectorAll('.rel-tab-panel').forEach(p => p.style.display = (p.dataset.tab === name ? 'block' : 'none'));
@@ -4992,7 +5286,7 @@ ${hpTxt}
                 : `${y}年${m}月`; // 節氣資料抓取失敗時的備援顯示
             // 時間格式比照六親分頁：過去＝深藍、現在＝亮藍＋「現在」標記；干支依五行上色
             const gzHtml = `<span style="color:${elementColors[ganElementMap[mGan]]}">${mGan}</span><span style="color:${elementColors[zhiElementMap[mZhi]]}">${mZhi}</span>`;
-            months.push({ i, m, gan: mGan, zhi: mZhi, start: jieRange ? jieRange.startLabel : `${m}月`, time: timeText });
+            months.push({ i, y, m, gan: mGan, zhi: mZhi, start: jieRange ? jieRange.startLabel : `${m}月`, time: timeText });
             const mi = months.length - 1;
             let monthStr = `<span class="lm-time${i < 0 ? ' is-past' : ''}">${timeText}</span> <span class="lm-gz">${gzHtml}</span>`
                 + (i === 0 ? ' <span class="rel-now">現在</span>' : (i < 0 ? '<span class="lm-past-note">（已過）</span>' : ''));
@@ -5055,7 +5349,20 @@ ${hpTxt}
             if (zhiHeMap[yz] === mZhi) addTactic('family', monthStr, combineBadge('年支'), `合動父母宮 (${yz}${mZhi}合)`, 'he', mi);
         }
 
-        const formatList = (list, emptyMsg) => list.length > 0 ? `<table class="lm-table">${list.join('')}</table>` : `<div style="font-size:13px; color:#888; margin-top:5px; padding-left:10px;">${emptyMsg}</div>`;
+        // 流月清單（新版）：一個月一列；左邊時間＋干支（中性色），右邊每件事一行，只用前方圓點區分類型
+        const EV_DOT = { sanhe: 'ev-sanhe', chong: 'ev-chong', xing: 'ev-xing', ku: 'ev-ku', he: 'ev-he', yin: 'ev-yin' };
+        const evClean = t => String(t || '').replace(/<[^>]*>/g, '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️★]/gu, '').replace(/\s+/g, ' ').trim();
+        const lmList = (k) => {
+            const rows = months.map((o, mi) => {
+                const L = ev.filter(e => e.cat === k && e.mi === mi);
+                if (!L.length) return '';
+                return `<div class="ev-row ${o.i < 0 ? 'past' : ''} ${o.i === 0 ? 'now' : ''}" title="${o.time}">
+                    <div class="ev-when"><b>${o.y}/${o.m}月</b><span>${o.gan}${o.zhi}</span>${o.i === 0 ? '<em>現在</em>' : ''}</div>
+                    <div class="ev-items">${L.map(e => `<div class="ev-it ${EV_DOT[e.kind] || 'ev-yin'}">${evClean(e.desc)}${e.kind === 'yin' ? `<small>${evClean(e.badge)}</small>` : ''}</div>`).join('')}</div>
+                </div>`;
+            }).filter(Boolean);
+            return rows.length ? `<div class="ev-list">${rows.join('')}</div>` : '<div class="rel-ev-empty">無</div>';
+        };
         const TOPICS = [
             ['love', '感情', '#ff9800', '觀測日支與配偶星', '無'],
             ['career', '事業', '#2ed573', '觀測月柱與官殺食傷', '無'],
@@ -5077,7 +5384,7 @@ ${hpTxt}
                 return `${n}：\n${rows.length ? rows.join('\n') : '- 無'}`;
             }).join('\n');
         }
-        const KIND = { sanhe: ['★', '#ff7eb6'], chong: ['●', '#ff5252'], xing: ['●', '#ff4fa3'], ku: ['◆', '#ffd166'], he: ['○', '#00d2ff'], yin: ['■', null] };
+        const KIND = { sanhe: ['★', '#ff7eb6'], chong: ['●', '#ff6b6b'], xing: ['●', '#ffa94d'], ku: ['◆', '#e6c35c'], he: ['○', '#5cc8e6'], yin: ['■', null] };
         const cellOf = (cat, mi, col) => {
             const L = ev.filter(e => e.cat === cat && e.mi === mi);
             if (!L.length) return '<i class="lm-dot0"></i>';
@@ -5092,7 +5399,7 @@ ${hpTxt}
                 ${TOPICS.map(([k, n, col]) => `<tr><td class="lm-rl" style="color:${col}" onclick="lmTab('${k}')">${n}</td>${months.map((o, mi) => `<td class="${colCls(o)}">${cellOf(k, mi, col)}</td>`).join('')}</tr>`).join('')}
                 <tr class="lm-sum"><td class="lm-rl">變動</td>${months.map((o, mi) => { const n = ev.filter(e => e.mi === mi && e.kind !== 'yin' && e.kind !== 'sanhe').length; return `<td class="${colCls(o)}">${n ? `<span class="lm-bar" style="height:${Math.min(4, n) * 4 + 2}px"></span>` : ''}</td>`; }).join('')}</tr>
             </table></div>
-            <div class="lm-legend"><span><b style="color:#ff5252">●</b>沖</span><span><b style="color:#ff4fa3">●</b>刑</span><span><b style="color:#ffd166">◆</b>庫</span><span><b style="color:#00d2ff">○</b>合</span><span><b>■</b>十神引動</span><span><b style="color:#ff7eb6">★</b>生肖三合</span><span class="lm-legend-r">淡＝已過・框＝本月</span></div>`;
+            <div class="lm-legend"><span><b style="color:#ff6b6b">●</b>沖</span><span><b style="color:#ffa94d">●</b>刑</span><span><b style="color:#e6c35c">◆</b>庫</span><span><b style="color:#5cc8e6">○</b>合</span><span><b>■</b>十神引動</span><span><b style="color:#ff7eb6">★</b>生肖三合</span><span class="lm-legend-r">淡＝已過・框＝本月</span></div>`;
         const upcoming = k => ev.filter(e => e.cat === k && months[e.mi].i >= 0).length;
         return `
             <div class="lm-wrap">
@@ -5104,7 +5411,7 @@ ${hpTxt}
                 <div class="lm-lists">
                 ${TOPICS.map(([k, n, col, sub, empty]) => `<div class="lm-pane" data-k="${k}" style="display:none;">
                     <div class="lm-sub" style="color:${col}">${n}<span>${sub}</span></div>
-                    ${formatList(tactics[k], empty)}
+                    ${lmList(k)}
                 </div>`).join('')}
                 </div>
             </div>
@@ -5730,7 +6037,7 @@ ${hpTxt}
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
                     ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : (topic === 'cai' || topic === 'tao') ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : `<div class="lw-pane" data-v="fr" style="display:none;"><div id="friendPanel"></div></div>`}
                 `;
-                document.getElementById('liuriOutput').innerHTML = wrapAccordion('⚡ 流日動能', body, true);
+                document.getElementById('liuriOutput').innerHTML = wrapAccordion('<span style="display:inline-flex; align-items:center;"><svg class="sec-ic ic-pulse" viewBox="0 0 24 24" aria-hidden="true"><polyline points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".25"/><polyline class="ic-pulse-run" points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/></svg>流日動能</span>', body, true);
                 document.getElementById('liuriOutput').className = 'topic-' + topic;
 
                 const todayIdx = days.findIndex(d => d.isToday);
@@ -5860,11 +6167,22 @@ ${hpTxt}
                 <div class="rel-tab-panel" data-tab="marriage" style="display:none;"><div id="marriagePanel"></div></div>
                 <div class="rel-tab-panel" data-tab="children" style="display:none;">${renderChildScanHtml(childScan)}</div>
             `;
-            document.getElementById('relativesOutput').innerHTML = wrapAccordion('👥 我的人際圈', relBody, false);
+            document.getElementById('relativesOutput').innerHTML = wrapAccordion('<span style="display:inline-flex; align-items:center;"><svg class="sec-ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="12" y1="6" x2="5.5" y2="17" stroke="currentColor" stroke-width="1.6" opacity=".5"/><line x1="12" y1="6" x2="18.5" y2="17" stroke="currentColor" stroke-width="1.6" opacity=".5"/><line x1="5.5" y1="17" x2="18.5" y2="17" stroke="currentColor" stroke-width="1.6" opacity=".5"/><circle class="ic-net n0" cx="12" cy="6" r="2.6" fill="currentColor"/><circle class="ic-net n1" cx="5.5" cy="17" r="2.6" fill="currentColor"/><circle class="ic-net n2" cx="18.5" cy="17" r="2.6" fill="currentColor"/></svg>我的人際圈</span>', relBody, false);
         } catch (e) {
             console.warn('六親偵測失敗:', e);
             document.getElementById('relativesOutput').innerHTML = '';
         }
+
+        // ===== 平安提醒 =====
+        let safetyPromptText = '';
+        try {
+            const sc = scanSafety({ baseZhis, pNames, daYunData, currentYear });
+            window.__safetyScan = sc; safetyPromptText = buildSafetyPromptText(sc);
+            const cur = sc.ts[0];
+            const badge = cur && cur.fan.length ? `<span class="ts-head">今年：${cur.fan[0].split('・')[0]}</span>` : '';
+            window.__sfSel = { ts: 0, car: 0 };
+            document.getElementById('safetyOutput').innerHTML = wrapAccordion(`<span style="display:inline-flex; align-items:center;"><svg class="sec-ic ic-shield" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v5.5c0 4.4-3 8.1-7 9.5-4-1.4-7-5.1-7-9.5V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path class="ic-shield-ck" d="M8.5 12.2l2.4 2.4 4.6-4.8" fill="none" stroke="#2ed573" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/></svg>平安曆</span>${badge}`, `<div id="safetyBody">${renderSafetyHtml(sc)}</div>`, true);
+        } catch (e) { console.warn('平安提醒失敗:', e); document.getElementById('safetyOutput').innerHTML = ''; }
 
         const elementCount = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
         const elementSpecificShiShen = { '木': [], '火': [], '土': [], '金': [], '水': [] }; 
@@ -6160,7 +6478,7 @@ ${hpTxt}
                     </div>
                 </div>
         </div>`;
-        document.getElementById('energyDashboardOutput').innerHTML = wrapAccordion('<span style="flex:1; text-align:center;">⚡ 核心能量儀表板 ⚡</span>', dashboardHtml, true);
+        document.getElementById('energyDashboardOutput').innerHTML = wrapAccordion('<span style="flex:1; display:flex; align-items:center; justify-content:center;"><svg class="sec-ic ic-gauge" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 16.5a8.5 8.5 0 0 1 17 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/><path d="M3.5 16.5a8.5 8.5 0 0 1 13.2-7.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><g class="ic-needle"><line x1="12" y1="16.5" x2="12" y2="9" stroke="#ffb347" stroke-width="2" stroke-linecap="round"/></g><circle cx="12" cy="16.5" r="1.8" fill="currentColor"/></svg>核心能量儀表板</span>', dashboardHtml, true);
         try { initDashAnims(document.querySelector('#energyDashboardOutput .dash-anim')); }
         catch (e) { console.warn('儀表板動畫失敗:', e); const d = document.querySelector('#energyDashboardOutput .dash-anim'); if (d) d.classList.remove('anim-pending'); }
 
@@ -6427,7 +6745,7 @@ ${hpTxt}
         let lnKuAlerts = checkAdvancedTransitKu(lnZhi, '本年');
         let nextLnKuAlerts = checkAdvancedTransitKu(nyZhi, '次年');
 
-        document.getElementById('sikuOutput').innerHTML = wrapAccordion('📦 四庫雷達（辰戌丑未動態偵測）', `
+        document.getElementById('sikuOutput').innerHTML = (`
             <div class="score-box" style="text-align: left; padding: 15px; border-color: #555; background: rgba(0,0,0,0.2); margin-bottom: 0;">
                 <div style="font-size: 13px; line-height: 1.8;">
                     <b style="color:#ccc;">【原局內建狀態】</b><br>
@@ -6438,7 +6756,7 @@ ${hpTxt}
                     ${nextLnKuAlerts.length > 0 ? nextLnKuAlerts.join('<br>') : `<span style="color:#888; padding-left: 10px;">次年無引動</span>`}
                 </div>
             </div>
-        `, false);
+        `);
 
         // ===== 會合局／刑沖害：原局＋目前大運、流年、流月，一起掃描並標出互動柱 =====
         const nowBz = Solar.fromDate(new Date()).getLunar().getEightChar();
@@ -6586,7 +6904,7 @@ ${hpTxt}
         document.getElementById('dayunLiunianOutput').innerHTML = ''; // 大運流年時間軸已由歲運互動盤取代，不再顯示
 
         const monthlyHtml = generate12MonthTactics(dg, dz, mg, mz, tg, tz, yg, yz, dayElement, gender, daYunData);
-        document.getElementById('monthlyTacticsOutput').innerHTML = wrapAccordion('📅 流月趨勢掃描', monthlyHtml, false);
+        document.getElementById('monthlyTacticsOutput').innerHTML = wrapAccordion('<span style="display:inline-flex; align-items:center;"><svg class="sec-ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><line x1="3.5" y1="9.5" x2="20.5" y2="9.5" stroke="currentColor" stroke-width="2"/><line x1="8" y1="3" x2="8" y2="6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect class="ic-cal c0" x="6.0" y="12" width="3" height="2.6" rx=".6" fill="currentColor"/><rect class="ic-cal c1" x="10.5" y="12" width="3" height="2.6" rx=".6" fill="currentColor"/><rect class="ic-cal c2" x="15.0" y="12" width="3" height="2.6" rx=".6" fill="currentColor"/><rect class="ic-cal c3" x="6.0" y="16" width="3" height="2.6" rx=".6" fill="currentColor"/><rect class="ic-cal c4" x="10.5" y="16" width="3" height="2.6" rx=".6" fill="currentColor"/><rect class="ic-cal c5" x="15.0" y="16" width="3" height="2.6" rx=".6" fill="currentColor"/></svg>流月趨勢掃描</span>', monthlyHtml, false);
 
         window.currentBaziDataForAI = {
             gender: genderStr,
@@ -6610,7 +6928,8 @@ ${hpTxt}
             childScan: childScanPromptText,
             siblingScan: siblingScanPromptText,
             parentScan: parentScanPromptText,
-            spouseScan: spouseScanPromptText
+            spouseScan: spouseScanPromptText,
+            safetyScan: safetyPromptText
         };
 
         document.getElementById('resultBox').style.display = 'block';
@@ -6696,13 +7015,16 @@ ${hpTxt}
         lmTab: { all: '流月・總覽', love: '流月・感情', career: '流月・事業', wealth: '流月・財運', health: '流月・健康', family: '流月・家庭' },
         switchRelTab: { parents: '六親・父母', siblings: '六親・兄弟', marriage: '六親・婚姻', children: '六親・子女' },
         mgTab: { gong: '婚姻・夫妻宮', hp: '婚姻・合盤' },
-        tt2Tab: { nat: '天地通透・原局', dyn: '天地通透・歲運引動' },
+        tt2Tab: { nat: '自動偵測・通根透干', dyn: '自動偵測・歲運引動', siku: '自動偵測・四庫' },
         copyPromptForAI: { pro: '提詞・命師版', plain: '提詞・白話版' },
+        sfTab: { ts: '平安・安太歲', car: '平安・行車跌倒' },
+        sfPick: { ts: '平安・點年曆', car: '平安・點月曆' },
+        copyPartnerPrompt: { pro: '合盤・命師提詞', plain: '合盤・白話提詞' },
         aiGo: { gemini: '開啟AI・Gemini', chatgpt: '開啟AI・ChatGPT', claude: '開啟AI・Claude' }
     };
     const TRACK_FN = {
-        saveCurrentChartPrompt: '儲存命盤', loadSavedChart: '載入命盤', savePartner: '合盤・計算', copyPartnerPrompt: '合盤・相處提詞',
-        yyToggle: '姻緣時機・展開流月', stOvOpen: '手動調整強弱', addFriend: '人際・新增朋友', selectFriend: '人際・查看朋友',
+        saveCurrentChartPrompt: '儲存命盤', loadSavedChart: '載入命盤', savePartner: '合盤・計算', 
+        yyToggle: '姻緣時機・展開流月', sfMore: '平安・命師詳細', stOvOpen: '手動調整強弱', addFriend: '人際・新增朋友', selectFriend: '人際・查看朋友',
         lwPick: '流日・點日期', lwCalPick: '流日・月曆點日期', lwZhPick: '流日・轉職點月份', iaSetMode: '歲運互動盤', iaScope: '歲運互動盤',
         iaPickDy: '歲運互動盤', iaPickLn: '歲運互動盤', iaPickLm: '歲運互動盤', baziPickYear: '手動八字・選年份', toggleLocAdv: '出生地校正'
     };
@@ -6791,7 +7113,10 @@ ${d.parentScan || '無'}
 【7. 婚姻】
 ${d.spouseScan || '無'}
 姻緣時機（未來 10 年）：
-${d.yinyuan || '無'}`;
+${d.yinyuan || '無'}
+
+【8. 平安提醒】
+${d.safetyScan || '無'}`;
     }
 
     const PROMPT_RULES = `# 使用規則（請先讀完再開始）
@@ -6818,6 +7143,7 @@ ${d.yinyuan || '無'}`;
   梟神奪食 → 比劫通關（梟印生比劫、比劫生食神），或財制梟印；
   其他相剋組合依同一原則類推；只指出通關或制化的十神與五行，不宣告用神、喜神。
 - 家人星所在柱的地支被歲運沖、或驛馬刑（寅申巳亥）→ 提醒出入安全；被四庫刑（辰戌丑未）→ 提醒健康檢查。
+- 平安提醒：行車・跌倒＝歲運地支沖原局任一柱，或湊齊三刑（寅巳申、丑戌未，至少一字來自歲運）；原局驛馬（寅申巳亥）2 個以上或原局有沖，屬本身較易奔波、須注意交通。犯太歲＝流年與年支（生肖）同支、相沖、相刑（含子卯刑、自刑）；太歲引動＝流年沖、刑月日時支，力道較輕。
 - 姻緣時機：「姻緣」＝流年天干或地支本氣為夫妻星；「三合」＝原局年支（生肖）＋流年＋原局其他地支或大運地支，湊成完整三合；「爛桃花」＝同一柱夫妻星與比劫並見。`;
 
     const PROMPT_TASK_PRO = `# 你的任務：命師版深度解析
@@ -6841,9 +7167,10 @@ ${d.yinyuan || '無'}`;
 6. 兄弟（【5】）：比劫星在原局的強弱與狀態；每個觸發時間點對應的手足變動；比劫對命主是助力還是消耗，依原局結構說明，不宣告喜忌。
 7. 父母（【6】）：母星、父星的位置與狀態；每個觸發時間點依規則提醒出入安全或健康檢查。
 8. 婚姻（【7】）：夫妻星位置（年齡差、距離日主）與通根；原局夫妻宮與夫妻星所在柱的刑沖害代表的感情模式；歲運觸發與姻緣時機中最值得注意的年份與月份。
-9. 深度追問：依命盤中尚未解開的庫或刑沖，提出 2 個最值得命主補充現實資訊、再進一步追問的問題。
+9. 平安提醒（【8】）：行車與跌倒（含家中長輩）要留意的大運、流年、流月，原局本身的沖或驛馬多也要點出；安太歲列出犯太歲的年份與原因，引動的年份輕描即可。語氣以提醒為主，不嚇人。
+10. 深度追問：依命盤中尚未解開的庫或刑沖，提出 2 個最值得命主補充現實資訊、再進一步追問的問題。
 
-篇幅：約 3000～4500 字。若一次寫不完，先完成 0～4，結尾寫「回覆『繼續』完成 5～9」。`;
+篇幅：約 3000～4500 字。若一次寫不完，先完成 0～4，結尾寫「回覆『繼續』完成 5～10」。`;
 
     const PROMPT_TASK_PLAIN = `# 你的任務：白話版解析
 角色：你是把八字講成白話的命理顧問，讀者完全沒有命理背景。請以繁體中文回答，像朋友聊天一樣清楚、溫和但直接。
@@ -6859,7 +7186,7 @@ ${d.yinyuan || '無'}`;
    針對最大的盲點，寫「怎麼改善」：依判讀規則的通關／制化對照找出化解的力量，但用生活語言寫成 2～3 個具體做法（例如養成什麼習慣、用什麼方式工作、找什麼樣的人合作），不要出現術語。
 2. 工作與賺錢：適合的工作環境與賺錢方式；要避開的地雷。
 3. 感情與婚姻：容易吸引的伴侶類型、相處上要注意的地方；未來幾年感情較有機會、或需要多留意的年份。
-4. 家人：父母、兄弟姊妹、子女，只講需要留意的時間點與一句提醒。
+4. 家人與平安：父母、兄弟姊妹、子女，只講需要留意的時間點與一句提醒；再依【8】說明哪幾年犯太歲（要不要安太歲）、哪些時間出門開車或長輩要特別小心跌倒。
 5. 接下來 12 個月：先用 2～3 個已過的月份讓讀者對照看準不準；再用表格列出未來 12 個月（月份｜主題｜一句建議），沒有特別事件的月份可以合併。
 6. 現在就能做的 3 件事。
 
@@ -6878,9 +7205,13 @@ ${buildPromptData(data)}
 
 # 再次提醒
 以上資料為系統精算結果，請直接解讀，不要重新排盤，不要推定用神忌神。請依「你的任務」開始撰寫。`;
+        copyWithAiGo(prompt, btn, 'aiGo', `✅ 已複製${mode === 'plain' ? '白話' : '命師'}提詞`);
+    }
+    // 複製文字 → 按鈕顯示已複製 → 打開指定的 AI 選擇框
+    function copyWithAiGo(text, btn, panelId, title) {
         const done = () => {
-            const go = document.getElementById('aiGo');
-            if (go) { document.getElementById('aiGoTitle').textContent = `✅ 已複製${mode === 'plain' ? '白話' : '命師'}提詞`; go.style.display = 'block'; }
+            const go = document.getElementById(panelId);
+            if (go) { const t = go.querySelector('.ai-go-title'); if (t) t.textContent = title; go.style.display = 'block'; }
             if (!btn) return;
             const t = btn.querySelector('.ab-t') || btn, original = t.innerHTML;
             t.innerHTML = '✅ 已複製'; btn.classList.add('copied');
@@ -6889,12 +7220,12 @@ ${buildPromptData(data)}
         const fallback = () => {
             try {
                 const ta = document.createElement('textarea');
-                ta.value = prompt; ta.style.position = 'absolute'; ta.style.left = '-9999px';
+                ta.value = text; ta.style.position = 'absolute'; ta.style.left = '-9999px';
                 document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done();
             } catch (err) { console.error('複製失敗:', err); alert('複製失敗，請檢查瀏覽器權限或換個瀏覽器試試。'); }
         };
-        window.__lastPrompt = prompt;
-        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(prompt).then(done, fallback); else fallback();
+        window.__lastPrompt = text;
+        if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
     }
 
 </script>
