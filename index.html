@@ -1024,10 +1024,9 @@
         .who-empty { font-size:13px; color:#999; padding:10px 12px; }
         .who-empty small { color:#666; font-size:11px; }
         .act-row1 { grid-template-columns:1fr; }
-        .fab-ai { color:#c792ea !important; border-color:rgba(199,146,234,.55) !important; box-shadow:0 4px 16px rgba(0,0,0,.5), 0 0 10px rgba(199,146,234,.22) !important; font-size:15px !important; }
-        .fab-ai.on { background:#c792ea !important; color:#111 !important; }
-        .ai-pop { display:none; position:fixed; right:max(10px, calc(50% - 280px + 10px)); bottom:calc(86px + env(safe-area-inset-bottom)); z-index:902; width:min(calc(100% - 84px), 380px); box-sizing:border-box;
-            padding:12px; border-radius:16px; background:rgba(24,27,30,.97); border:1px solid rgba(199,146,234,.35); box-shadow:0 10px 32px rgba(0,0,0,.6); margin-right:62px; animation: actIn .2s ease-out; }
+
+        .ai-pop { display:none; position:fixed; right:max(10px, calc(50% - 280px + 10px)); bottom:calc(86px + env(safe-area-inset-bottom)); z-index:902; width:min(calc(100% - 20px), 380px); box-sizing:border-box;
+            padding:12px; border-radius:16px; background:rgba(24,27,30,.97); border:1px solid rgba(199,146,234,.35); box-shadow:0 10px 32px rgba(0,0,0,.6); margin-bottom:54px; animation: actIn .2s ease-out; }
         .ai-pop.on { display:block; }
         body.mini-on .ai-pop { bottom:calc(94px + var(--mini-h, 150px) + env(safe-area-inset-bottom)); }
         .ai-pop-h { display:flex; justify-content:space-between; align-items:center; font-size:15px; color:#e3c4f7; }
@@ -1055,10 +1054,22 @@
         body.has-bnav.sheet-open .cs-mask { display:block; position:fixed; inset:0; z-index:940; background:rgba(0,0,0,.55); }
         body.has-bnav .chart-sheet .site-foot { margin-top:18px; }
         /* 懸浮按鈕群 */
-        .fab-stack { position:fixed; right:max(14px, calc(50% - 280px + 14px)); bottom:calc(86px + env(safe-area-inset-bottom)); z-index:901; flex-direction:column; gap:10px; }
+        .fab-stack { position:fixed; right:max(14px, calc(50% - 280px + 14px)); bottom:calc(86px + env(safe-area-inset-bottom)); z-index:903; flex-direction:column; align-items:flex-end; gap:8px; }
         body.mini-on .fab-stack { bottom:calc(94px + var(--mini-h, 150px) + env(safe-area-inset-bottom)); }
-        .fab-stack .mini-fab { position:static; display:flex; align-items:center; justify-content:center; }
-        .fab-chart { color:#ffd166 !important; border-color:rgba(255,209,102,.55) !important; box-shadow:0 4px 16px rgba(0,0,0,.5), 0 0 10px rgba(255,209,102,.2) !important; }
+        .fab-main { grid-column:auto; width:44px; height:44px; padding:0; margin:0; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:bold;
+            color:var(--accent); background:rgba(24,28,31,.92) !important; border:1px solid rgba(0,210,255,.5); box-shadow:0 4px 14px rgba(0,0,0,.5), 0 0 10px rgba(0,210,255,.22) !important; transform:none !important;
+            backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+        .fab-main .fm-close { display:none; font-size:16px; }
+        .fab-stack.open .fab-main { background:var(--accent) !important; color:#0a0a0a; }
+        .fab-stack.open .fab-main .fm-open { display:none; } .fab-stack.open .fab-main .fm-close { display:inline; }
+        .fab-items { display:none; flex-direction:column; align-items:flex-end; gap:8px; }
+        .fab-stack.open .fab-items { display:flex; animation: actIn .18s ease-out; }
+        .fab-pill { grid-column:auto; width:auto; margin:0; padding:9px 14px; display:flex; align-items:center; gap:7px; font-size:14px; font-weight:600; color:#e6eef1; white-space:nowrap;
+            background:rgba(24,28,31,.95) !important; border:1px solid rgba(0,210,255,.35); border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.5) !important; transform:none !important; }
+        .fab-pill i { font-style:normal; color:var(--accent); }
+        .fab-pill.fab-chart i { color:#ffd166; } .fab-pill.fab-ai i { color:#c792ea; }
+        .fab-pill.on { border-color:var(--accent); color:var(--accent); }
+
         .mbz-hid { display:flex; flex-direction:column; align-items:center; margin-top:2px; min-height:12px; }
         .mbz-hid i { font-style:normal; font-size:9.5px; color:#8a979d; line-height:1.25; white-space:nowrap; }
         .mbz-hid b { font-weight:600; margin-right:1px; }
@@ -7090,7 +7101,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.40';
+    const APP_VER = 'V3.41';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -7390,6 +7401,9 @@ ${d.safetyScan || '無'}`;
         el.innerHTML = `${window.__chartName ? `<b>${window.__chartName}</b>` : '<b>目前命盤</b>'}<span>${ps.join(' ')}・${sex}</span><i>▾</i>`;
         el.style.display = document.body.classList.contains('has-bnav') ? 'inline-flex' : 'none';
     }
+    function fabToggle() { const st = document.getElementById('fabStack'); st.classList.toggle('open'); if (st.classList.contains('open')) { whoMenuClose(); aiPopClose(); } }
+    function fabClose() { const st = document.getElementById('fabStack'); if (st) st.classList.remove('open'); }
+    document.addEventListener('click', (e) => { if (e.target.closest && !e.target.closest('#fabStack')) fabClose(); });
     function aiPopToggle() { const p = document.getElementById('aiPop'); if (p.classList.contains('on')) aiPopClose(); else { whoMenuClose(); p.classList.add('on'); document.getElementById('aiFab').classList.add('on'); } }
     function aiPopClose() { const p = document.getElementById('aiPop'); if (p) p.classList.remove('on'); const f = document.getElementById('aiFab'); if (f) f.classList.remove('on'); }
     function whoMenuToggle() {
@@ -7443,7 +7457,7 @@ ${d.safetyScan || '無'}`;
         if (!document.body.classList.contains('has-bnav')) return 230;
         const box = document.getElementById('liuriOutput');
         const disp = Math.max(640, (box && box.clientWidth) || 640), sc = disp / w;
-        const avail = window.innerHeight - 440;          // 標題列＋主題分頁＋當日小卡＋導覽列 約 440px
+        const avail = window.innerHeight - 500;          // 標題列＋主題分頁＋當日小卡＋導覽列＋懸浮鈕 約 500px
         return Math.round(Math.max(230, Math.min(640, avail / sc)));
     }
     function navGo(k) { window.__navTab = k; navApply(); navScrollTop(); }
@@ -7505,9 +7519,12 @@ ${buildPromptData(data)}
     </div>
 </div>
 <div class="fab-stack" id="fabStack" style="display:none;">
-    <button type="button" class="mini-fab fab-chart" id="chartFab" onclick="sheetOpen()"><span>命盤</span></button>
-    <button type="button" class="mini-fab fab-ai" id="aiFab" onclick="aiPopToggle()"><span>AI</span></button>
-    <button type="button" class="mini-fab" id="miniFab" onclick="miniToggle()"><span>八字</span></button>
+    <div class="fab-items">
+        <button type="button" class="fab-pill fab-chart" id="chartFab" onclick="fabClose(); sheetOpen()"><i>✎</i>命盤</button>
+        <button type="button" class="fab-pill fab-ai" id="aiFab" onclick="fabClose(); aiPopToggle()"><i>✦</i>AI 提詞</button>
+        <button type="button" class="fab-pill" id="miniFab" onclick="fabClose(); miniToggle()"><i>☰</i>小八字</button>
+    </div>
+    <button type="button" class="fab-main" id="fabMain" onclick="fabToggle()" aria-label="工具"><span class="fm-open">⋯</span><span class="fm-close">✕</span></button>
 </div>
 <nav class="bnav" id="bnav" style="display:none;" aria-label="主選單"></nav>
 </body>
