@@ -751,20 +751,20 @@
         .wish-note { font-size:11px; color:#7fdca4; margin:8px 0 10px; }
         .wish-send { grid-column:auto; width:100%; margin:0; padding:11px; font-size:15px; }
         .wish-send:disabled { opacity:.6; }
-        .share-opt { display:flex; align-items:center; justify-content:center; gap:7px; font-size:12px; color:#8a9aa2; cursor:pointer; user-select:none; }
-        .share-opt input { width:16px; height:16px; margin:0; accent-color:var(--accent); cursor:pointer; flex:none; display:block; }
-        .share-box { position:relative; display:inline-flex; border-radius:4px; flex:none; }
-        .share-opt:not(.on) .share-box { animation: sharePulse 1.6s ease-in-out infinite; }
-        .share-opt:not(.on) .share-txt { color:#cfe9f2; }
-        .share-opt.on .share-txt { color:#6f8792; }
-        .share-q::after { content:''; position:absolute; inset:-10px; }
-        .share-lbl { display:flex; align-items:center; gap:7px; cursor:pointer; }
-        @keyframes sharePulse {
+        .wx-copt { display:flex; align-items:center; justify-content:center; gap:7px; font-size:12px; color:#8a9aa2; cursor:pointer; user-select:none; }
+        .wx-copt input { width:16px; height:16px; margin:0; accent-color:var(--accent); cursor:pointer; flex:none; display:block; }
+        .wx-cbox { position:relative; display:inline-flex; border-radius:4px; flex:none; }
+        .wx-copt:not(.on) .wx-cbox { animation: wxPulse 1.6s ease-in-out infinite; }
+        .wx-copt:not(.on) .wx-ctxt { color:#cfe9f2; }
+        .wx-copt.on .wx-ctxt { color:#6f8792; }
+        .wx-cq::after { content:''; position:absolute; inset:-10px; }
+        .wx-clbl { display:flex; align-items:center; gap:7px; cursor:pointer; }
+        @keyframes wxPulse {
             0%, 100% { box-shadow: 0 0 0 2px rgba(0,210,255,.95), 0 0 10px 2px rgba(0,210,255,.8); }
             50% { box-shadow: 0 0 0 2px rgba(0,210,255,.95), 0 0 0 10px rgba(0,210,255,0); }
         }
-        @media (prefers-reduced-motion: reduce) { .share-opt:not(.on) .share-box { animation:none; box-shadow:0 0 0 2px rgba(0,210,255,.6); } }
-        .share-q { font-style:normal; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; position:relative; border-radius:50%; border:1px solid #4a5a62; color:#6f8792; font-size:10px; cursor:pointer; flex:none; }
+        @media (prefers-reduced-motion: reduce) { .wx-copt:not(.on) .wx-cbox { animation:none; box-shadow:0 0 0 2px rgba(0,210,255,.6); } }
+        .wx-cq { font-style:normal; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; position:relative; border-radius:50%; border:1px solid #4a5a62; color:#6f8792; font-size:10px; cursor:pointer; flex:none; }
         .saved-charts-list { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
         .saved-charts-label { font-size: 12px; color: #888; margin-right: 2px; }
         .saved-charts-empty { font-size: 12px; color: #666; }
@@ -1305,7 +1305,7 @@
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
         <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
         <div class="privacy-pill">🔒 排盤全程在你的瀏覽器內完成・生日與命盤不會上傳</div>
-        <div class="share-opt" id="shareOpt"><label class="share-lbl"><span class="share-box"><input type="checkbox" id="shareData" onchange="shareToggle(this)"></span><span class="share-txt">匿名分享功能使用次數，一起讓五行動能更好用</span></label><i class="share-q" data-tip="1" data-tip-html="只記錄「哪個功能被點了幾次」，以及使用者年齡層與性別，用來了解不同族群最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
+        <div class="wx-copt" id="wxCopt"><label class="wx-clbl"><span class="wx-cbox"><input type="checkbox" id="wxConsent" onchange="shareToggle(this)"></span><span class="wx-ctxt">匿名分享功能使用次數，一起讓五行動能更好用</span></label><i class="wx-cq" data-tip="1" data-tip-html="只記錄「哪個功能被點了幾次」，以及使用者年齡層與性別，用來了解不同族群最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
     </div>
     <div class="act-row act-row3" id="aiBtnContainer" style="display:none;">
         <button onclick="saveCurrentChartPrompt()" class="act-btn"><span class="ab-t">💾 儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
@@ -6998,10 +6998,10 @@ ${hpTxt}`;
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
     const APP_VER = 'V3.37';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
-    function shareOn() { const cb = document.getElementById('shareData'); return !!(cb && cb.checked); }
+    function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
         try { localStorage.setItem('bazi_share_ok', cb.checked ? '1' : '0'); } catch (e) {}
-        document.getElementById('shareOpt').classList.toggle('on', cb.checked);
+        document.getElementById('wxCopt').classList.toggle('on', cb.checked);
         if (!cb.checked) { __usage.ev = {}; return; } // 取消勾選：尚未送出的紀錄全部丟棄
         // 排盤後才勾選：補記目前這張盤的排盤
         if (window.currentBaziDataForAI && __chartTag.band !== '未排盤') track('排盤・' + ((document.querySelector('input[name="inputMode"]:checked') || {}).value === 'bazi' ? '手動八字' : '出生日期'));
@@ -7010,8 +7010,8 @@ ${hpTxt}`;
     (function () {
         let v = null; try { v = localStorage.getItem('bazi_share_ok'); } catch (e) {}
         const on = !(v === '0' || v === '');
-        document.getElementById('shareData').checked = on;
-        document.getElementById('shareOpt').classList.toggle('on', on);
+        document.getElementById('wxConsent').checked = on;
+        document.getElementById('wxCopt').classList.toggle('on', on);
     })();
     // 命盤年齡層與性別（只取區間，不取生日）
     let __chartTag = { band: '未排盤', sex: '' };
