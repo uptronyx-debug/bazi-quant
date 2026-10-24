@@ -514,6 +514,9 @@
         .lw-scroll > svg { min-width: 640px; }
         #liuriCard .liuri-advice-card { margin-top:10px; width:100%; }
         @media (min-width: 1000px) { .liuri-chart-wrap { max-width:none !important; } }
+        /* 小卡滑動：只交給程式處理左右，不讓整頁跟著橫向平移 */
+        html, body { overflow-x: clip; }
+        #liuriCard, #lcDetailWrap, #zhCard { touch-action: pan-y; overflow-x: hidden; overflow-x: clip; overscroll-behavior-x: none; }
         .swipe-l { animation: swL .28s ease-out; }
         .swipe-r { animation: swR .28s ease-out; }
         @keyframes swL { from { opacity:.3; transform: translateX(28px); } }
