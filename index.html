@@ -170,6 +170,14 @@
         .act-row3 .act-btn small { font-size:10px; font-weight:normal; color:#7f95a3; letter-spacing:0; }
         .copy-prompt-btn.copied { background:#2ed573 !important; color:#000 !important; }
         .copy-prompt-btn.copied small { color:#0b3d22 !important; }
+        .ai-go { margin:-8px 0 20px; padding:12px 14px; border:1px solid rgba(46,213,115,.45); border-radius:12px; background:rgba(46,213,115,.06); animation: actIn .25s ease-out; }
+        .ai-go-h { display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:bold; color:#2ed573; }
+        .ai-go-h i { font-style:normal; color:#777; cursor:pointer; padding:0 4px; }
+        .ai-go-sub { font-size:11.5px; color:#8a9aa2; margin:4px 0 10px; }
+        .ai-go-btns { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+        .ai-go-b { display:flex; align-items:center; justify-content:center; gap:6px; padding:10px 4px; border-radius:10px; border:1px solid color-mix(in srgb, var(--c) 60%, transparent); background:color-mix(in srgb, var(--c) 10%, #1a1a1a); color:#eee; text-decoration:none; font-size:14px; font-weight:bold; }
+        .ai-go-b b { color:var(--c); font-size:15px; }
+        .ai-go-b:hover { background:color-mix(in srgb, var(--c) 22%, #1a1a1a); }
         .copy-prompt-btn { background: #333; color: var(--accent); border: 1px solid var(--accent); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
         .copy-prompt-btn:hover { background: #444; transform: translateY(-2px); }
 
@@ -1182,6 +1190,15 @@
         <button onclick="saveCurrentChartPrompt()" class="act-btn"><span class="ab-t">💾 儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
         <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('pro', this)"><span class="ab-t">📋 命師提詞</span><small>請 AI 說明判斷依據</small></button>
         <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)"><span class="ab-t">📋 白話提詞</span><small>不含術語的白話解析</small></button>
+    </div>
+    <div class="ai-go" id="aiGo" style="display:none;">
+        <div class="ai-go-h"><span id="aiGoTitle">✅ 已複製提詞</span><i onclick="aiGoClose()">✕</i></div>
+        <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
+        <div class="ai-go-btns">
+            <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
+            <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="aiGo('chatgpt')" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
+            <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
+        </div>
     </div>
 
     <div class="result-box" id="resultBox">
@@ -6680,7 +6697,8 @@ ${hpTxt}
         switchRelTab: { parents: '六親・父母', siblings: '六親・兄弟', marriage: '六親・婚姻', children: '六親・子女' },
         mgTab: { gong: '婚姻・夫妻宮', hp: '婚姻・合盤' },
         tt2Tab: { nat: '天地通透・原局', dyn: '天地通透・歲運引動' },
-        copyPromptForAI: { pro: '提詞・命師版', plain: '提詞・白話版' }
+        copyPromptForAI: { pro: '提詞・命師版', plain: '提詞・白話版' },
+        aiGo: { gemini: '開啟AI・Gemini', chatgpt: '開啟AI・ChatGPT', claude: '開啟AI・Claude' }
     };
     const TRACK_FN = {
         saveCurrentChartPrompt: '儲存命盤', loadSavedChart: '載入命盤', savePartner: '合盤・計算', copyPartnerPrompt: '合盤・相處提詞',
@@ -6847,6 +6865,8 @@ ${d.yinyuan || '無'}`;
 
 篇幅：約 1500～2500 字。`;
 
+    function aiGoClose() { const g = document.getElementById('aiGo'); if (g) g.style.display = 'none'; }
+    function aiGo(name) { /* 連結本身會開新分頁；這裡只供功能統計辨識 */ }
     function copyPromptForAI(mode, btn) {
         const data = window.currentBaziDataForAI;
         if (!data || !data.pureTonggen) { alert('請先點擊「執行運算」產生完整的精算數據！'); return; }
@@ -6859,6 +6879,8 @@ ${buildPromptData(data)}
 # 再次提醒
 以上資料為系統精算結果，請直接解讀，不要重新排盤，不要推定用神忌神。請依「你的任務」開始撰寫。`;
         const done = () => {
+            const go = document.getElementById('aiGo');
+            if (go) { document.getElementById('aiGoTitle').textContent = `✅ 已複製${mode === 'plain' ? '白話' : '命師'}提詞`; go.style.display = 'block'; }
             if (!btn) return;
             const t = btn.querySelector('.ab-t') || btn, original = t.innerHTML;
             t.innerHTML = '✅ 已複製'; btn.classList.add('copied');
