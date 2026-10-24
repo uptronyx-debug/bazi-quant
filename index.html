@@ -2209,7 +2209,7 @@
         <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
         <div class="ai-go-btns">
             <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
-            <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="aiGo('chatgpt')" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
+            <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="return aiGo('chatgpt', event)" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
             <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
         </div>
     </div>`;
@@ -7620,7 +7620,24 @@ ${d.safetyScan || '無'}`;
     function navGo(k) { window.__navTab = k; navApply(); navScrollTop(); }
     function proGo(id) { window.__proSub = id; navApply(); navScrollTop(); }
     function aiGoClose() { const g = document.getElementById('aiGo'); if (g) g.style.display = 'none'; }
-    function aiGo(name) { /* 連結本身會開新分頁；這裡只供功能統計辨識 */ }
+    // iPhone／iPad：網址連結常被 Safari 或 LINE 內建瀏覽器直接開成網頁版，改先用 App 的網址協定喚起，
+    // 1.5 秒內頁面沒有切走（沒裝 App 或被擋）才開網頁版
+    function aiGo(name, ev) {
+        const ios = /iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        if (name !== 'chatgpt' || !ios || !ev) return true;
+        ev.preventDefault();
+        const web = ev.currentTarget.href;
+        let left = false;
+        const mark = () => { if (document.hidden) left = true; };
+        document.addEventListener('visibilitychange', mark);
+        window.addEventListener('pagehide', () => left = true, { once: true });
+        setTimeout(() => {
+            document.removeEventListener('visibilitychange', mark);
+            if (!left && !document.hidden) location.href = web;
+        }, 1500);
+        location.href = 'chatgpt://';
+        return false;
+    }
     function copyPromptForAI(mode, btn) {
         const data = window.currentBaziDataForAI;
         if (!data || !data.pureTonggen) { alert('請先點擊「執行運算」產生完整的精算數據！'); return; }
@@ -7667,7 +7684,7 @@ ${buildPromptData(data)}
             <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
             <div class="ai-go-btns">
                 <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
-                <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="aiGo('chatgpt')" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
+                <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="return aiGo('chatgpt', event)" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
                 <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
             </div>
         </div>
@@ -7687,7 +7704,7 @@ ${buildPromptData(data)}
         <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
         <div class="ai-go-btns">
             <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
-            <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="aiGo('chatgpt')" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
+            <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="return aiGo('chatgpt', event)" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
             <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
         </div>
     </div>
