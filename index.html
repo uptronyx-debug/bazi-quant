@@ -6170,6 +6170,7 @@ ${hpTxt}`;
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('<span style="display:inline-flex; align-items:center;"><svg class="sec-ic ic-pulse" viewBox="0 0 24 24" aria-hidden="true"><polyline points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".25"/><polyline class="ic-pulse-run" points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/></svg>流日動能</span>', body, true);
                 document.getElementById('liuriOutput').className = 'topic-' + topic;
+                setTimeout(() => { try { lwFit(); } catch (e) {} }, 40);
 
                 const todayIdx = days.findIndex(d => d.isToday);
                 // 折線點 ↔ 單張小卡：點哪天就顯示哪天；手機版圖表可橫向滑動
@@ -7101,7 +7102,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.41';
+    const APP_VER = 'V3.42';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -7455,10 +7456,29 @@ ${d.safetyScan || '無'}`;
     // 運勢頁：趨勢圖高度依螢幕剩餘空間拉長，讓畫面填滿到導覽列
     function lwTargetH(w) {
         if (!document.body.classList.contains('has-bnav')) return 230;
+        if (window.__lwFitH) return window.__lwFitH;
         const box = document.getElementById('liuriOutput');
         const disp = Math.max(640, (box && box.clientWidth) || 640), sc = disp / w;
         const avail = window.innerHeight - 500;          // 標題列＋主題分頁＋當日小卡＋導覽列＋懸浮鈕 約 500px
         return Math.round(Math.max(230, Math.min(640, avail / sc)));
+    }
+    // 依實際版面微調：讓當日小卡剛好停在「⋯」按鈕上方，不留大片空白
+    window.addEventListener('resize', () => { window.__lwFitH = 0; });
+    function lwFit() {
+        if (!document.body.classList.contains('has-bnav') || window.__navTab !== 'luck') return;
+        const wrap = document.querySelector('#liuriOutput .lw-scroll'), svg = wrap && wrap.querySelector('svg');
+        const card = document.getElementById('liuriCard'), nav = document.getElementById('bnav');
+        if (!svg || !card || !nav || !card.offsetHeight) return;
+        const navTop = nav.getBoundingClientRect().top;
+        const cardBottom = card.getBoundingClientRect().bottom + window.scrollY;      // 以頁面頂端為基準
+        const delta = (navTop - 62) - cardBottom;                                      // 62＝「⋯」按鈕的空間
+        if (Math.abs(delta) < 12) return;
+        const vb = svg.viewBox.baseVal, dispH = svg.getBoundingClientRect().height;
+        if (!vb || !dispH) return;
+        const sc = dispH / vb.height;
+        const next = Math.round(Math.max(230, Math.min(900, (dispH + delta) / sc)));
+        if (next === window.__lwLastH) return;
+        window.__lwFitH = next; window.__renderLiuri();
     }
     function navGo(k) { window.__navTab = k; navApply(); navScrollTop(); }
     function proGo(id) { window.__proSub = id; navApply(); navScrollTop(); }
@@ -7522,7 +7542,7 @@ ${buildPromptData(data)}
     <div class="fab-items">
         <button type="button" class="fab-pill fab-chart" id="chartFab" onclick="fabClose(); sheetOpen()"><i>✎</i>命盤</button>
         <button type="button" class="fab-pill fab-ai" id="aiFab" onclick="fabClose(); aiPopToggle()"><i>✦</i>AI 提詞</button>
-        <button type="button" class="fab-pill" id="miniFab" onclick="fabClose(); miniToggle()"><i>☰</i>小八字</button>
+        <button type="button" class="fab-pill" id="miniFab" onclick="fabClose(); miniToggle()"><i>☰</i>八字</button>
     </div>
     <button type="button" class="fab-main" id="fabMain" onclick="fabToggle()" aria-label="工具"><span class="fm-open">⋯</span><span class="fm-close">✕</span></button>
 </div>
