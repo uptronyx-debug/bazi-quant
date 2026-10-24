@@ -734,7 +734,23 @@
         .vc-panel img { height:18px; border-radius:3px; display:block; }
         .site-mail { font-size:12px; color:#6f8792; text-decoration:none; letter-spacing:.5px; }
         .site-mail:hover { color:var(--accent); }
-        .site-privacy { flex-basis:100%; width:100%; font-size:10.5px; color:#55666e; line-height:1.6; text-align:center; margin-top:4px; }
+        .tip-strong { display:block; margin:6px 0; padding:6px 8px; border-radius:6px; background:rgba(46,213,115,.12); color:#7fdca4; font-weight:bold; }
+        .site-privacy { flex-basis:100%; width:100%; font-size:10.5px; color:#6f8792; line-height:1.7; text-align:center; margin-top:4px; }
+        .site-privacy b { color:#7fdca4; font-size:11.5px; font-weight:600; }
+        .privacy-pill { justify-self:stretch; display:flex; justify-content:center; text-align:center; align-items:center; gap:6px; grid-column:span 2; font-size:12px; color:#7fdca4; background:rgba(46,213,115,.08); border:1px solid rgba(46,213,115,.35); border-radius:10px; padding:6px 12px; }
+        .wish-btn { grid-column:auto; width:auto; margin:0; padding:9px 18px; font-size:13px; font-weight:bold; color:#ffd166; background:rgba(255,209,102,.08); border:1px solid rgba(255,209,102,.45); border-radius:999px; box-shadow:none; }
+        .wish-btn:hover { background:rgba(255,209,102,.16); transform:none; }
+        .wish-mask { display:none; position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.65); align-items:center; justify-content:center; padding:16px; }
+        .wish-mask.on { display:flex; }
+        .wish-box { width:100%; max-width:420px; background:#1b1b1b; border:1px solid #333; border-radius:14px; padding:16px; box-shadow:0 10px 40px rgba(0,0,0,.6); animation: actIn .2s ease-out; }
+        .wish-h { display:flex; justify-content:space-between; align-items:center; font-size:15px; color:#ffd166; }
+        .wish-h i { font-style:normal; color:#888; cursor:pointer; padding:4px 6px; }
+        .wish-sub { font-size:12px; color:#999; margin:4px 0 10px; }
+        .wish-box textarea { width:100%; box-sizing:border-box; min-height:120px; resize:vertical; padding:10px; font-size:14px; background:#111; color:#eee; border:1px solid #333; border-radius:8px; font-family:inherit; }
+        .wish-box input { width:100%; box-sizing:border-box; margin-top:8px; padding:9px 10px; font-size:13px; background:#111; color:#eee; border:1px solid #333; border-radius:8px; }
+        .wish-note { font-size:11px; color:#7fdca4; margin:8px 0 10px; }
+        .wish-send { grid-column:auto; width:100%; margin:0; padding:11px; font-size:15px; }
+        .wish-send:disabled { opacity:.6; }
         .share-opt { display:flex; align-items:center; justify-content:center; gap:7px; font-size:12px; color:#8a9aa2; cursor:pointer; user-select:none; }
         .share-opt input { width:16px; height:16px; margin:0; accent-color:var(--accent); cursor:pointer; flex:none; display:block; }
         .share-box { position:relative; display:inline-flex; border-radius:4px; flex:none; }
@@ -1288,7 +1304,8 @@
 
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
         <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
-        <div class="share-opt" id="shareOpt"><label class="share-lbl"><span class="share-box"><input type="checkbox" id="shareData" onchange="shareToggle(this)"></span><span class="share-txt">匿名分享功能使用次數，一起讓五行動能更好用</span></label><i class="share-q" data-tip="只記錄「哪個功能被點了幾次」，以及命盤的年齡層（例如 30–39 歲）與性別，用來了解不同族群最需要哪些功能。不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰；隨時可以取消勾選。">?</i></div>
+        <div class="privacy-pill">🔒 排盤全程在你的瀏覽器內完成・生日與命盤不會上傳</div>
+        <div class="share-opt" id="shareOpt"><label class="share-lbl"><span class="share-box"><input type="checkbox" id="shareData" onchange="shareToggle(this)"></span><span class="share-txt">匿名分享功能使用次數，一起讓五行動能更好用</span></label><i class="share-q" data-tip="1" data-tip-html="只記錄「哪個功能被點了幾次」，以及使用者年齡層與性別，用來了解不同族群最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
     </div>
     <div class="act-row act-row3" id="aiBtnContainer" style="display:none;">
         <button onclick="saveCurrentChartPrompt()" class="act-btn"><span class="ab-t">💾 儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
@@ -1360,8 +1377,17 @@
             <span class="vc-dot"></span><span class="vc-lbl">VISITORS</span>
             <img loading="lazy" src="https://visitor-badge.laobi.icu/badge?page_id=uptronyx-debug.bazi-app&left_text=TOTAL&left_color=%230b1a22&right_color=%23007a94" alt="訪客累計人次">
         </div>
-        <a class="site-mail" href="mailto:zh.xd@msn.com">✉ zh.xd@msn.com</a>
-        <div class="site-privacy">排盤全程在你的瀏覽器內完成，生日與命盤不會上傳。勾選「匿名分享功能使用次數」後，只會送出功能名稱、點擊次數，以及命盤的年齡層與性別，用來決定下一步優先改進哪些功能。</div>
+        <button type="button" class="wish-btn" onclick="openWish()">💡 希望新增的功能</button>
+    </div>
+    <div class="wish-mask" id="wishMask" onclick="if(event.target===this)closeWish()">
+        <div class="wish-box" role="dialog" aria-labelledby="wishTitle">
+            <div class="wish-h"><b id="wishTitle">💡 希望新增的功能</b><i onclick="closeWish()">✕</i></div>
+            <div class="wish-sub">想看到什麼功能、哪裡不好用，都歡迎告訴我。</div>
+            <textarea id="wishText" maxlength="500" placeholder="例如：希望可以看流時、合盤可以存多個人…"></textarea>
+            <input type="text" id="wishContact" maxlength="80" placeholder="聯絡方式（選填，想收到回覆再填）">
+            <div class="wish-note">🔒 只會送出你在這裡填寫的文字，不含命盤資料。</div>
+            <button type="button" class="wish-send" id="wishSend" onclick="sendWish()">送出</button>
+        </div>
     </div>
     
 </div>
@@ -2419,7 +2445,7 @@ ${hpTxt}`;
         const hide = () => { if (tip) tip.style.display = 'none'; cur = null; };
         const show = (el) => {
             if (!tip) { tip = document.createElement('div'); tip.className = 'pt-tip'; document.body.appendChild(tip); }
-            tip.textContent = el.dataset.tip; tip.style.display = 'block'; cur = el;
+            if (el.dataset.tipHtml) tip.innerHTML = el.dataset.tipHtml; else tip.textContent = el.dataset.tip; tip.style.display = 'block'; cur = el;
             const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
             const left = Math.max(8, Math.min(window.innerWidth - tw - 8, r.left + r.width / 2 - tw / 2));
             const top = r.top - th - 6 < 8 ? r.bottom + 6 : r.top - th - 6;
@@ -6970,17 +6996,23 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.31';
+    const APP_VER = 'V3.37';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('shareData'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
-        try { localStorage.setItem('bazi_share_ok', cb.checked ? '1' : ''); } catch (e) {}
+        try { localStorage.setItem('bazi_share_ok', cb.checked ? '1' : '0'); } catch (e) {}
         document.getElementById('shareOpt').classList.toggle('on', cb.checked);
         if (!cb.checked) { __usage.ev = {}; return; } // 取消勾選：尚未送出的紀錄全部丟棄
         // 排盤後才勾選：補記目前這張盤的排盤
         if (window.currentBaziDataForAI && __chartTag.band !== '未排盤') track('排盤・' + ((document.querySelector('input[name="inputMode"]:checked') || {}).value === 'bazi' ? '手動八字' : '出生日期'));
     }
-    try { if (localStorage.getItem('bazi_share_ok') === '1') { document.getElementById('shareData').checked = true; document.getElementById('shareOpt').classList.add('on'); } } catch (e) {}
+    // 預設勾選；使用者曾經取消勾選（存成 '0' 或舊版的空字串）就尊重他的選擇
+    (function () {
+        let v = null; try { v = localStorage.getItem('bazi_share_ok'); } catch (e) {}
+        const on = !(v === '0' || v === '');
+        document.getElementById('shareData').checked = on;
+        document.getElementById('shareOpt').classList.toggle('on', on);
+    })();
     // 命盤年齡層與性別（只取區間，不取生日）
     let __chartTag = { band: '未排盤', sex: '' };
     function setChartTag() {
@@ -6996,6 +7028,19 @@ ${hpTxt}`;
         if (!shareOn() || !name) return;
         const k = `${__chartTag.band}|${__chartTag.sex}|${name}`;
         __usage.ev[k] = (__usage.ev[k] || 0) + 1;
+    }
+    // ===== 希望新增的功能（送到同一份試算表的「功能許願」分頁） =====
+    function openWish() { document.getElementById('wishMask').classList.add('on'); setTimeout(() => document.getElementById('wishText').focus(), 50); }
+    function closeWish() { document.getElementById('wishMask').classList.remove('on'); }
+    function sendWish() {
+        const t = document.getElementById('wishText'), c = document.getElementById('wishContact'), b = document.getElementById('wishSend');
+        const text = t.value.trim();
+        if (text.length < 2) { t.focus(); t.placeholder = '請先寫下你希望的功能'; return; }
+        b.disabled = true; b.textContent = '送出中…';
+        const body = JSON.stringify({ type: 'wish', ver: APP_VER, device: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '手機' : '電腦', text, contact: c.value.trim() });
+        const ok = () => { b.textContent = '✅ 已送出，謝謝你！'; t.value = ''; c.value = ''; setTimeout(() => { closeWish(); b.disabled = false; b.textContent = '送出'; }, 1400); };
+        try { fetch(SHARE_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body }).then(ok, () => { b.disabled = false; b.textContent = '送出失敗，請再試一次'; }); }
+        catch (e) { b.disabled = false; b.textContent = '送出失敗，請再試一次'; }
     }
     function flushUsage() {
         if (!shareOn() || !Object.keys(__usage.ev).length) return;
@@ -7024,7 +7069,7 @@ ${hpTxt}`;
     };
     const TRACK_FN = {
         saveCurrentChartPrompt: '儲存命盤', loadSavedChart: '載入命盤', savePartner: '合盤・計算', 
-        yyToggle: '姻緣時機・展開流月', sfMore: '平安・命師詳細', stOvOpen: '手動調整強弱', addFriend: '人際・新增朋友', selectFriend: '人際・查看朋友',
+        yyToggle: '姻緣時機・展開流月', openWish: '許願・開啟', sendWish: '許願・送出', sfMore: '平安・命師詳細', stOvOpen: '手動調整強弱', addFriend: '人際・新增朋友', selectFriend: '人際・查看朋友',
         lwPick: '流日・點日期', lwCalPick: '流日・月曆點日期', lwZhPick: '流日・轉職點月份', iaSetMode: '歲運互動盤', iaScope: '歲運互動盤',
         iaPickDy: '歲運互動盤', iaPickLn: '歲運互動盤', iaPickLm: '歲運互動盤', baziPickYear: '手動八字・選年份', toggleLocAdv: '出生地校正'
     };
