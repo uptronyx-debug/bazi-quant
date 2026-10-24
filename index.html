@@ -1041,6 +1041,8 @@
         .ai-pop-sub { font-size:11.5px; color:#8a979d; margin:4px 0 10px; }
         .ai-pop-btns { grid-template-columns:1fr 1fr; margin:0 0 4px; display:grid; gap:8px; }
         .ai-pop-btns .act-btn { font-size:13.5px; padding:10px 4px; white-space:nowrap; display:flex; flex-direction:column; align-items:center; gap:3px; line-height:1.2; }
+        .act-row1 .act-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; line-height:1.2; }
+        .act-row1 .act-btn small { display:block; font-size:10.5px; font-weight:normal; color:#7f95a3; letter-spacing:0; }
         .ai-pop-btns .act-btn small { font-size:10px; font-weight:normal; color:#7f95a3; }
         .ai-pop .ai-go { margin:10px 0 0; }
         .ask-open { grid-column:auto; width:100%; margin:0 0 10px; padding:11px 12px; display:flex; flex-direction:column; align-items:flex-start; gap:3px; text-align:left;
@@ -7520,8 +7522,7 @@ ${d.safetyScan || '無'}`;
         const list = getSavedCharts();
         m.innerHTML = (list.length ? list.map((it, i) => `<button type="button" class="who-it ${it.name === window.__chartName ? 'on' : ''}" onclick="whoMenuClose(); loadSavedChart(${i})">👤 ${it.name}</button>`).join('')
             : '<div class="who-empty">尚無儲存的命盤<br><small>在命盤裡按「儲存命盤」就會出現在這裡</small></div>')
-            + '<button type="button" class="who-it who-new" onclick="whoMenuClose(); sheetOpen()">＋ 新排盤</button>'
-            + '<button type="button" class="who-it who-share" onclick="shareChart(this)">🔗 分享此命盤連結<small>連結含生日資料，只傳給信任的人</small></button>';
+            + '<button type="button" class="who-it who-new" onclick="whoMenuClose(); sheetOpen()">＋ 新排盤</button>';
         m.classList.add('on');
     }
     function shareChart(btn) {
@@ -7531,8 +7532,10 @@ ${d.safetyScan || '無'}`;
             url = location.origin + location.pathname + '#c=' + btoa(unescape(encodeURIComponent(JSON.stringify(pay))));
         } catch (e) { return; }
         track('分享命盤連結');
-        const ok = () => { btn.innerHTML = '✅ 已複製連結，貼給朋友即可'; setTimeout(whoMenuClose, 1600); };
-        if (navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)) { navigator.share({ title: '五行動能・命盤', url }).then(() => whoMenuClose(), () => {}); return; }
+        const orig = btn.innerHTML;
+        const ok = () => { btn.innerHTML = '<i>✅</i>已複製連結'; setTimeout(() => { btn.innerHTML = orig; fabClose(); }, 1500); };
+        if (!window.__shareWarned) { window.__shareWarned = true; if (!confirm('分享連結會包含這張命盤的生日資料，只傳給信任的人。\n要繼續嗎？')) return; }
+        if (navigator.share && /iPhone|iPad|Android/i.test(navigator.userAgent)) { navigator.share({ title: '五行動能・命盤', url }).then(fabClose, () => {}); return; }
         if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(url).then(ok, () => prompt('複製這個連結：', url));
         else prompt('複製這個連結：', url);
     }
@@ -7694,6 +7697,7 @@ ${buildPromptData(data)}
         <button type="button" class="fab-pill fab-chart" id="chartFab" onclick="fabClose(); sheetOpen()"><i>✎</i>命盤</button>
         <button type="button" class="fab-pill fab-ai" id="aiFab" onclick="fabClose(); aiPopToggle()"><i>✦</i>AI 提詞</button>
         <button type="button" class="fab-pill" id="miniFab" onclick="fabClose(); miniToggle()"><i>☰</i>八字</button>
+        <button type="button" class="fab-pill" id="shareFab" onclick="event.stopPropagation(); shareChart(this)"><i>🔗</i>分享命盤</button>
     </div>
     <button type="button" class="fab-main" id="fabMain" onclick="fabToggle()" aria-label="工具"><span class="fm-open">⋯</span><span class="fm-close">✕</span></button>
 </div>
