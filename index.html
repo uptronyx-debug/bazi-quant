@@ -1036,6 +1036,26 @@
         .ai-pop-btns .act-btn { font-size:13.5px; padding:10px 4px; white-space:nowrap; display:flex; flex-direction:column; align-items:center; gap:3px; line-height:1.2; }
         .ai-pop-btns .act-btn small { font-size:10px; font-weight:normal; color:#7f95a3; }
         .ai-pop .ai-go { margin:10px 0 0; }
+        .ask-open { grid-column:auto; width:100%; margin:0 0 10px; padding:11px 12px; display:flex; flex-direction:column; align-items:flex-start; gap:3px; text-align:left;
+            background:linear-gradient(135deg, rgba(255,209,102,.16), rgba(199,146,234,.12)) !important; border:1px solid rgba(255,209,102,.5); border-radius:12px; color:#ffe2a0; box-shadow:none !important; transform:none !important; }
+        .ask-open b { font-size:15px; } .ask-open small { font-size:11px; font-weight:normal; color:#c9b88a; }
+        .ai-pop-sec { font-size:11px; color:#7f8c92; margin:2px 0 6px; letter-spacing:1px; }
+        .ask-mask { display:none; position:fixed; inset:0; z-index:9998; background:rgba(0,0,0,.65); align-items:flex-end; justify-content:center; }
+        .ask-mask.on { display:flex; }
+        .ask-box { width:min(100%, 560px); max-height:90vh; overflow-y:auto; box-sizing:border-box; padding:14px 16px calc(18px + env(safe-area-inset-bottom)); background:#1b1e20; border:1px solid #2e3438; border-bottom:none; border-radius:18px 18px 0 0; animation: actIn .2s ease-out; }
+        .ask-h { font-size:13px; font-weight:bold; color:#dfe6e9; margin:12px 0 6px; }
+        .ask-h small { font-weight:normal; color:#7f8c92; font-size:11px; margin-left:6px; }
+        .ask-chips { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+        .ask-chip { grid-column:auto; width:auto; margin:0; padding:7px 12px; font-size:13px; font-weight:normal; color:#b8c2c7; background:#141618 !important; border:1px solid #333a3e; border-radius:999px; box-shadow:none !important; transform:none !important; }
+        .ask-chip.on { color:#0a0a0a; background:var(--accent) !important; border-color:var(--accent); font-weight:600; }
+        .ask-cb { display:inline-flex; align-items:center; gap:5px; font-size:12.5px; color:#b8c2c7; margin-left:4px; }
+        .ask-cb input { width:15px; height:15px; margin:0; accent-color:var(--accent); }
+        .ask-box textarea { width:100%; box-sizing:border-box; min-height:64px; padding:9px 10px; font-size:14px; background:#111; color:#eee; border:1px solid #333; border-radius:8px; font-family:inherit; resize:vertical; }
+        .ask-input { width:100%; box-sizing:border-box; margin-top:8px; padding:9px 10px; font-size:13.5px; background:#111; color:#eee; border:1px solid #333; border-radius:8px; }
+        .ask-err { color:#ff8a8a; font-size:12px; min-height:16px; margin:6px 0 2px; }
+        .ask-go { grid-column:auto; width:100%; margin:4px 0 0; padding:12px; font-size:15px; }
+        .ask-go.copied { background:#2ed573 !important; color:#000 !important; }
+        .ask-box .ai-go { margin:12px 0 0; }
         .who-chip i { font-style:normal; color:#667; font-size:10px; }
         /* 儀表板頁：拿掉命盤表格底色框 */
         body.has-bnav .bazi-table-wrapper { background:transparent; padding:6px 0; margin-bottom:6px; }
@@ -5841,13 +5861,14 @@ ${hpTxt}`;
                 const topic = window.__lwTopic || 'cai';
                 // 桃花：夫妻星＝男看財（副食傷）、女看官殺（副財）；邏輯分別沿用財運、工作的掃法，不分身強身弱
                 const taoBase = gender === 1 ? 'cai' : 'work';
-                const T = topic === 'tao'
+                const TOF = (topic) => (topic === 'tao'
                     ? { c: '#ff7eb6', c2: '#b0527f', c3: '#ffc2dd', rgb: '255,126,182', hot: '桃花日', mark: '桃', energy: '夫妻星能量', hotShort: '桃花' }
                     : topic === 'work'
                     ? { c: '#5ab0ff', c2: '#3a6fa8', c3: '#a8d4ff', rgb: '90,176,255', hot: '官旺日', mark: '旺', energy: '官殺能量', hotShort: '官旺' }
                     : topic === 'ren'
                     ? { c: '#c792ea', c2: '#8a5fb0', c3: '#e3c4f7', rgb: '199,146,234', hot: '慎言日', mark: '慎', energy: '比劫能量', hotShort: '慎言' }
-                    : { c: '#ffb347', c2: '#c98a3a', c3: '#ffcf7a', rgb: '255,179,71', hot: '財旺日', mark: '旺', energy: '財星能量', hotShort: '財旺' };
+                    : { c: '#ffb347', c2: '#c98a3a', c3: '#ffcf7a', rgb: '255,179,71', hot: '財旺日', mark: '旺', energy: '財星能量', hotShort: '財旺' });
+                const T = TOF(topic);
                 const isHot = t => t === T.hot;
                 const topicEl = topic === 'tao' ? (gender === 1 ? wuxingRel[dayElement].ke : Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement)) : topic === 'work' ? Object.keys(wuxingRel).find(k => wuxingRel[k].ke === dayElement) : topic === 'ren' ? dayElement : wuxingRel[dayElement].ke;
                 if (typeof Solar === 'undefined') { document.getElementById('liuriOutput').innerHTML = ''; return; }
@@ -5863,7 +5884,7 @@ ${hpTxt}`;
                 const careerCtxOf = (year) => computeCareerContext(strengthLabel, totalScore, dayElement,
                     daYunData.find(x => year >= x.startYear && year < x.startYear + 10), baseGans, baseZhis, year);
                 // 財星能量＋三合三會加權＋破財
-                const fullDay = (bz, year) => {
+                const mkFullDay = (topic) => { const T = TOF(topic); return (bz, year) => {
                     const g = bz.getDayGan(), z = bz.getDayZhi();
                     const tk = topic === 'tao' ? taoBase : topic;
                     const w = tk === 'work' ? computeLiuriWork(g, z, dayGan, dayElement) : tk === 'ren' ? computeLiuriRen(g, z, dayGan, dayElement) : computeLiuriWealth(g, z, dayGan, dayElement);
@@ -5887,6 +5908,21 @@ ${hpTxt}`;
                         const sh = yySanhe(baseZhis[0], [dy ? dy.zhi : '', bz.getYearZhi(), bz.getMonthZhi(), z], z);
                         if (sh) { tao.he = `${sh}三合・生肖${baseZhis[0]}`; w.score = 100; w.hasMain = true; w.tier = T.hot; } }
                     return { g, z, w, ju, po, career, tao };
+                }; };
+                const fullDay = mkFullDay(topic);
+                // 提詞用：指定主題掃某一天
+                window.__liuriDay = (t, d) => mkFullDay(t)(Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0).getLunar().getEightChar(), d.getFullYear());
+                // 提詞用：未來 n 個月轉職分數
+                window.__careerMonths = (n) => {
+                    const out = [], t0 = new Date();
+                    for (let k = 0; k < n; k++) {
+                        const dm = new Date(t0.getFullYear(), t0.getMonth() + k, 15);
+                        const bz = Solar.fromYmdHms(dm.getFullYear(), dm.getMonth() + 1, 15, 12, 0, 0).getLunar().getEightChar();
+                        const cx = careerCtxOf(dm.getFullYear());
+                        const c = careerScore(bz.getYearGan(), bz.getYearZhi(), bz.getMonthGan(), bz.getMonthZhi(), cx, dayElement);
+                        out.push({ y: dm.getFullYear(), m: dm.getMonth() + 1, gz: bz.getMonthGan() + bz.getMonthZhi(), score: c.score, ok: c.ok, basis: cx.basis });
+                    }
+                    return out;
                 };
                 const dayInfo = (d) => fullDay(Solar.fromYmdHms(d.getFullYear(), d.getMonth() + 1, d.getDate(), 12, 0, 0).getLunar().getEightChar(), d.getFullYear());
                 window.__liuriDayInfo = dayInfo;
@@ -7102,7 +7138,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.42';
+    const APP_VER = 'V3.43';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -7177,7 +7213,7 @@ ${hpTxt}`;
     };
     const TRACK_FN = {
         saveCurrentChartPrompt: '儲存命盤', loadSavedChart: '載入命盤', savePartner: '合盤・計算', 
-        yyToggle: '姻緣時機・展開流月', openWish: '反饋・開啟', sendWish: '反饋・送出', sfMore: '平安・命師詳細', stOvOpen: '手動調整強弱', addFriend: '人際・新增朋友', selectFriend: '人際・查看朋友',
+        yyToggle: '姻緣時機・展開流月', openAsk: '問題提詞・開啟', openWish: '反饋・開啟', sendWish: '反饋・送出', sfMore: '平安・命師詳細', stOvOpen: '手動調整強弱', addFriend: '人際・新增朋友', selectFriend: '人際・查看朋友',
         lwPick: '流日・點日期', lwCalPick: '流日・月曆點日期', lwZhPick: '流日・轉職點月份', iaSetMode: '歲運互動盤', iaScope: '歲運互動盤',
         iaPickDy: '歲運互動盤', iaPickLn: '歲運互動盤', iaPickLm: '歲運互動盤', baziPickYear: '手動八字・選年份', toggleLocAdv: '出生地校正'
     };
@@ -7210,6 +7246,7 @@ ${hpTxt}`;
             baziData.pureChongxing = (window.__iaPromptText || {}).chong || '無';
             baziData.pure12Month = window.__lmPromptText || '無';
             try { baziData.yinyuan = window.__friendCtx ? yyPromptText(window.__friendCtx) : ''; } catch (e) { baziData.yinyuan = ''; }
+            try { baziData.careerText = askCareerText(); baziData.poDaysText = askPoDaysText(30); } catch (e) { baziData.careerText = ''; baziData.poDaysText = ''; }
             setChartTag();
             track('排盤・' + ((document.querySelector('input[name="inputMode"]:checked') || {}).value === 'bazi' ? '手動八字' : '出生日期'));
         }
@@ -7222,6 +7259,247 @@ ${hpTxt}`;
             whoRender();
         } catch (e) { console.warn('導覽失敗', e); }
     };
+
+
+    // ===================================================================
+    // 🎯 問題提詞：只帶相關資料、回答精簡（500～800 字）
+    // ===================================================================
+    const ASK_TOPICS = [
+        ['hunt', '找工作・第一份工作'], ['job', '要不要轉職、何時轉'], ['field', '適合的行業與方向'], ['exam', '考試・證照・升學'],
+        ['people', '職場與同儕人際'], ['love', '感情運（時機與相處）'], ['money', '存錢・賺錢與投資方式'],
+        ['trade', '短線交易破財提醒'], ['abroad', '出國・留學・搬家時機']
+    ];
+    const ASK_WORK = [['student', '學生'], ['grad', '應屆・找工作中'], ['exam', '準備考試'], ['job', '正職'], ['part', '兼職打工'], ['contract', '約聘派遣'],
+        ['civil', '公職・國營'], ['start', '創業'], ['free', '自由接案'], ['none', '待業']];
+    const ASK_WORK_DESC = { student: '學生', grad: '應屆畢業、正在找工作', exam: '正在準備考試（國考、證照或升學）', job: '正職上班族', part: '兼職或打工',
+        contract: '約聘或派遣人員', civil: '公職或國營事業', start: '創業中', free: '自由業或接案', none: '待業中' };
+    // 未來 n 個月的流月十神（供考試、出國、人際等題目判讀）
+    function askMonthTGText(n) {
+        const c = window.__friendCtx; if (!c) return '無';
+        const t0 = new Date(), out = [];
+        for (let k = 0; k < n; k++) {
+            const dm = new Date(t0.getFullYear(), t0.getMonth() + k, 15);
+            const bz = Solar.fromYmdHms(dm.getFullYear(), dm.getMonth() + 1, 15, 12, 0, 0).getLunar().getEightChar();
+            const mg = bz.getMonthGan(), mz = bz.getMonthZhi(), zm = zhiMainGan(mz);
+            const chong = (c.baseZhis || []).map((z, i) => zhiChongMap[mz] === z ? ['年', '月', '日', '時'][i] + '支' : '').filter(Boolean);
+            out.push(`- ${dm.getFullYear()}/${dm.getMonth() + 1}月 ${mg}${mz}：天干${getPreciseTenGod(mg, c.dg)}、地支${getPreciseTenGod(zm, c.dg)}${chong.length ? '；沖' + chong.join('、') : ''}`);
+        }
+        return out.join('\n');
+    }
+    function askLmBlocks() {
+        const out = {}; let cur = null;
+        String(window.__lmPromptText || '').split('\n').forEach(l => {
+            const h = l.match(/^(感情|事業|財運|健康|家庭)（/);
+            if (h) { cur = h[1]; out[cur] = []; } else if (cur && l.trim()) out[cur].push(l);
+        });
+        Object.keys(out).forEach(k => out[k] = out[k].join('\n'));
+        return out;
+    }
+    function askDays(t, n, pick) {
+        const res = [], t0 = new Date(); if (!window.__liuriDay) return res;
+        for (let i = 0; i < n; i++) {
+            const d = new Date(t0.getFullYear(), t0.getMonth(), t0.getDate() + i);
+            let fd; try { fd = window.__liuriDay(t, d); } catch (e) { continue; }
+            const r = pick(fd); if (r) res.push(`- ${d.getMonth() + 1}/${d.getDate()}（${'日一二三四五六'[d.getDay()]}）${fd.g}${fd.z}：${r}`);
+        }
+        return res;
+    }
+    function askCareerText() {
+        const ms = window.__careerMonths ? window.__careerMonths(12) : [];
+        if (!ms.length) return '無';
+        return `判斷基準（今年）：${ms[0].basis}\n` + ms.map(m => `- ${m.y}/${m.m}月 ${m.gz}：轉職分數 ${m.score}${m.ok ? '（≥60，適合轉職）' : ''}`).join('\n');
+    }
+    function askPoDaysText(n) {
+        const L = askDays('cai', n, fd => fd.po && fd.po.length ? '破財（' + fd.po.map(x => x.txt).join('；') + '）' : '');
+        return L.length ? L.join('\n') : '- 無';
+    }
+    function askHotDaysText(t, n) {
+        const L = askDays(t, n, fd => {
+            const tags = [];
+            if (fd.w && /旺日|桃花日|慎言日/.test(fd.w.tier)) tags.push(`${fd.w.tier} ${fd.w.score}`);
+            if (fd.tao && fd.tao.he) tags.push('生肖三合');
+            if (fd.tao && fd.tao.xing) tags.push('刑夫妻宮');
+            if (fd.tao && fd.tao.dong) tags.push('沖夫妻宮（變動）');
+            return tags.join('、');
+        });
+        return L.length ? L.join('\n') : '- 無';
+    }
+    function askBase(d) {
+        return `【命盤基礎】
+- 性別：${d.gender.replace('元', '')}；八字（年 月 日 時）：${d.pillars}；日主：${d.dayMaster}
+- 量化身強弱：${d.strength}（${d.totalScore} 分${d.autoStrength && d.autoStrength !== d.strength ? '；使用者手動調整，系統原判定為' + d.autoStrength : ''}）
+- 五行比例：木 ${d.elements['木']}%、火 ${d.elements['火']}%、土 ${d.elements['土']}%、金 ${d.elements['金']}%、水 ${d.elements['水']}%
+- 傳統格局：${d.geJu}（${d.geJuNote}）
+- 格局成敗：
+${d.geJuCombos}
+- 目前大運：${d.currentDaYun}；今年：${d.currentYear}`;
+    }
+    function buildAskPrompt(o) {
+        const d = window.currentBaziDataForAI; if (!d) return '';
+        const lm = askLmBlocks(), t = new Date();
+        const sec = [askBase(d)], need = new Set(o.topics), tasks = [];
+        const day = o.invest.includes('當沖'), short = o.invest.includes('短線') || day;
+        if (o.invest.includes('無')) o.invest = ['無'];
+        const other = (o.other || '').trim();
+        // 其他問題：關鍵字自動補資料
+        if (other) {
+            if (/搬|出國|開車|長輩|車|跌倒|太歲/.test(other)) need.add('_safe');
+            if (/小孩|懷孕|子女|生子/.test(other)) need.add('_child');
+            if (/爸|媽|父母|兄|弟|姊|妹/.test(other)) need.add('_family');
+            if (/結婚|另一半|桃花|感情|對象|分手|復合/.test(other)) need.add('love');
+            if (/工作|升遷|轉職|老闆|主管|創業|打工|兼職|求職|面試|找工作/.test(other)) need.add('job');
+            if (/考試|國考|證照|升學|學測|分科|研究所|讀書|申請/.test(other)) need.add('exam');
+            if (/同事|同學|朋友|人際|小人|室友/.test(other)) need.add('people');
+            if (/出國|留學|打工度假|搬|租屋|外地|移民|遠行|旅行/.test(other)) need.add('abroad');
+            if (/錢|投資|股票|基金|期貨|買房|財/.test(other)) need.add('money');
+        }
+        if (need.has('hunt')) need.add('job');
+        if (need.has('exam') || need.has('people') || need.has('abroad')) sec.push(`【未來 12 個月流月十神（官殺＝名份、錄取、上司；印＝讀書、長輩、資格；食傷＝表現、口才；比劫＝同儕、競爭；財＝收入、實務；沖＝變動）】\n${askMonthTGText(12)}`);
+        if (need.has('exam') || need.has('people')) need.add('field');
+        if (need.has('people')) sec.push(`【未來 30 天慎言日（比劫旺，同儕競爭、口舌較多）】\n${askHotDaysText('ren', 30)}`);
+        if (need.has('abroad')) need.add('_safe');
+        if (need.has('job')) sec.push(`【轉職分數（未來 12 個月；流年 40％＋流月 60％，≥60 適合轉職）】\n${askCareerText()}\n【事業流月】\n${lm['事業'] || '- 無'}`);
+        if (need.has('field') || need.has('money')) sec.push(`【天干通根】\n${d.pureTonggen}\n【藏干透干】\n${d.pureTougan}`);
+        if (need.has('love')) {
+            const spouseHead = String(d.spouseScan || '').split('大運觸發')[0].trim();
+            // 已存另一半資料、且命主有對象時，附上合盤條件
+            let hp = '';
+            try {
+                const pp = getPartner(), ctx = window.__friendCtx;
+                if (pp && ctx && o.love && o.love !== 's0') {
+                    const r = calcPartner(pp), h = hepanCalc(ctx, pp, r);
+                    hp = `\n【與對方的合盤條件（對方四柱 ${r.pillars.join(' ')}）】\n` + HP_ITEMS.map(([k, n]) => `${n}：${h.res[k] === null ? '無法判定' : (h.res[k] ? '是' : '否')}`).join('；');
+                }
+            } catch (e) {}
+            sec.push(`【夫妻星與夫妻宮】\n${spouseHead || '無'}\n【姻緣時機（未來 10 年）】\n${d.yinyuan || '無'}\n【感情流月】\n${lm['感情'] || '- 無'}\n【未來 30 天桃花日】\n${askHotDaysText('tao', 30)}${hp}`);
+        }
+        if (need.has('money')) sec.push(`【四庫】\n${d.pureSiku}\n【財運流月】\n${lm['財運'] || '- 無'}`);
+        if (need.has('trade')) sec.push(`【財運流月（破財月參考：比劫透干奪財、沖時柱）】\n${lm['財運'] || '- 無'}` + (short ? `\n【未來 ${day ? 30 : 14} 天破財日】\n${askPoDaysText(day ? 30 : 14)}\n【未來 ${day ? 30 : 14} 天財旺日】\n${askHotDaysText('cai', day ? 30 : 14)}` : ''));
+        if (other) sec.push(`【歲運引透與得根】\n${d.pureDynamic}\n【流月掃描（過去 6 個月＋未來 12 個月）】\n${d.pure12Month}`);
+        if (need.has('_safe')) sec.push(`【平安提醒】\n${d.safetyScan || '無'}`);
+        if (need.has('_child')) sec.push(`【子女】\n${d.childScan || '無'}`);
+        if (need.has('_family')) sec.push(`【父母】\n${d.parentScan || '無'}\n【兄弟】\n${d.siblingScan || '無'}`);
+
+        const st = [o.work ? `工作：${ASK_WORK_DESC[o.work] || o.work}${o.considering ? '，正在考慮轉職' : ''}` : '', (o.role || '').trim() ? `目前職務／產業：${o.role.trim()}` : '',
+            o.love ? `感情：${ASK_LOVE[o.love]}` : '', o.invest.length ? `投資風格：${o.invest.join('、')}` : ''].filter(Boolean);
+
+        if (o.topics.includes('hunt')) tasks.push(`【找工作・第一份工作】一句結論（近期好不好找）→ 未來 12 個月最適合投履歷、面試或到職的 2～3 個月份（逐月照抄轉職分數並引用事業流月依據）→ 第一份工作適合的環境類型（看格局與透干十神）→ 2 點求職建議。`);
+        if (o.topics.includes('exam')) tasks.push(`【考試・證照・升學】一句結論 → 未來 12 個月較適合衝刺、報名、應考的月份（印＝讀書吸收、官殺＝錄取名份、食傷＝臨場發揮；沖月支或日支的月份留意狀態起伏）→ 適合的讀書方式（依原局十神）→ 2 點建議。不要保證考上。`);
+        if (o.topics.includes('people')) tasks.push(`【職場與同儕人際】一句結論 → 和同儕（比劫）、上司或老師（官殺）、長輩（印）的相處模式各一句 → 未來 30 天容易起口舌的日子 → 2 點相處建議。`);
+        if (o.topics.includes('abroad')) tasks.push(`【出國・留學・搬家時機】一句結論 → 較適合出發、搬遷或送出申請的年份月份（驛馬、沖代表移動變動；流月十神輔助）→ 這段期間平安上要留意的月份 → 2 點建議。`);
+        if (o.topics.includes('job')) tasks.push(`【要不要轉職、何時轉】一句結論（現在適不適合動）→ 未來 12 個月中最適合的 2～3 個月份與原因 → 3 點具體建議${o.considering ? '（命主正在考慮轉職，請直接回答「要不要、何時」）' : ''}。`);
+        if (o.topics.includes('field')) tasks.push(`【適合的行業與方向】先只依格局、透干有根的十神與五行比例，列出 3 個適合的方向（各一句理由，具體到職務類型，不要只侷限在命主目前的產業）→ 1 個要避開的類型 → 最後一句說明命主目前的經驗可以怎麼銜接過去。不要推定用神。`);
+        if (o.topics.includes('love')) tasks.push(ASK_LOVE_TASK[o.love] || ASK_LOVE_TASK.s0);
+        if (o.topics.includes('money')) tasks.push(`【存錢・賺錢與投資方式】${['student', 'grad', 'part'].includes(o.work) ? '（命主剛起步，請把存第一桶金與預備金放在前面）' : ''}依財星強弱、食傷生財或比劫奪財、身強弱，判斷適合主動收入還是被動收入、風險承受度高低 → 3 個具體做法${st.length ? '（參考命主目前的工作與投資風格）' : ''}${o.invest.includes('打算嘗試') ? '；命主正打算開始投資，請給入門階段的注意事項' : ''}。`);
+        if (o.topics.includes('trade')) tasks.push(`【短線交易破財提醒】列出未來要特別小心的破財月份${short ? '與破財日' : ''}（表格：時間｜原因｜建議），再給 3 條交易紀律。請定位為「風險偏高、宜減碼或休息」的紀律提醒，不可當作買賣訊號或預測漲跌。`);
+        if (other) tasks.push(`【命主的問題】「${other}」：直接回答。若資料不足以判斷，請說明缺什麼，不要猜。`);
+        const len = Math.min(1000, 350 * Math.max(1, tasks.length) + 150);
+        const studentNote = ({
+            student: '\n命主是學生：建議以課業為優先；談到打工時，請提醒選擇合法、工時清楚的工作，未成年要留意勞動保障。',
+            grad: '\n命主是社會新鮮人：建議以累積經驗與穩定收入為優先，轉職分數在這裡解讀為「求職、到職」的時機。',
+            exam: '\n命主正在準備考試：時機建議以讀書、報名、應考為主軸。',
+            part: '\n命主目前是兼職或打工：可一併評估轉正職或增加收入的時機。',
+            contract: '\n命主是約聘或派遣：可一併評估爭取轉正、續約或換約的時機。',
+            civil: '\n命主在公職或國營體系：轉職分數請解讀為調動、升遷、考陞等職位變動的時機，不要建議輕易離開體制。',
+            start: '\n命主正在創業：轉職分數請解讀為擴張、轉型的時機；財務建議請以現金流與風險控管為主。',
+            free: '\n命主是自由業或接案：轉職分數請解讀為接大案、轉換主力業務的時機；收入波動較大，請重視預備金。',
+            none: '\n命主目前待業：請以「何時較容易找到工作」為主軸，避免只給長期建議。'
+        })[o.work] || '';
+
+        return `# 你的任務：回答命主的具體問題
+你是子平八字命理顧問。請以繁體中文回答，口吻像朋友般清楚直接，少用術語（必要時括號附一句白話）。
+${st.length ? '命主目前狀態：' + st.join('；') + studentNote + '\n' : ''}
+請只回答下列問題，不要另外寫性格分析或命盤總論：
+${tasks.map((x, i) => `${i + 1}. ${x}`).join('\n')}
+
+格式：每題用「## 標題」，第一句先講結論；時間點用條列或表格；全文約 ${len} 字以內。若需要命主補充資訊，統一放在全文最後，最多 2 個問題，不要穿插在答案中間。
+
+# 規則
+- 下方資料由量化八字系統精算完成，直接採用，不要重新排盤；不要推定用神、忌神，也不要說「需要某五行／某星來幫身」這類等同用神的話。
+- 量化身強弱與傳統格局是兩套獨立方法，不要互相解釋。
+- 求職、打工、轉職的時機看「轉職分數」與「事業流月」；「財運流月」只用來談收支與投資，不要拿來推求職時機。
+- 轉職分數：引用時數字必須和資料逐月一致，不可合併月份、取平均或自行估算；≥60 代表該月適合轉職。不需要列出全部 12 個月，只列重點月份（≥60、或有事業流月依據的月份）。
+- 破財日、破財月是風險提醒，不是必然發生。
+- 考試報名與考期、開學、求職旺季等實際時程以官方公告與市場為準；命盤月份只是輔助，若建議的月份和實際時程衝突（例如報名已截止），要直接指出。
+- 引用格局成敗時，若有破格（例如傷官見官、比劫奪財），要說明它對工作環境或做事方式的實際影響。
+- 只談收入與投資的「方式」和風險屬性，不可點名任何股票、ETF、基金、幣種、指數或金融商品，也不可給買賣建議。
+- 命盤不能判斷一個人的投資能力、市場直覺或交易天分，不要做這類宣稱；風險承受度只用「宜保守／中性」等建議語氣，並提醒以實際財務狀況為準。
+- 判斷轉職時機時，除了分數，再引用 1～2 個事業流月或四庫的依據（例如官殺引透、官庫被打開）說明原因。
+- 同一份資料（例如轉職分數表）全文只列一次，其他題直接引用結論，不要重複貼表。
+- 感情只能看時機與相處模式，無法保證對方的意願或結果，請據實說明；不要用某個時間點斷定「緣分已盡」。
+- 合盤條件不符合，只代表需要更多經營，不代表兩人不適合，請不要據此下「不合」的結論。
+- 感情題若有「未來 30 天桃花日」，請先點出最近的日子，再談較遠的月份。
+- 避免「極其」「強烈」「一定」這類絕對化用語；不要使用 LaTeX 或數學公式語法，直接寫「≥」或文字。
+
+# 命盤資料（今天：${t.getFullYear()}/${t.getMonth() + 1}/${t.getDate()}）
+${sec.join('\n\n')}`;
+    }
+    // ---- 問題提詞視窗 ----
+    const ASK_LOVE = { s0: '單身・沒有對象', s1: '單身・有曖昧或心儀對象', dating: '交往中', wed: '交往中・想結婚', married: '已婚', tense: '已婚或交往中・關係緊張',
+        back: '已分手・希望復合', remarry: '離婚或分居・想找下一段' };
+    const ASK_LOVE_TASK = {
+        s0: `【感情運何時到】最有機會的年份與月份（看姻緣時機與感情流月）→ 未來 30 天比較有桃花的日子 → 2 點增加機會的做法。`,
+        s1: `【感情運】命主有曖昧或心儀對象：何時適合告白或推進（優先看未來 30 天桃花日與近期姻緣月）、要避開的日子（刑夫妻宮），給 2 點建議；若有合盤條件，說明兩人契合的地方與要注意的地方。`,
+        dating: `【感情運】命主交往中：未來一年感情穩定與容易起摩擦的月份（刑沖夫妻宮），給 2 點經營建議；若有合盤條件一併說明。`,
+        wed: `【感情運】命主交往中、想結婚：適合談婚嫁、訂婚或登記的年份與月份（姻緣年、三合年優先，避開刑夫妻宮的月份）→ 2 點推進建議；若有合盤條件一併說明。`,
+        married: `【感情運】命主已婚：未來一年夫妻相處要留意的月份（刑沖夫妻宮）與 2 點經營建議，不要談桃花。`,
+        tense: `【感情運】命主目前關係緊張：說明衝突較高與較容易緩和的月份（刑＝口角糾結、沖＝變動）→ 原局夫妻宮的相處模式提醒 → 2 點修復建議；若有合盤條件，說明摩擦點在哪。`,
+        back: `【感情運】命主已分手、希望復合：說明比較有機會重新聯繫或復合的時間窗（姻緣月、合動或沖動夫妻宮的月份），以及原局夫妻宮是否有反覆分合的模式 → 誠實評估：命盤只能看時機，無法保證對方意願 → 2 點建議（包含何時該放下）；若有合盤條件，說明兩人本來的契合度。`,
+        remarry: `【感情運】命主離婚或分居、想找下一段：下一段緣分最有機會的年份與月份 → 這次要避免重蹈覆轍的相處重點（看原局夫妻宮刑沖）→ 2 點建議。`
+    };
+    function askLoad() { try { return JSON.parse(localStorage.getItem('bazi_ask_v1') || '{}'); } catch (e) { return {}; } }
+    function askSave(o) { try { localStorage.setItem('bazi_ask_v1', JSON.stringify({ topics: o.topics, work: o.work, considering: o.considering, role: o.role, love: o.love, invest: o.invest })); } catch (e) {} }
+    function openAsk() {
+        aiPopClose();
+        const o = Object.assign({ topics: [], work: '', considering: false, role: '', love: '', invest: [] }, askLoad());
+        const chip = (grp, v, n, on, multi) => `<button type="button" class="ask-chip ${on ? 'on' : ''}" data-g="${grp}" data-v="${v}" onclick="askPick(this, ${multi ? 1 : 0})">${n}</button>`;
+        document.getElementById('askBody').innerHTML = `
+            <div class="ask-h">想問什麼？<small>最多選 2 題</small></div>
+            <div class="ask-chips">${ASK_TOPICS.map(([k, n]) => chip('topics', k, n, o.topics.includes(k), 1)).join('')}</div>
+            <div class="ask-h">工作／身分<small>選填</small></div>
+            <div class="ask-chips">${ASK_WORK.map(([k, n]) => chip('work', k, n, o.work === k)).join('')}
+                <label class="ask-cb"><input type="checkbox" id="askConsider" ${o.considering ? 'checked' : ''}>正在考慮轉職</label></div>
+            <input type="text" id="askRole" class="ask-input" maxlength="40" placeholder="目前職務／產業（選填，例如：超商門市・5 年・正職）" value="${(o.role || '').replace(/"/g, '&quot;')}">
+            <div class="ask-h">感情<small>選填</small></div>
+            <div class="ask-chips">${[['s0', '單身・無對象'], ['s1', '單身・有對象'], ['dating', '交往中'], ['wed', '交往中・想結婚'], ['married', '已婚'], ['tense', '關係緊張'], ['back', '希望復合'], ['remarry', '離婚・想找下一段']].map(([k, n]) => chip('love', k, n, o.love === k)).join('')}</div>
+            <div class="ask-h">投資風格<small>可複選</small></div>
+            <div class="ask-chips">${['長線', '短線', '當沖', '打算嘗試', '無'].map(k => chip('invest', k, k, o.invest.includes(k), 1)).join('')}</div>
+            <div class="ask-h">其他問題<small>選填，100 字內</small></div>
+            <textarea id="askOther" maxlength="100" placeholder="例如：明年適合搬家嗎？"></textarea>
+            <div class="ask-err" id="askErr"></div>
+            <button type="button" class="ask-go" id="askGoBtn" onclick="askCopy(this)"><span class="ab-t">📋 產生並複製提詞</span></button>`;
+        document.getElementById('askMask').classList.add('on');
+        const g = document.getElementById('aiGoAsk'); if (g) g.style.display = 'none';
+    }
+    function closeAsk() { document.getElementById('askMask').classList.remove('on'); }
+    function askPick(btn, multi) {
+        const grp = btn.dataset.g;
+        if (multi) {
+            if (grp === 'topics' && !btn.classList.contains('on') && document.querySelectorAll('.ask-chip.on[data-g="topics"]').length >= 2) {
+                const e = document.getElementById('askErr'); e.textContent = '一次最多選 2 題，回答才會精簡'; setTimeout(() => e.textContent = '', 2000); return;
+            }
+            btn.classList.toggle('on');
+            // 投資風格：「無」與其他選項互斥
+            if (grp === 'invest' && btn.classList.contains('on')) {
+                document.querySelectorAll('.ask-chip[data-g="invest"]').forEach(b => { if (b !== btn && ((btn.dataset.v === '無') !== (b.dataset.v === '無'))) b.classList.remove('on'); });
+            }
+        } else {
+            const was = btn.classList.contains('on');
+            document.querySelectorAll(`.ask-chip[data-g="${grp}"]`).forEach(b => b.classList.remove('on'));
+            if (!was) btn.classList.add('on');
+        }
+    }
+    function askCopy(btn) {
+        const val = g => [...document.querySelectorAll(`.ask-chip.on[data-g="${g}"]`)].map(b => b.dataset.v);
+        const o = { topics: val('topics'), work: val('work')[0] || '', considering: document.getElementById('askConsider').checked, role: document.getElementById('askRole').value, love: val('love')[0] || '', invest: val('invest'), other: document.getElementById('askOther').value };
+        if (!o.topics.length && !o.other.trim()) { const e = document.getElementById('askErr'); e.textContent = '請至少選一題，或在「其他問題」輸入'; return; }
+        askSave(o);
+        const txt = buildAskPrompt(o);
+        if (!txt) { alert('請先執行運算'); return; }
+        o.topics.forEach(k => track('問題提詞・' + (ASK_TOPICS.find(x => x[0] === k) || [k, k])[1]));
+        if (o.other.trim()) track('問題提詞・其他問題');
+        copyWithAiGo(txt, btn, 'aiGoAsk', '✅ 已複製問題提詞');
+    }
 
     function buildPromptData(d) {
         const t = new Date();
@@ -7257,6 +7535,10 @@ ${d.pureDynamic}
 ${d.pureSiku}
 3-3 流月掃描（過去 6 個月＋未來 12 個月）：
 ${d.pure12Month}
+3-4 轉職分數（未來 12 個月；流年 40％＋流月 60％，≥60 適合轉職）：
+${d.careerText || '無'}
+3-5 未來 30 天破財日（財運流日）：
+${d.poDaysText || '無'}
 
 【4. 子女】
 ${d.childScan || '無'}
@@ -7283,6 +7565,8 @@ ${d.safetyScan || '無'}`;
 4. 標「已過」的時間點用來驗證，寫成「這段期間可能發生過…，可對照看看」；未來的時間點給提醒。每個推斷給 2～3 種可能情境，不要編造具體情節。
 5. 家人安全、健康相關只用「提醒留意、建議檢查」的語氣，不下斷言。
 6. 不要重抄資料本身，也不要解釋資料的定義。
+7. 避免「極其」「強烈」「一定」這類絕對化用語；不要使用 LaTeX 或數學公式語法，直接寫「≥」或文字。
+8. 不可點名任何股票、ETF、基金、指數或金融商品；命盤不能判斷投資能力或交易天分，不要做這類宣稱。
 
 # 判讀規則（系統依此產出資料，解讀時請沿用）
 - 宮位：年柱＝根基、祖上、父母宮；月柱＝事業宮、父母、兄弟；日支＝夫妻宮、自身；時柱＝子女宮、晚運。
@@ -7319,7 +7603,7 @@ ${d.safetyScan || '無'}`;
    接著針對原局最大盲點寫「改善方式」：依判讀規則的通關／制化對照，說明此盲點用哪個十神（五行）通關或制化；若【1】格局成敗已標出通關，直接引用並說明原局本身已有的化解力量；最後轉成現實上可執行的做法（行為習慣、工作方式、合作對象、環境選擇），每個做法對應到它代表的十神。
 2. 原生家庭：從年月柱的十神互動與刑沖合害，看家庭給的是支持還是消耗；從印星與財星的狀態，看金錢觀與安全感如何形成。
 3. 事業與財務：依原局結構與透干十神，給職涯環境建議；指出理財與重大決策上要防的十神風險（如比劫奪財、官殺壓身），對應【1】的破格標籤要明講。
-4. 近期動態（重點）：用【3-1】去年、今年、明年的引透得根，【3-2】開庫，【3-3】流月。先挑 2～3 個已過月份做驗證，再列出未來 6～12 個月最需要注意的月份，每個月份寫可能情境與行動建議；引動成格組合的時機宜把握，引動破格組合的時機宜防範。
+4. 近期動態（重點）：用【3-1】去年、今年、明年的引透得根，【3-2】開庫，【3-3】流月，【3-4】轉職分數，【3-5】破財日。先挑 2～3 個已過月份做驗證，再列出未來 6～12 個月最需要注意的月份，每個月份寫可能情境與行動建議；引動成格組合的時機宜把握，引動破格組合的時機宜防範。
 5. 子女（【4】）：依標籤解讀子女緣深淺（緣分輕薄時並列多種可能：晚得、子女早獨立、聚少離多、本人不想生育等）；子女個性只用「子女個性判讀柱」干支本身的五行陰陽推斷，不用命主十神；列出變動與得子時間窗口。不推斷性別、胎數。
 6. 兄弟（【5】）：比劫星在原局的強弱與狀態；每個觸發時間點對應的手足變動；比劫對命主是助力還是消耗，依原局結構說明，不宣告喜忌。
 7. 父母（【6】）：母星、父星的位置與狀態；每個觸發時間點依規則提醒出入安全或健康檢查。
@@ -7344,10 +7628,10 @@ ${d.safetyScan || '無'}`;
 2. 工作與賺錢：適合的工作環境與賺錢方式；要避開的地雷。
 3. 感情與婚姻：容易吸引的伴侶類型、相處上要注意的地方；未來幾年感情較有機會、或需要多留意的年份。
 4. 家人與平安：父母、兄弟姊妹、子女，只講需要留意的時間點與一句提醒；再依【8】說明哪幾年犯太歲（要不要安太歲）、哪些時間出門開車或長輩要特別小心跌倒。
-5. 接下來 12 個月：先用 2～3 個已過的月份讓讀者對照看準不準；再用表格列出未來 12 個月（月份｜主題｜一句建議），沒有特別事件的月份可以合併。
+5. 接下來 12 個月：先用 2 個已過的月份讓讀者對照看準不準；再用表格只列出有事件的月份（月份｜主題｜一句建議）。
 6. 現在就能做的 3 件事。
 
-篇幅：約 1500～2500 字。`;
+篇幅：約 1200～1500 字。`;
 
 
     // ===== 手機 App 式底部導覽：底部選大區，命師區上方再分頁 =====
@@ -7521,9 +7805,26 @@ ${buildPromptData(data)}
 </script>
 
 <div class="mini-bz" id="miniBz" style="display:none;"></div>
+<div class="ask-mask" id="askMask" onclick="if(event.target===this)closeAsk()">
+    <div class="ask-box">
+        <div class="wish-h"><b>🎯 問題提詞</b><i onclick="closeAsk()">✕</i></div>
+        <div id="askBody"></div>
+        <div class="ai-go" id="aiGoAsk" style="display:none;">
+            <div class="ai-go-h"><span class="ai-go-title">✅ 已複製提詞</span><i onclick="this.closest('.ai-go').style.display='none'">✕</i></div>
+            <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
+            <div class="ai-go-btns">
+                <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
+                <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="aiGo('chatgpt')" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
+                <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="ai-pop" id="aiPop">
     <div class="ai-pop-h"><b>🤖 AI 提詞</b><i onclick="aiPopClose()">✕</i></div>
     <div class="ai-pop-sub">複製後貼到 Gemini／ChatGPT／Claude，讓 AI 幫你解盤</div>
+    <button type="button" class="ask-open" onclick="openAsk()"><b>🎯 問題提詞</b><small>轉職、行業、感情、投資…只問你想知道的（約 500～800 字）</small></button>
+    <div class="ai-pop-sec">完整解盤（第一次看盤用）</div>
     <div class="act-row ai-pop-btns">
         <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('pro', this)"><span class="ab-t">📋 命師提詞</span><small>請 AI 說明判斷依據</small></button>
         <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)"><span class="ab-t">📋 白話提詞</span><small>不含術語的白話解析</small></button>
