@@ -166,8 +166,10 @@
         .act-btn { background: #333; color: var(--accent); border: 1px solid var(--accent); font-weight: bold; margin-top: 0; }
         @keyframes actIn { from { opacity: 0; transform: translateY(-4px); } }
         .act-row3 { grid-template-columns: repeat(3, 1fr); }
-        .act-row3 .act-btn { font-size: 13.5px; padding-left: 4px; padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .act-row3 .act-btn { font-size: 13.5px; padding-left: 4px; padding-right: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; line-height:1.2; }
+        .act-row3 .act-btn small { font-size:10px; font-weight:normal; color:#7f95a3; letter-spacing:0; }
         .copy-prompt-btn.copied { background:#2ed573 !important; color:#000 !important; }
+        .copy-prompt-btn.copied small { color:#0b3d22 !important; }
         .copy-prompt-btn { background: #333; color: var(--accent); border: 1px solid var(--accent); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); }
         .copy-prompt-btn:hover { background: #444; transform: translateY(-2px); }
 
@@ -722,6 +724,19 @@
         .vc-panel img { height:18px; border-radius:3px; display:block; }
         .site-mail { font-size:12px; color:#6f8792; text-decoration:none; letter-spacing:.5px; }
         .site-mail:hover { color:var(--accent); }
+        .site-privacy { flex-basis:100%; width:100%; font-size:10.5px; color:#55666e; line-height:1.6; text-align:center; margin-top:4px; }
+        .share-opt { display:flex; align-items:center; justify-content:center; gap:7px; font-size:12px; color:#8a9aa2; cursor:pointer; user-select:none; }
+        .share-opt input { width:16px; height:16px; margin:0; accent-color:var(--accent); cursor:pointer; flex:none; display:block; }
+        .share-box { position:relative; display:inline-flex; border-radius:4px; flex:none; }
+        .share-opt:not(.on) .share-box { animation: sharePulse 1.6s ease-in-out infinite; }
+        .share-opt:not(.on) > span:nth-child(2) { color:#cfe9f2; }
+        .share-opt.on > span:nth-child(2) { color:#6f8792; }
+        @keyframes sharePulse {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(0,210,255,.95), 0 0 10px 2px rgba(0,210,255,.8); }
+            50% { box-shadow: 0 0 0 2px rgba(0,210,255,.95), 0 0 0 10px rgba(0,210,255,0); }
+        }
+        @media (prefers-reduced-motion: reduce) { .share-opt:not(.on) .share-box { animation:none; box-shadow:0 0 0 2px rgba(0,210,255,.6); } }
+        .share-q { font-style:normal; display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; border:1px solid #4a5a62; color:#6f8792; font-size:10px; cursor:pointer; flex:none; }
         .saved-charts-list { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
         .saved-charts-label { font-size: 12px; color: #888; margin-right: 2px; }
         .saved-charts-empty { font-size: 12px; color: #666; }
@@ -1161,11 +1176,12 @@
 
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
         <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
+        <label class="share-opt" id="shareOpt"><span class="share-box"><input type="checkbox" id="shareData" onchange="shareToggle(this)"></span><span>匿名分享功能使用次數，一起讓五行動能更好用</span><i class="share-q" data-tip="只記錄「哪個功能被點了幾次」，以及命盤的年齡層（例如 30–39 歲）與性別，用來了解不同族群最需要哪些功能。不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰；隨時可以取消勾選。">?</i></label>
     </div>
     <div class="act-row act-row3" id="aiBtnContainer" style="display:none;">
-        <button onclick="saveCurrentChartPrompt()" class="act-btn">💾 儲存命盤</button>
-        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('pro', this)">📋 命師提詞</button>
-        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)">📋 白話提詞</button>
+        <button onclick="saveCurrentChartPrompt()" class="act-btn"><span class="ab-t">💾 儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
+        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('pro', this)"><span class="ab-t">📋 命師提詞</span><small>請 AI 說明判斷依據</small></button>
+        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)"><span class="ab-t">📋 白話提詞</span><small>不含術語的白話解析</small></button>
     </div>
 
     <div class="result-box" id="resultBox">
@@ -1216,6 +1232,7 @@
             <img loading="lazy" src="https://visitor-badge.laobi.icu/badge?page_id=uptronyx-debug.bazi-app&left_text=TOTAL&left_color=%230b1a22&right_color=%23007a94" alt="訪客累計人次">
         </div>
         <a class="site-mail" href="mailto:zh.xd@msn.com">✉ zh.xd@msn.com</a>
+        <div class="site-privacy">排盤全程在你的瀏覽器內完成，生日與命盤不會上傳。勾選「匿名分享功能使用次數」後，只會送出功能名稱、點擊次數，以及命盤的年齡層與性別，用來決定下一步優先改進哪些功能。</div>
     </div>
     
 </div>
@@ -6615,6 +6632,78 @@ ${hpTxt}
         return lines.length ? lines.join('\n') : '無';
     }
 
+    // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
+    const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
+    const APP_VER = 'V3.31';
+    const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
+    function shareOn() { const cb = document.getElementById('shareData'); return !!(cb && cb.checked); }
+    function shareToggle(cb) {
+        try { localStorage.setItem('bazi_share_ok', cb.checked ? '1' : ''); } catch (e) {}
+        document.getElementById('shareOpt').classList.toggle('on', cb.checked);
+        if (!cb.checked) { __usage.ev = {}; return; } // 取消勾選：尚未送出的紀錄全部丟棄
+        // 排盤後才勾選：補記目前這張盤的排盤
+        if (window.currentBaziDataForAI && __chartTag.band !== '未排盤') track('排盤・' + ((document.querySelector('input[name="inputMode"]:checked') || {}).value === 'bazi' ? '手動八字' : '出生日期'));
+    }
+    try { if (localStorage.getItem('bazi_share_ok') === '1') { document.getElementById('shareData').checked = true; document.getElementById('shareOpt').classList.add('on'); } } catch (e) {}
+    // 命盤年齡層與性別（只取區間，不取生日）
+    let __chartTag = { band: '未排盤', sex: '' };
+    function setChartTag() {
+        const mode = (document.querySelector('input[name="inputMode"]:checked') || {}).value, ny = new Date().getFullYear();
+        let by = NaN;
+        if (mode === 'date') by = parseInt(((document.getElementById('birthDate') || {}).value || '').slice(0, 4));
+        else { const v = parseInt((document.getElementById('baziYear') || {}).value); if (v && v !== ny) by = v; }
+        const age = ny - by;
+        const band = !(age >= 0 && age < 130) ? '不明' : age < 18 ? '未滿18' : age < 25 ? '18–24' : age < 30 ? '25–29' : age < 35 ? '30–34' : age < 40 ? '35–39' : age < 50 ? '40–49' : age < 60 ? '50–59' : '60以上';
+        __chartTag = { band, sex: (document.getElementById('gender') || {}).value === '0' ? '女' : '男' };
+    }
+    function track(name) {
+        if (!shareOn() || !name) return;
+        const k = `${__chartTag.band}|${__chartTag.sex}|${name}`;
+        __usage.ev[k] = (__usage.ev[k] || 0) + 1;
+    }
+    function flushUsage() {
+        if (!shareOn() || !Object.keys(__usage.ev).length) return;
+        const body = JSON.stringify({ sid: __usage.sid, ver: APP_VER, device: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '手機' : '電腦', events: __usage.ev });
+        __usage.ev = {};
+        try {
+            if (navigator.sendBeacon) navigator.sendBeacon(SHARE_URL, new Blob([body], { type: 'text/plain;charset=utf-8' }));
+            else fetch(SHARE_URL, { method: 'POST', mode: 'no-cors', keepalive: true, headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body }).catch(() => {});
+        } catch (e) {}
+    }
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushUsage(); });
+    window.addEventListener('pagehide', flushUsage);
+    // 點擊 → 功能名稱
+    const TRACK_MAP = {
+        lwTopic: { cai: '流日・財運', work: '流日・工作', ren: '流日・人際', tao: '流日・桃花' },
+        lwView: { d10: '流日・近日', cal: '流日・月曆', zh: '流日・轉職', cc: '流日・充能顏色', fr: '流日・朋友' },
+        lmTab: { all: '流月・總覽', love: '流月・感情', career: '流月・事業', wealth: '流月・財運', health: '流月・健康', family: '流月・家庭' },
+        switchRelTab: { parents: '六親・父母', siblings: '六親・兄弟', marriage: '六親・婚姻', children: '六親・子女' },
+        mgTab: { gong: '婚姻・夫妻宮', hp: '婚姻・合盤' },
+        tt2Tab: { nat: '天地通透・原局', dyn: '天地通透・歲運引動' },
+        copyPromptForAI: { pro: '提詞・命師版', plain: '提詞・白話版' }
+    };
+    const TRACK_FN = {
+        saveCurrentChartPrompt: '儲存命盤', loadSavedChart: '載入命盤', savePartner: '合盤・計算', copyPartnerPrompt: '合盤・相處提詞',
+        yyToggle: '姻緣時機・展開流月', stOvOpen: '手動調整強弱', addFriend: '人際・新增朋友', selectFriend: '人際・查看朋友',
+        lwPick: '流日・點日期', lwCalPick: '流日・月曆點日期', lwZhPick: '流日・轉職點月份', iaSetMode: '歲運互動盤', iaScope: '歲運互動盤',
+        iaPickDy: '歲運互動盤', iaPickLn: '歲運互動盤', iaPickLm: '歲運互動盤', baziPickYear: '手動八字・選年份', toggleLocAdv: '出生地校正'
+    };
+    document.addEventListener('click', (e) => {
+        if (!shareOn()) return;
+        const el = e.target.closest && e.target.closest('[onclick]'); if (!el) return;
+        const m = (el.getAttribute('onclick') || '').match(/([A-Za-z_]\w*)\(\s*['"]?([\w-]*)/);
+        if (!m) return;
+        const [, fn, arg] = m;
+        if (TRACK_MAP[fn]) track(TRACK_MAP[fn][arg] || fn);
+        else if (TRACK_FN[fn]) track(TRACK_FN[fn]);
+    }, true);
+    // 展開區塊（只算使用者點開，不算程式自動展開）
+    document.addEventListener('click', (e) => {
+        if (!shareOn()) return;
+        const sm = e.target.closest && e.target.closest('details.acc-section > summary'); if (!sm || sm.parentElement.open) return;
+        track('展開・' + sm.textContent.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}️▾⚡]/gu, '').replace(/\s+/g, '').slice(0, 20));
+    }, true);
+
     const calculateBazi = function() {
         calculateBaziCore(); 
         
@@ -6628,6 +6717,8 @@ ${hpTxt}
             baziData.pureChongxing = (window.__iaPromptText || {}).chong || '無';
             baziData.pure12Month = window.__lmPromptText || '無';
             try { baziData.yinyuan = window.__friendCtx ? yyPromptText(window.__friendCtx) : ''; } catch (e) { baziData.yinyuan = ''; }
+            setChartTag();
+            track('排盤・' + ((document.querySelector('input[name="inputMode"]:checked') || {}).value === 'bazi' ? '手動八字' : '出生日期'));
         }
 
         setTimeout(() => {
@@ -6769,9 +6860,9 @@ ${buildPromptData(data)}
 以上資料為系統精算結果，請直接解讀，不要重新排盤，不要推定用神忌神。請依「你的任務」開始撰寫。`;
         const done = () => {
             if (!btn) return;
-            const original = btn.innerHTML;
-            btn.innerHTML = '✅ 已複製'; btn.classList.add('copied');
-            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('copied'); }, 2500);
+            const t = btn.querySelector('.ab-t') || btn, original = t.innerHTML;
+            t.innerHTML = '✅ 已複製'; btn.classList.add('copied');
+            setTimeout(() => { t.innerHTML = original; btn.classList.remove('copied'); }, 2500);
         };
         const fallback = () => {
             try {
