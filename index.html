@@ -1567,8 +1567,155 @@
         .lx .lc-dt b { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:17px; }
         .lx .lw-line { color:#dfe4e6; font-size:12px; }
         .lx .lw-po-act { color:var(--lx-ink); opacity:.85; font-size:11.5px; margin-top:3px; line-height:1.55; }
+
+        /* ===== 平安 V2：與流日同一套語言，主色平安綠 ===== */
+        .sx { --ink:#f4f6f7; --mute:#aab4b9; --faint:#6f7a80; --line:#34404a; --surf:#232c33; --panel:#1c242a; --ok:#4fd88a; --warn:#f6b73c; --bad:#ff6550; --tc:var(--ok); font-variant-numeric:tabular-nums; }
+        .sx-tabs { display:flex; margin:0 0 14px; }
+        .sx-tab { all:unset; box-sizing:border-box; cursor:pointer; position:relative; padding:6px 12px 9px; font-size:15px; letter-spacing:1px; color:var(--mute); -webkit-tap-highlight-color:transparent; }
+        .sx-tab:first-child { padding-left:2px; }
+        .sx-tab.on { color:var(--ink); font-weight:600; }
+        .sx-tab.on::after { content:''; position:absolute; left:12px; right:12px; bottom:0; height:2px; border-radius:2px; background:var(--ok); }
+        .sx-tab:first-child.on::after { left:2px; }
+        .sx-tab:focus-visible { outline:1px solid var(--ok); outline-offset:2px; border-radius:4px; }
+        .sx-tip { font-size:12px; color:var(--mute); line-height:1.6; border-left:2px solid var(--warn); padding:2px 0 2px 10px; margin:-4px 0 12px; }
+        .sx-grid { display:grid; gap:6px; }
+        .sx-g5 { grid-template-columns:repeat(5, minmax(0,1fr)); }
+        .sx-g4 { grid-template-columns:repeat(4, minmax(0,1fr)); }
+        .sx-cell { all:unset; box-sizing:border-box; cursor:pointer; position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; gap:3px; padding:9px 2px 8px;
+            border-radius:12px; background:var(--panel); border:1px solid transparent; -webkit-tap-highlight-color:transparent; transition:border-color .15s, background .15s; }
+        .sx-cell::before { content:''; position:absolute; left:0; right:0; top:0; height:3px; background:transparent; }
+        .sx-cell.bad::before { background:var(--bad); }
+        .sx-cell.warn::before { background:var(--warn); }
+        .sx-cell.bad { background:color-mix(in srgb, var(--bad) 10%, var(--panel)); }
+        .sx-cell.sel { border-color:var(--ink); }
+        .sx-cell:focus-visible { outline:1px solid var(--ok); outline-offset:2px; }
+        .sx-y { font-size:11px; color:var(--mute); white-space:nowrap; display:flex; align-items:center; gap:3px; }
+        .sx-y i { font-style:normal; font-size:9px; color:var(--ok); }
+        .sx-gz { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:19px; letter-spacing:1px; line-height:1.15; }
+        .sx-st { font-size:11px; color:var(--faint); }
+        .sx-cell.ok .sx-st { color:var(--faint); }
+        .sx-cell.warn .sx-st { color:var(--warn); }
+        .sx-cell.bad .sx-st { color:var(--bad); font-weight:600; }
+        .sx-card { margin-top:12px; padding:13px 15px 12px; border-radius:16px; border:1px solid color-mix(in srgb, var(--tc) 32%, var(--line));
+            background:linear-gradient(150deg, color-mix(in srgb, var(--tc) 22%, var(--surf)) 0%, var(--surf) 60%); box-shadow:0 10px 30px rgba(0,0,0,.25); }
+        .sx-card.warn { --tc:var(--warn); } .sx-card.bad { --tc:var(--bad); } .sx-card.ok { --tc:var(--ok); }
+        .sx-top { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+        .sx-when { font-size:13px; color:var(--ink); letter-spacing:.5px; display:flex; align-items:center; gap:8px; }
+        .sx-when em { font-style:normal; font-size:11px; color:var(--ok); border:1px solid color-mix(in srgb, var(--ok) 45%, transparent); border-radius:4px; padding:0 5px; line-height:17px; }
+        .sx-badge { font-size:11px; color:var(--tc); border:1px solid color-mix(in srgb, var(--tc) 50%, transparent); border-radius:999px; padding:1px 9px; white-space:nowrap; }
+        .sx-range { font-size:11px; color:var(--mute); white-space:nowrap; }
+        .sx-main { display:flex; align-items:flex-end; justify-content:space-between; margin:8px 0 8px; }
+        .sx-big { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:30px; letter-spacing:4px; line-height:1; }
+        .sx-verdict { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:22px; color:var(--tc); letter-spacing:1px; }
+        .sx-rows { margin:0; border-top:1px solid var(--line); padding-top:6px; }
+        .sx-rows > div { display:flex; gap:10px; font-size:12.5px; line-height:1.6; padding:2px 0; color:#dfe4e6; }
+        .sx-rows dt { flex:0 0 3.2em; color:var(--mute); font-size:12px; }
+        .sx-rows .bad dt { color:var(--bad); } .sx-rows .warn dt { color:var(--warn); }
+        .sx-rows dd { margin:0; }
+        .sx-advice { margin-top:6px; font-size:12px; color:var(--ink); opacity:.85; }
+        .sx-empty { border-top:1px solid var(--line); padding-top:8px; font-size:12px; color:var(--mute); }
+        .sx-legend { display:flex; flex-wrap:wrap; gap:4px 14px; margin:10px 2px 0; font-size:11px; color:var(--mute); }
+        .sx-legend span { display:inline-flex; align-items:center; gap:6px; }
+        .sx-legend i { width:12px; height:3px; border-radius:2px; display:inline-block; }
+        .sx-legend i.bad { background:var(--bad); } .sx-legend i.warn { background:var(--warn); }
+        .sx-more { all:unset; box-sizing:border-box; cursor:pointer; display:flex; justify-content:space-between; align-items:center; width:100%; margin-top:14px; padding:11px 14px;
+            border-radius:12px; background:var(--panel); color:var(--ink); font-size:13px; letter-spacing:.5px; }
+        .sx-more span { color:var(--mute); }
+        .sx-more:focus-visible { outline:1px solid var(--ok); }
+        .sx-pro { margin-top:8px; padding:4px 12px 8px; border-radius:12px; background:var(--panel); }
+        .sx-pro .rel-ev-block { border:none; background:none; padding:8px 0 4px; margin:0; border-bottom:1px solid var(--line); }
+        .sx-pro .rel-ev-block:last-child { border-bottom:none; }
+        .sx-pro .rel-ev-title { color:var(--ink); font-size:12.5px; font-weight:600; }
+        .sx-pro .tag { border-radius:4px; box-shadow:none; }
+        @media (max-width: 380px) { .sx-gz { font-size:17px; } .sx-g5 { gap:4px; } }
+
+        /* ===== 合盤 V2：與平安同一套語言，主色合盤粉 ===== */
+        .hx { --ink:#f4f6f7; --mute:#aab4b9; --faint:#6f7a80; --line:#34404a; --surf:#232c33; --panel:#1c242a; --pk:#ff7eb0; font-variant-numeric:tabular-nums; }
+        .hx-card { background:var(--panel); border-radius:16px; padding:13px 14px 14px; margin-bottom:10px; }
+        .hx-lbl { font-size:13px; color:var(--ink); font-weight:600; letter-spacing:.5px; margin-bottom:10px; display:flex; align-items:baseline; gap:8px; }
+        .hx-lbl small { font-size:11px; color:var(--faint); font-weight:normal; }
+        .hx .hx-input { margin:0; gap:8px; }
+        .hx .hx-input input, .hx .hx-input select { background:var(--surf); border:1px solid var(--line); border-radius:10px; color:var(--ink); }
+        .hx .hx-sex { background:var(--surf); border-color:var(--line); }
+        .hx .hx-sex button.on { background:var(--pk); color:#2a0d18; font-weight:600; }
+        .hx .hx-go { background:var(--pk); color:#2a0d18; font-weight:700; border:none; border-radius:10px; box-shadow:none; }
+        .hx .hx-go:hover { background:#ff95bf; transform:none; box-shadow:none; }
+        .hx-res { background:linear-gradient(150deg, color-mix(in srgb, var(--pk) 20%, var(--surf)) 0%, var(--surf) 60%); border:1px solid color-mix(in srgb, var(--pk) 30%, var(--line)); box-shadow:0 10px 30px rgba(0,0,0,.25); }
+        .hx-top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+        .hx-who { display:flex; align-items:center; gap:12px; }
+        .hx-el { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:34px; line-height:1; }
+        .hx-who b { display:block; font-size:12px; color:var(--mute); font-weight:normal; letter-spacing:.5px; }
+        .hx-who div span { display:block; font-size:15px; color:var(--ink); font-weight:600; margin-top:3px; }
+        .hx .hx-del { all:unset; cursor:pointer; font-size:11.5px; color:var(--mute); border:1px solid var(--line); border-radius:999px; padding:3px 11px; }
+        .hx .hx-del.arm { color:#ff6550; border-color:#ff6550; }
+        .hx-note { font-size:11px; color:var(--faint); margin-top:8px; }
+        .hx-list { list-style:none; margin:10px 0 0; padding:9px 0 0; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:7px 10px; }
+        .hx-list li { display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--faint); }
+        .hx-list li i { flex-shrink:0; width:16px; height:16px; border-radius:50%; border:1.5px solid var(--line); display:inline-flex; align-items:center; justify-content:center; font-style:normal; font-size:10px; font-weight:700; }
+        .hx-list li.ok { color:var(--ink); }
+        .hx-list li.ok i { background:var(--pk); border-color:var(--pk); color:#2a0d18; }
+        .hx-list li.na i { border-style:dashed; color:var(--faint); }
+        .hx-prompts { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .hx .hx-pb { all:unset; box-sizing:border-box; cursor:pointer; position:relative; display:flex; flex-direction:column; gap:3px; padding:12px 34px 12px 14px; border-radius:14px; background:var(--panel);
+            -webkit-tap-highlight-color:transparent; transition:background .15s; }
+        .hx .hx-pb:hover { background:#222c33; }
+        .hx .hx-pb .ab-t { font-size:14px; font-weight:600; color:var(--ink); letter-spacing:.5px; }
+        .hx .hx-pb small { font-size:11px; color:var(--mute); }
+        .hx .hx-pb em { position:absolute; right:12px; top:50%; transform:translateY(-50%); font-style:normal; font-size:16px; color:var(--pk); }
+        .hx .hx-pb.copied { background:color-mix(in srgb, var(--pk) 16%, var(--panel)) !important; color:var(--ink) !important; border:none !important; box-shadow:none !important; }
+        .hx .hx-pb.copied .ab-t { color:var(--pk); }
+        .hx .hx-pb.copied small { color:var(--mute) !important; }
+        .hx .hx-pb:focus-visible { outline:1px solid var(--pk); outline-offset:2px; }
+        .hx .ai-go { margin-top:10px; background:var(--panel) !important; border:1px solid color-mix(in srgb, var(--pk) 35%, var(--line)) !important; border-radius:16px; box-shadow:none !important; }
+        .hx .ai-go .ai-go-title { color:var(--pk) !important; text-shadow:none !important; }
+        .hx .ai-go .ai-go-sub { color:var(--mute); }
+
+        /* ===== AI 提詞彈窗、懸浮選單、命盤輸入：與平安／合盤同一套 ===== */
+        .ai-pop { background:#1c242a !important; border:1px solid #34404a !important; border-radius:18px !important; box-shadow:0 18px 40px rgba(0,0,0,.55) !important; padding:14px 14px 12px !important; }
+        .ai-pop-h { color:#f4f6f7; font-size:15px; font-weight:600; letter-spacing:.5px; }
+        .ai-pop-h i { color:#aab4b9; }
+        .ai-pop-sub { color:#aab4b9; font-size:11.5px; }
+        .ai-pop .ask-open { all:unset; box-sizing:border-box; cursor:pointer; position:relative; display:flex; flex-direction:column; gap:3px; width:100%; padding:13px 34px 13px 14px; border-radius:14px;
+            background:linear-gradient(150deg, color-mix(in srgb, #f6b73c 24%, #232c33) 0%, #232c33 62%); border:1px solid color-mix(in srgb, #f6b73c 35%, #34404a); -webkit-tap-highlight-color:transparent; }
+        .ai-pop .ask-open b { font-size:15px; color:#f6b73c; letter-spacing:.5px; }
+        .ai-pop .ask-open small { font-size:11.5px; color:#dfe4e6; }
+        .ai-pop .ask-open em { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-style:normal; font-size:22px; color:#f6b73c; }
+        .ai-pop-sec { color:#aab4b9; font-size:11.5px; letter-spacing:.5px; margin:12px 2px 6px; }
+        .ai-pop-btns .act-btn { all:unset; box-sizing:border-box; cursor:pointer; position:relative; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:11px 30px 11px 13px; border-radius:14px; background:#232c33; -webkit-tap-highlight-color:transparent; }
+        .ai-pop-btns .act-btn .ab-t { font-size:14px; font-weight:600; color:#f4f6f7; }
+        .ai-pop-btns .act-btn small { font-size:11px; color:#aab4b9; }
+        .ai-pop-btns .act-btn em { position:absolute; right:11px; top:50%; transform:translateY(-50%); font-style:normal; font-size:15px; color:#5fc8e6; }
+        .ai-pop-btns .act-btn.copied { background:color-mix(in srgb, #5fc8e6 16%, #232c33) !important; color:#f4f6f7 !important; }
+        .ai-pop-btns .act-btn.copied .ab-t { color:#5fc8e6; }
+        .ai-pop-btns .act-btn.copied small { color:#aab4b9 !important; }
+        .ai-pop .ai-go { background:#232c33 !important; border:1px solid #34404a !important; border-radius:14px; box-shadow:none !important; }
+        .ai-pop .ai-go-title { color:#5fc8e6 !important; text-shadow:none !important; }
+        /* 右上常駐 AI 鈕 */
+        .hdr-ai { background:#232c33 !important; border:1px solid #34404a !important; color:#f4f6f7 !important; }
+        .hdr-ai::first-letter { color:#c49bff; }
+        /* 懸浮選單 */
+        .fab-pill { background:#1c242a !important; border:1px solid #34404a !important; box-shadow:0 8px 22px rgba(0,0,0,.45) !important; color:#f4f6f7 !important; }
+        .fab-pill i { color:#5fc8e6; }
+        .fab-pill.fab-chart i { color:#ffd166; } .fab-pill.fab-ai i { color:#c49bff; }
+        .fab-pill.on { border-color:#5fc8e6 !important; }
+        .fab-main { background:#1c242a !important; border:1px solid #34404a !important; box-shadow:0 8px 22px rgba(0,0,0,.5) !important; color:#5fc8e6 !important; }
+        .fab-stack.open .fab-main { background:#5fc8e6 !important; color:#0d1418 !important; border-color:#5fc8e6 !important; }
+        /* 命盤輸入（抽屜與首次輸入同一份表單） */
+        #chartSheet input:not([type=checkbox]):not([type=radio]), #chartSheet select { background:#232c33 !important; border:1px solid #34404a !important; border-radius:10px !important; color:#f4f6f7; }
+        #chartSheet .loc-f { background:#232c33 !important; border:1px solid #34404a !important; border-radius:10px !important; }
+        #chartSheet .loc-f input:not([type=checkbox]):not([type=radio]), #chartSheet .loc-f select { background:transparent !important; border:none !important; }
+        #chartSheet .mode-toggle { background:#1c242a; border:none; border-radius:12px; padding:4px; }
+        #chartSheet .mode-toggle-btn { border-radius:9px; color:#aab4b9; }
+        #chartSheet .mode-toggle-btn.active { background:#2f3a41; color:#f4f6f7; font-weight:600; }
+        #chartSheet details { background:#1c242a; border:none !important; border-radius:12px; }
+        #chartSheet .privacy-pill { background:rgba(79,216,138,.07) !important; border:none !important; border-radius:10px; color:#9fdcb8 !important; }
+        #chartSheet .cs-save { all:unset; box-sizing:border-box; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; padding:11px; border-radius:12px; background:#1c242a; }
+        #chartSheet .cs-save .ab-t { font-size:14px; font-weight:600; color:#f4f6f7; }
+        #chartSheet .cs-save small { font-size:11px; color:#aab4b9; }
+        body.has-bnav .chart-sheet { background:#161c20 !important; border-top:1px solid #34404a !important; }
+        body.has-bnav .cs-head { background:#161c20 !important; color:#f4f6f7; }
     </style>
-    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect\" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -1664,10 +1811,10 @@
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
         <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
         <div class="privacy-pill">🔒 排盤全程在你的瀏覽器內完成・生日與命盤不會上傳</div>
-        <div class="wx-copt" id="wxCopt"><label class="wx-clbl"><span class="wx-cbox"><input type="checkbox" id="wxConsent" onchange="shareToggle(this)"></span><span class="wx-ctxt">匿名分享使用情形，一起讓五行動能更好用</span></label><i class="wx-cq" data-tip="1" data-tip-html="記錄「哪個功能被點了幾次」、使用者年齡層與性別，裝置類型（手機或電腦、系統、瀏覽器），以及你在問題提詞自己填寫的職務與問題文字，用來了解大家最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
+        <div class="wx-copt" id="wxCopt"><label class="wx-clbl"><span class="wx-cbox"><input type="checkbox" id="wxConsent" onchange="shareToggle(this)"></span><span class="wx-ctxt">匿名分享使用情形，一起讓五行動能更好用</span></label><i class="wx-cq" data-tip="1" data-tip-html="記錄功能使用次數、年齡層、性別、裝置系統，以及你在提詞自行輸入的文字，用來了解大家最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
     </div>
     <div class="act-row act-row1" id="aiBtnContainer" style="display:none;">
-        <button onclick="saveCurrentChartPrompt()" class="act-btn"><span class="ab-t">💾 儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
+        <button onclick="saveCurrentChartPrompt()" class="act-btn cs-save"><span class="ab-t">儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
     </div>
 
     <div class="site-foot">
@@ -1676,7 +1823,7 @@
             <span class="vc-dot"></span><span class="vc-lbl">VISITORS</span>
             <img loading="lazy" src="https://visitor-badge.laobi.icu/badge?page_id=uptronyx-debug.bazi-app&left_text=TOTAL&left_color=%230b1a22&right_color=%23007a94" alt="訪客累計人次">
         </div>
-        <button type="button" class="wish-btn" onclick="openWish()">💬 反饋</button>
+        <button type="button" class="wish-btn" onclick="openWish()">✨ 許願</button>
         </div>
     </div>
     </div>
@@ -1734,7 +1881,7 @@
 
     <div class="wish-mask" id="wishMask" onclick="if(event.target===this)closeWish()">
         <div class="wish-box" role="dialog" aria-labelledby="wishTitle">
-            <div class="wish-h"><b id="wishTitle">💬 反饋</b><i onclick="closeWish()">✕</i></div>
+            <div class="wish-h"><b id="wishTitle">✨ 許願</b><i onclick="closeWish()">✕</i></div>
             <div class="wish-sub">想新增的功能、哪裡不好用、發現錯誤，都歡迎告訴我。</div>
             <textarea id="wishText" maxlength="500" placeholder="例如：希望可以看流時、合盤可以存多個人…"></textarea>
             <input type="text" id="wishContact" maxlength="80" placeholder="聯絡方式（選填，想收到回覆再填）">
@@ -2405,33 +2552,45 @@
         const tab = window.__mgTab || 'gong';
         let gongHtml = window.__spouseScan ? renderSpouseScanHtml(window.__spouseScan) : '';
         try { gongHtml += renderYinyuanHtml(ctx); } catch (e) { console.warn('姻緣時機失敗', e); }
-        let html = `
-            <div class="mg-input">
-                <input type="date" id="partnerDate" value="${p ? p.date : ''}">
-                <select id="partnerHour">${hourOpts}</select>
-                <div class="seg2 mg-sex"><button type="button" data-g="1" class="${p && p.gender === 1 ? 'on' : ''}" onclick="partnerSex(1)">男生</button><button type="button" data-g="0" class="${p && p.gender === 0 ? 'on' : ''}" onclick="partnerSex(0)">女生</button></div>
-                <button class="mg-go" onclick="savePartner()">排盤</button>
+        let html = `<div class="hx">
+            <div class="hx-card">
+                <div class="hx-lbl">另一半的生日<small>時辰可不填</small></div>
+                <div class="mg-input hx-input">
+                    <input type="date" id="partnerDate" value="${p ? p.date : ''}" aria-label="另一半的出生日期">
+                    <select id="partnerHour" aria-label="出生時辰">${hourOpts}</select>
+                    <div class="seg2 mg-sex hx-sex"><button type="button" data-g="1" class="${p && p.gender === 1 ? 'on' : ''}" onclick="partnerSex(1)">男生</button><button type="button" data-g="0" class="${p && p.gender === 0 ? 'on' : ''}" onclick="partnerSex(0)">女生</button></div>
+                    <button class="mg-go hx-go" onclick="savePartner()">${r ? '重新排盤' : '排盤'}</button>
+                </div>
             </div>`;
         if (r) {
-            html += `
-                <div class="mg-done">已排盤${r.hasHour ? '' : '（時辰不詳，以三柱計算）'}<button type="button" class="mg-del" id="partnerDel" onclick="clearPartner()">清除</button></div>
-                ${(() => { try { return renderHepanLamps(hepanCalc(ctx, p, r)); } catch (e) { console.warn('合盤失敗', e); return ''; } })()}
-                <div class="act-row hp-prompt-row">
-                    <button class="act-btn copy-prompt-btn" onclick="copyPartnerPrompt('pro', this)"><span class="ab-t">📋 命師提詞</span><small>請 AI 說明判斷依據</small></button>
-                    <button class="act-btn copy-prompt-btn" onclick="copyPartnerPrompt('plain', this)"><span class="ab-t">📋 白話提詞</span><small>不含術語的白話解析</small></button>
+            let h = null; try { h = hepanCalc(ctx, p, r); } catch (e) { console.warn('合盤失敗', e); }
+            const notes = [r.hasHour ? '' : '時辰不詳，以三柱計算', h && h.assumedG ? '性別未選，以異性計' : ''].filter(Boolean).join('・');
+            html += h ? `
+            <div class="hx-card hx-res">
+                <div class="hx-top">
+                    <div class="hx-who"><span class="hx-el" style="color:${elementColors[h.pel]}">${h.pel}</span>
+                        <div><b>對方日主</b><span>${h.pcat ? `${h.pcat}・${h.lo === h.hi ? h.lo : h.lo + '～' + h.hi} 分` : `強弱未定・${h.lo}～${h.hi} 分`}</span></div></div>
+                    <button type="button" class="mg-del hx-del" id="partnerDel" onclick="clearPartner()">清除</button>
                 </div>
-                <div class="ai-go" id="aiGoHp" style="display:none;">
-        <div class="ai-go-h"><span class="ai-go-title">✅ 已複製提詞</span><i onclick="this.closest('.ai-go').style.display='none'">✕</i></div>
-        <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
-        <div class="ai-go-btns">
-            <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
-            <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="return aiGo('chatgpt', event)" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
-            <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
-        </div>
-    </div>`;
-        } else {
-            html += `<div class="rel-coming">輸入另一半的出生日期（時辰可不填）</div>`;
+                ${notes ? `<div class="hx-note">${notes}</div>` : ''}
+                <ul class="hx-list">${HP_ITEMS.map(([k, n]) => { const v = h.res[k]; return `<li class="${v ? 'ok' : (v === null ? 'na' : '')}"><i>${v ? '✓' : (v === null ? '?' : '')}</i>${n}</li>`; }).join('')}</ul>
+            </div>` : '';
+            html += `
+            <div class="hx-prompts">
+                <button type="button" class="hx-pb copy-prompt-btn" onclick="copyPartnerPrompt('pro', this)"><span class="ab-t">命師提詞</span><small>請 AI 說明判斷依據</small><em aria-hidden="true">⧉</em></button>
+                <button type="button" class="hx-pb copy-prompt-btn" onclick="copyPartnerPrompt('plain', this)"><span class="ab-t">白話提詞</span><small>不含術語的白話解析</small><em aria-hidden="true">⧉</em></button>
+            </div>
+            <div class="ai-go" id="aiGoHp" style="display:none;">
+                <div class="ai-go-h"><span class="ai-go-title">✅ 已複製提詞</span><i onclick="this.closest('.ai-go').style.display='none'">✕</i></div>
+                <div class="ai-go-sub">選擇 AI，開啟後貼上（電腦 Ctrl+V／手機長按貼上）</div>
+                <div class="ai-go-btns">
+                    <a href="https://gemini.google.com/app" target="_blank" rel="noopener" onclick="aiGo('gemini')" class="ai-go-b" style="--c:#8ab4f8"><b>✦</b>Gemini</a>
+                    <a href="https://chatgpt.com/?model=auto" target="_blank" rel="noopener" onclick="return aiGo('chatgpt', event)" class="ai-go-b" style="--c:#10a37f"><b>◎</b>ChatGPT</a>
+                    <a href="https://claude.ai/new" target="_blank" rel="noopener" onclick="aiGo('claude')" class="ai-go-b" style="--c:#d97757"><b>✳</b>Claude</a>
+                </div>
+            </div>`;
         }
+        html += `</div>`;
         panel.innerHTML = gongHtml;
         const hp = document.getElementById('hepanPanel'); if (hp) hp.innerHTML = html;
     }
@@ -5227,37 +5386,42 @@ ${hpTxt}`;
         let body = '';
         if (tab === 'ts') {
             const cells = sc.ts.map((r, k) => {
-                const st = r.fan.length ? r.fan[0].split('・')[0] : (r.yin.length ? '引動' : '');
-                return `<div class="sf-cell ${r.fan.length ? 'fan' : (r.yin.length ? 'yin' : '')} ${k === sel.ts ? 'sel' : ''} ${k === 0 ? 'now' : ''}" onclick="sfPick('ts',${k})">
-                    <span class="sf-y">${r.y}</span><span class="sf-gz">${gz(r.gz.gan, r.gz.zhi)}</span><span class="sf-st">${st || '・'}</span></div>`;
+                const st = r.fan.length ? r.fan[0].split('・')[0] : (r.yin.length ? '引動' : '平安');
+                return `<button type="button" class="sx-cell ${r.fan.length ? 'bad' : (r.yin.length ? 'warn' : 'ok')} ${k === sel.ts ? 'sel' : ''}" onclick="sfPick('ts',${k})">
+                    <span class="sx-y">${r.y}${k === 0 ? '<i>今年</i>' : ''}</span><span class="sx-gz">${gz(r.gz.gan, r.gz.zhi)}</span><span class="sx-st">${st}</span></button>`;
             }).join('');
-            const r = sc.ts[sel.ts];
-            const det = r.fan.length || r.yin.length
-                ? [...r.fan.map(t => `<div class="sf-line fan"><b>${t.split('・')[0]}</b><span>${t.split('・')[1] || '生肖' + sc.yz}</span><em>建議安太歲</em></div>`),
-                   ...r.yin.map(t => `<div class="sf-line yin"><b>太歲引動</b><span>${t}</span><em>影響較輕</em></div>`)].join('')
-                : '<div class="sf-line"><span>這一年沒有犯太歲</span></div>';
-            body = `<div class="sf-grid sf-grid5">${cells}</div>
-                <div class="sf-det"><div class="sf-det-h">${r.y} ${gz(r.gz.gan, r.gz.zhi)} 年</div>${det}</div>
-                <div class="sf-legend"><span><i class="sf-dot fan"></i>犯太歲（生肖 ${sc.yz} 被坐、沖、刑）</span><span><i class="sf-dot yin"></i>太歲引動（其他柱，影響較輕）</span></div>`;
+            const r = sc.ts[sel.ts], lvl = r.fan.length ? 'bad' : (r.yin.length ? 'warn' : 'ok');
+            const rows = [...r.fan.map(t => `<div class="bad"><dt>${t.split('・')[0]}</dt><dd>${t.split('・')[1] || '生肖' + sc.yz}</dd></div>`),
+                          ...r.yin.map(t => `<div class="warn"><dt>引動</dt><dd>${t}</dd></div>`)].join('');
+            body = `<div class="sx-grid sx-g5">${cells}</div>
+                <div class="sx-card ${lvl}">
+                    <div class="sx-top"><div class="sx-when">${r.y} 年${sel.ts === 0 ? '<em>今年</em>' : ''}</div><span class="sx-badge">${r.fan.length ? '建議安太歲' : (r.yin.length ? '影響較輕' : '無犯太歲')}</span></div>
+                    <div class="sx-main"><span class="sx-big">${gz(r.gz.gan, r.gz.zhi)}</span><span class="sx-verdict">${r.fan.length ? r.fan[0].split('・')[0] : (r.yin.length ? '太歲引動' : '平安')}</span></div>
+                    ${rows ? `<dl class="sx-rows">${rows}</dl>` : `<div class="sx-empty">生肖 ${sc.yz} 這一年沒有被坐、沖、刑</div>`}
+                </div>
+                <div class="sx-legend"><span><i class="bad"></i>犯太歲（生肖 ${sc.yz} 被坐、沖、刑）</span><span><i class="warn"></i>太歲引動（其他柱，影響較輕）</span></div>`;
         } else {
             const natalTxt = [...sc.natal.map(n => n.name), ...(sc.yima.length >= 2 ? [`驛馬 ${sc.yima.length} 個`] : [])];
-            const cells = sc.cal.map((c, k) => `<div class="sf-cell ${c.clash.length ? 'warn' : ''} ${k === sel.car ? 'sel' : ''} ${k === 0 ? 'now' : ''}" onclick="sfPick('car',${k})">
-                    <span class="sf-y">${c.m === 1 || k === 0 ? c.y + '/' : ''}${c.m}月</span><span class="sf-gz">${gz(c.gan, c.zhi)}</span><span class="sf-st">${c.clash.length ? '⚠' : '・'}</span></div>`).join('');
+            const cells = sc.cal.map((c, k) => `<button type="button" class="sx-cell ${c.clash.length ? 'warn' : 'ok'} ${k === sel.car ? 'sel' : ''}" onclick="sfPick('car',${k})">
+                    <span class="sx-y">${c.m === 1 || k === 0 ? c.y + '/' : ''}${c.m} 月${k === 0 ? '<i>本月</i>' : ''}</span><span class="sx-gz">${gz(c.gan, c.zhi)}</span><span class="sx-st">${c.clash.length ? '留意' : '平安'}</span></button>`).join('');
             const c = sc.cal[sel.car];
-            const det = c.clash.length
-                ? c.clash.map(x => `<div class="sf-line warn"><b>${x.type === '沖' ? '相沖' : '三刑'}</b><span>${x.name}・${x.target}</span><em>開車、出遠門、長輩行走多注意</em></div>`).join('')
-                : '<div class="sf-line"><span>這個月沒有特別要注意的</span></div>';
-            body = (natalTxt.length ? `<div class="sf-natal">原局本身有 ${natalTxt.join('、')}，平時就較常奔波，行車多留意</div>` : '')
-                + `<div class="sf-grid sf-grid4">${cells}</div>
-                <div class="sf-det"><div class="sf-det-h">${c.y}/${c.m}月 ${gz(c.gan, c.zhi)}<small>${c.range}</small></div>${det}</div>
-                <div class="sf-legend"><span><i class="sf-dot warn"></i>⚠ 開車、長輩跌倒多注意（地支相沖或三刑湊齊）</span></div>
-                <button class="sf-more" onclick="sfMore()">${more ? '收起命師詳細 ▴' : '命師詳細（大運・流年・流月）▾'}</button>
-                ${more ? sfDetailHtml(sc, c, natalTxt) : ''}`;
+            const rows = c.clash.map(x => `<div class="warn"><dt>${x.type === '沖' ? '相沖' : '三刑'}</dt><dd>${x.name}・${x.target}</dd></div>`).join('');
+            body = (natalTxt.length ? `<div class="sx-tip">原局本身有 ${natalTxt.join('、')}，平時就較常奔波，行車多留意。</div>` : '')
+                + `<div class="sx-grid sx-g4">${cells}</div>
+                <div class="sx-card ${c.clash.length ? 'warn' : 'ok'}">
+                    <div class="sx-top"><div class="sx-when">${c.y} 年 ${c.m} 月${sel.car === 0 ? '<em>本月</em>' : ''}</div>${c.range ? `<span class="sx-range">${c.range}</span>` : ''}</div>
+                    <div class="sx-main"><span class="sx-big">${gz(c.gan, c.zhi)}</span><span class="sx-verdict">${c.clash.length ? '出行留意' : '平安'}</span></div>
+                    ${rows ? `<dl class="sx-rows">${rows}</dl><div class="sx-advice">自己開車、出遠門、上下樓梯多注意，小心碰撞跌倒</div>` : `<div class="sx-empty">這個月沒有特別要注意的</div>`}
+                </div>
+                <div class="sx-legend"><span><i class="warn"></i>自己開車、出遠門、走路多注意（地支相沖或三刑湊齊）</span></div>
+                <button type="button" class="sx-more" onclick="sfMore()">${more ? '收起命師詳細' : '命師詳細：大運・流年・流月・流日'}<span>${more ? '▴' : '▾'}</span></button>
+                ${more ? `<div class="sx-pro">${sfDetailHtml(sc, c, natalTxt)}</div>` : ''}`;
         }
-        return `<div class="lm-tabs sf-tabs">
-                <button class="lm-tab ${tab === 'ts' ? 'on' : ''}" onclick="sfTab('ts')">🧧 安太歲</button>
-                <button class="lm-tab ${tab === 'car' ? 'on' : ''}" onclick="sfTab('car')">🚗 行車・跌倒</button>
-            </div>${body}`;
+        return `<div class="sx">
+            <div class="sx-tabs" role="tablist">
+                <button type="button" role="tab" class="sx-tab ${tab === 'ts' ? 'on' : ''}" onclick="sfTab('ts')">安太歲</button>
+                <button type="button" role="tab" class="sx-tab ${tab === 'car' ? 'on' : ''}" onclick="sfTab('car')">行車・跌倒</button>
+            </div>${body}</div>`;
     }
     function sfDetailHtml(sc, c, natalTxt) {
         const row = (time, gzs, clash, cur) => `<div class="rel-ev-row${cur ? ' is-current' : ''}">
@@ -5296,7 +5460,7 @@ ${hpTxt}`;
     function sfPick(k, i) { (window.__sfSel = window.__sfSel || { ts: 0, car: 0 })[k] = i; sfRerender(); }
     function sfMore() { window.__sfMore = !window.__sfMore; sfRerender(); }
     function buildSafetyPromptText(sc) {
-        let t = '行車・跌倒（含長輩跌倒）：歲運地支沖原局任一柱，或與原局／大運／流年／流月湊齊三刑（寅巳申、丑戌未）。\n';
+        let t = '行車・跌倒（命主本人）：歲運地支沖原局任一柱，或與原局／大運／流年／流月湊齊三刑（寅巳申、丑戌未）。觸發對象是年支（父母宮）時，另外提醒家中長輩出入小心。\n';
         t += '原局：' + ([...sc.natal.map(n => `${n.name}（${n.with}）`), ...(sc.yima.length >= 2 ? [`驛馬 ${sc.yima.length} 個（${sc.yima.map(o => o.z).join('')}）`] : [])].join('、') || '無') + '\n';
         const fmt = e => `- ${e.time} ${e.ganZhi}${e.isCurrent ? '（現在）' : (e.isPast ? '（已過，供驗證）' : '')}：${e.clash.map(c => c.name + '・' + c.target).join('、')}`;
         t += '大運觸發：\n' + (sc.ev.dayun.length ? sc.ev.dayun.map(fmt).join('\n') : '- 無') + '\n';
@@ -7098,7 +7262,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.45';
+    const APP_VER = 'V3.46';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -7674,7 +7838,7 @@ ${d.safetyScan || '無'}`;
 6. 兄弟（【5】）：比劫星在原局的強弱與狀態；每個觸發時間點對應的手足變動；比劫對命主是助力還是消耗，依原局結構說明，不宣告喜忌。
 7. 父母（【6】）：母星、父星的位置與狀態；每個觸發時間點依規則提醒出入安全或健康檢查。
 8. 婚姻（【7】）：夫妻星位置（年齡差、距離日主）與通根；原局夫妻宮與夫妻星所在柱的刑沖害代表的感情模式；歲運觸發與姻緣時機中最值得注意的年份與月份。
-9. 平安提醒（【8】）：行車與跌倒（含家中長輩）要留意的大運、流年、流月，原局本身的沖或驛馬多也要點出；安太歲列出犯太歲的年份與原因，引動的年份輕描即可。語氣以提醒為主，不嚇人。
+9. 平安提醒（【8】）：命主本人行車與跌倒要留意的大運、流年、流月（只有沖或刑到年支（父母宮）時，才另外提醒一句家中長輩出入小心），原局本身的沖或驛馬多也要點出；安太歲列出犯太歲的年份與原因，引動的年份輕描即可。語氣以提醒為主，不嚇人。
 10. 深度追問：依命盤中尚未解開的庫或刑沖，提出 2 個最值得命主補充現實資訊、再進一步追問的問題。
 
 篇幅：約 3000～4500 字。若一次寫不完，先完成 0～4，結尾寫「回覆『繼續』完成 5～10」。`;
@@ -7693,7 +7857,7 @@ ${d.safetyScan || '無'}`;
    針對最大的盲點，寫「怎麼改善」：依判讀規則的通關／制化對照找出化解的力量，但用生活語言寫成 2～3 個具體做法（例如養成什麼習慣、用什麼方式工作、找什麼樣的人合作），不要出現術語。
 2. 工作與賺錢：適合的工作環境與賺錢方式；要避開的地雷。
 3. 感情與婚姻：容易吸引的伴侶類型、相處上要注意的地方；未來幾年感情較有機會、或需要多留意的年份。
-4. 家人與平安：父母、兄弟姊妹、子女，只講需要留意的時間點與一句提醒；再依【8】說明哪幾年犯太歲（要不要安太歲）、哪些時間出門開車或長輩要特別小心跌倒。
+4. 家人與平安：父母、兄弟姊妹、子女，只講需要留意的時間點與一句提醒；再依【8】說明哪幾年犯太歲（要不要安太歲）、哪些時間自己出門開車、走路要特別小心（只有沖或刑到年支時，才順帶提醒家中長輩）。
 5. 接下來 12 個月：先用 2 個已過的月份讓讀者對照看準不準；再用表格只列出有事件的月份（月份｜主題｜一句建議）。
 6. 現在就能做的 3 件事。
 
@@ -7932,13 +8096,13 @@ ${buildPromptData(data)}
     </div>
 </div>
 <div class="ai-pop" id="aiPop">
-    <div class="ai-pop-h"><b>🤖 AI 提詞</b><i onclick="aiPopClose()">✕</i></div>
+    <div class="ai-pop-h"><b>AI 提詞</b><i onclick="aiPopClose()">✕</i></div>
     <div class="ai-pop-sub">複製後貼到 Gemini／ChatGPT／Claude，讓 AI 幫你解盤</div>
-    <button type="button" class="ask-open" onclick="openAsk()"><b>🎯 問題提詞</b><small>轉職、行業、感情、投資…只問你想知道的（約 500～800 字）</small></button>
+    <button type="button" class="ask-open" onclick="openAsk()"><b>問題提詞</b><small>轉職、行業、感情、投資…只問你想知道的</small><em aria-hidden="true">›</em></button>
     <div class="ai-pop-sec">完整解盤（第一次看盤用）</div>
     <div class="act-row ai-pop-btns">
-        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('pro', this)"><span class="ab-t">📋 命師提詞</span><small>請 AI 說明判斷依據</small></button>
-        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)"><span class="ab-t">📋 白話提詞</span><small>不含術語的白話解析</small></button>
+        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('pro', this)"><span class="ab-t">命師提詞</span><small>請 AI 說明判斷依據</small><em aria-hidden="true">⧉</em></button>
+        <button class="act-btn copy-prompt-btn" onclick="copyPromptForAI('plain', this)"><span class="ab-t">白話提詞</span><small>不含術語的白話解析</small><em aria-hidden="true">⧉</em></button>
     </div>
     <div class="ai-go" id="aiGo" style="display:none;">
         <div class="ai-go-h"><span class="ai-go-title" id="aiGoTitle">✅ 已複製提詞</span><i onclick="aiGoClose()">✕</i></div>
