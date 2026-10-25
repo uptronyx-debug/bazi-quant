@@ -573,6 +573,35 @@
         .st-dychip text { fill:#ffb347; font-size:10px; font-weight:bold; }
         .st-dychip.weak rect { stroke:rgba(255,179,71,.45); stroke-dasharray:2 2; }
         .st-dychip.weak text { fill:rgba(255,179,71,.7); font-weight:normal; }
+        .st-lychip rect { fill:rgba(18,10,28,.92); stroke:#c49bff; }
+        .st-lychip text { fill:#d6bcff; }
+        .st-lychip.weak rect { stroke:rgba(196,155,255,.45); }
+        .st-lychip.weak text { fill:rgba(214,188,255,.7); }
+        /* 大運／流年：開關移到星圖下方，橫向選單不擠壓星圖 */
+        .st-run { margin-top:6px; }
+        .st-run-sw { display:flex; justify-content:center; gap:22px; padding:4px 0 2px; }
+        .st-run .st-switch { font-size:12px; letter-spacing:.5px; color:#8a949a; }
+        .st-sw-ly:has(input:checked) { color:#c49bff; }
+        .st-sw-ly input:checked + .st-knob { background:rgba(196,155,255,.2); border-color:#c49bff; }
+        .st-sw-ly input:checked + .st-knob::after { background:#c49bff; box-shadow:0 0 6px #c49bff; }
+        .st-strip { display:flex; gap:8px; overflow-x:auto; scroll-snap-type:x proximity; scrollbar-width:none; padding:2px 2px 4px; -webkit-overflow-scrolling:touch; }
+        .st-strip::-webkit-scrollbar { display:none; }
+        .st-strip:empty { display:none; }
+        .st-strip { margin-top:4px; padding-top:9px; }
+        .st-it { all:unset; box-sizing:border-box; flex:0 0 auto; min-width:76px; scroll-snap-align:center; position:relative; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px;
+            padding:8px 10px 7px; border-radius:12px; background:#171c1f; border:1px solid #242a2e; transition: border-color .2s, background .2s; -webkit-tap-highlight-color:transparent; }
+        .st-it-t { font-size:11px; color:#8a949a; white-space:nowrap; font-variant-numeric:tabular-nums; }
+        .st-it-t em { font-style:normal; margin-left:4px; color:#5e676c; }
+        .st-gz { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:20px; letter-spacing:2px; line-height:1.15; }
+        .st-it-s { font-size:11px; color:#a7b0b5; white-space:nowrap; }
+        .st-it.past { opacity:.5; }
+        .st-it-now { position:absolute; top:-7px; right:6px; font-style:normal; font-size:9.5px; line-height:15px; padding:0 5px; border-radius:4px; background:#2a3135; color:#e8ecee; }
+        .st-strip-dy .st-it.on { border-color:#ffb347; background:rgba(255,179,71,.09); opacity:1; }
+        .st-strip-dy .st-it.on .st-it-s { color:#ffcf87; }
+        .st-strip-ly .st-it { min-width:70px; }
+        .st-strip-ly .st-it.on { border-color:#c49bff; background:rgba(196,155,255,.10); opacity:1; }
+        .st-strip-ly .st-it.on .st-it-s { color:#dcc7ff; }
+        .st-it:focus-visible { outline:1px solid #e8ecee; outline-offset:2px; }
         .st-dy-layer > * { animation: peFade .35s ease-out both; }
         .st-flow { stroke-dasharray: 2 12; opacity:.75; }
         .anim-on .st-flow { animation: peFade .6s ease-out both, stFlow 1.6s linear infinite; animation-delay: var(--d), 0s; }
@@ -1125,6 +1154,9 @@
         .mini-bz { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(86px + env(safe-area-inset-bottom)); z-index:899; width:min(calc(100% - 20px), 560px); box-sizing:border-box;
             padding:8px 10px; border-radius:16px; background:rgba(20,24,27,.94); border:1px solid rgba(0,210,255,.22); box-shadow:0 8px 24px rgba(0,0,0,.55);
             backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); animation: actIn .2s ease-out; }
+        .mbz-close { all:unset; position:absolute; top:-13px; left:50%; transform:translateX(-50%); cursor:pointer; font-size:11px; line-height:1; padding:6px 11px; border-radius:999px;
+            color:#cfe9f1; background:rgba(28,34,38,.98); border:1px solid rgba(0,210,255,.3); box-shadow:0 4px 10px rgba(0,0,0,.4); -webkit-tap-highlight-color:transparent; }
+        .mbz-close:focus-visible { outline:1px solid #00d2ff; }
         .mbz-grid { display:grid; grid-template-columns:repeat(7, 1fr); align-items:start; }
         .mbz-col { display:flex; flex-direction:column; align-items:center; line-height:1.15; }
         .mbz-col.sep { border-left:1px solid #33393d; }
@@ -1363,7 +1395,181 @@
         .tt-sc i.nil { color:#555; }
         .tt-li b { font-weight:700; }
         .ia-empty { font-size:12.5px; color:#666; padding:2px 6px; }
+
+        /* ===== 流日 V2：黃曆頁＋長條尺 ===== */
+        #liuriOutput.lx { --lx-ink:#f4f6f7; --lx-mute:#aab4b9; --lx-faint:#6f7a80; --lx-line:#34404a; --lx-surf:#232c33; --lx-panel:#1c242a; --lx-seal:#ff6550; --tc:#f6b73c; --tcs:rgba(246,183,60,.45); }
+        #liuriOutput.lx.topic-work { --tc:#5fb0ff; --tcs:rgba(95,176,255,.45); }
+        #liuriOutput.lx.topic-ren  { --tc:#b79bff; --tcs:rgba(183,155,255,.45); }
+        #liuriOutput.lx.topic-tao  { --tc:#ff8ab4; --tcs:rgba(255,138,180,.45); }
+        #liuriOutput.lx { font-variant-numeric: tabular-nums; }
+        .lx .lx-top { margin:0 0 14px; align-items:flex-end; flex-wrap:nowrap; }
+        .lx .lx-topics { gap:0; flex-wrap:nowrap; }
+        .lx .lx-topic { all:unset; box-sizing:border-box; cursor:pointer; position:relative; padding:6px 10px 9px; font-size:15px; letter-spacing:1px; color:var(--lx-mute); box-shadow:none; background:none; border:none; font-weight:500; -webkit-tap-highlight-color:transparent; }
+        .lx .lx-topic:first-child { padding-left:2px; }
+        .lx .lx-topic.on { color:var(--lx-ink); font-weight:600; background:none; box-shadow:none; border:none; }
+        .lx .lx-topic.on::after { content:''; position:absolute; left:10px; right:10px; bottom:0; height:2px; border-radius:2px; background:var(--tc); }
+        .lx .lx-topic:first-child.on::after { left:2px; }
+        .lx .lx-topic:focus-visible { outline:1px solid var(--tc); outline-offset:2px; border-radius:4px; }
+        .lx .lx-view { border:none; background:#1a1f22; border-radius:9px; padding:2px; flex-shrink:0; margin-bottom:5px; }
+        .lx .lx-view .lw-vbtn { font-size:12px; padding:4px 9px; border-radius:7px; color:var(--lx-mute); }
+        .lx .lx-view .lw-vbtn.on { background:#2a3135; color:var(--lx-ink); font-weight:600; }
+        .lx .lw-tip b { color:var(--tc); }
+        .lx .lw-tip { border-left-color:var(--tc); background:none; color:var(--lx-mute); padding:2px 0 2px 10px; margin:-4px 0 12px; font-size:12px; }
+
+        .lx #liuriCard { touch-action: pan-y; }
+        .lx .lx-hero { box-sizing:border-box; margin:10px 0 0; padding:11px 14px 10px; border-radius:16px;
+            background:linear-gradient(150deg, color-mix(in srgb, var(--tc) 26%, var(--lx-surf)) 0%, var(--lx-surf) 58%); border:1px solid color-mix(in srgb, var(--tc) 32%, var(--lx-line)); box-shadow:0 10px 30px rgba(0,0,0,.25); }
+        .lx .lx-hero.is-today { background:linear-gradient(150deg, color-mix(in srgb, var(--tc) 26%, var(--lx-surf)) 0%, var(--lx-surf) 58%); border-color:color-mix(in srgb, var(--tc) 32%, var(--lx-line)); }
+        .lx .lx-hero.flat { background:linear-gradient(150deg, #2a343b 0%, var(--lx-surf) 60%); border-color:var(--lx-line); }
+        .lx .lx-date { font-size:13px; color:var(--lx-ink); letter-spacing:.5px; display:flex; align-items:baseline; gap:8px; }
+        .lx .lx-date span { color:var(--lx-mute); font-size:12px; }
+        .lx .lx-date em { font-style:normal; font-size:11px; color:var(--tc); border:1px solid var(--tcs); border-radius:4px; padding:0 5px; line-height:17px; }
+        .lx .lx-main { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin:6px 0 8px; }
+        .lx .lx-gz { display:flex; gap:10px; }
+        .lx .lx-ch { display:flex; flex-direction:column; align-items:center; gap:4px; }
+        .lx .lx-ch b { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:30px; line-height:1; }
+        .lx .lx-ch small { font-size:11px; color:var(--lx-mute); letter-spacing:.5px; white-space:nowrap; }
+        .lx .lx-score { text-align:right; }
+        .lx .lx-score b { display:block; font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:32px; line-height:1; color:var(--lx-ink); letter-spacing:-1px; }
+        .lx .lx-score span { display:block; margin-top:4px; font-size:12px; color:var(--lx-mute); letter-spacing:1px; }
+        .lx .lx-hero.hot .lx-score b, .lx .lx-hero.hot .lx-score span { color:var(--tc); }
+        .lx .lx-hero.flat .lx-score b { color:var(--lx-faint); }
+        .lx .lx-tags { margin:0 0 6px; }
+        .lx .lx-tags .pt-tag { border-radius:4px; font-size:10.5px; }
+        .lx .lx-rows { margin:0; border-top:1px solid var(--lx-line); padding-top:6px; }
+        .lx .lx-rows > div { display:flex; gap:10px; font-size:12px; line-height:1.55; padding:2px 0; color:#dfe4e6; }
+        .lx .lx-rows .tip dd { color:var(--lx-ink); }
+        .lx .lx-rows .tip dt { color:var(--tc); }
+        .lx .lx-rows dt { flex:0 0 2.6em; color:var(--lx-mute); font-size:11.5px; }
+        .lx .lx-rows dd { margin:0; flex:1; min-width:0; }
+        .lx .lx-rows .seal dt { color:var(--lx-seal); }
+        .lx .lx-rows .acc dt { color:var(--tc); }
+        .lx .lx-empty { border-top:1px solid var(--lx-line); padding-top:9px; font-size:12px; color:var(--lx-mute); }
+        .lx .tg-hit-tag { animation:none; box-shadow:none; background:var(--lx-seal); color:#fff; border-radius:4px; }
+        .lx .tg-hit { color:#e2a59b; }
+
+        .lx .lx-chart { margin-top:4px; overflow:visible !important; background:var(--lx-panel); border-radius:16px 16px 0 0; padding:8px 8px 0; box-sizing:border-box; }
+        .lx .lx-legend { background:var(--lx-panel); border-radius:0 0 16px 16px; padding:2px 12px 9px; margin-top:0 !important; }
+        body.has-bnav #liuriOutput.lx { padding-bottom:84px; }
+        .lx .lx-thr { stroke:var(--lx-faint); stroke-width:1; stroke-dasharray:2 4; opacity:.7; }
+        .lx .lx-base { stroke:var(--lx-line); stroke-width:1; }
+        .lx .lx-col { cursor:pointer; -webkit-tap-highlight-color:transparent; }
+        .lx .lx-sel { fill:transparent; transition:fill .2s; }
+        .lx .lx-col.active .lx-sel { fill:rgba(235,230,218,.06); }
+        .lx .lx-bar { fill:#384045; transform-box:fill-box; transform-origin:bottom; animation:lxGrow .5s cubic-bezier(.2,.8,.2,1) both; animation-delay:var(--d); }
+        .lx .lx-col.half .lx-bar { fill:var(--tcs); }
+        .lx .lx-col.hot .lx-bar { fill:var(--tc); }
+        .lx .lx-col.past .lx-bar { opacity:.38; }
+        .lx .lx-col.active .lx-bar { opacity:1; }
+        .lx .lx-dn { font-size:11px; fill:var(--lx-mute); }
+        .lx .lx-wd { font-size:10px; fill:var(--lx-faint); }
+        .lx .lx-col.past .lx-dn { fill:var(--lx-faint); }
+        .lx .lx-col.today .lx-wd { fill:var(--tc); font-weight:600; }
+        .lx .lx-col.active .lx-dn { fill:var(--lx-ink); font-weight:600; }
+        .lx-m-po { fill:#d24a3a; }
+        .lx-m-xing { fill:none; stroke:#d24a3a; stroke-width:1.4; }
+        .lx-m-dong { fill:none; stroke:#cfc8b8; stroke-width:1.2; }
+        .lx-m-he { fill:var(--tc, #d77c9c); }
+        .lx .lx-star { filter:drop-shadow(0 0 3px var(--tc)); }
+        .lx-m-ju { fill:none; stroke:var(--tc, #d4a24c); stroke-width:1.3; }
+        @keyframes lxGrow { from { transform:scaleY(0); } }
+        .lx .lx-svg { touch-action: pan-y; user-select:none; -webkit-user-select:none; cursor:crosshair; }
+        .lx .lx-ga0 { stop-color:var(--tc); stop-opacity:.34; } .lx .lx-ga1 { stop-color:var(--tc); stop-opacity:0; }
+        .lx .lx-line { fill:none; stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1; stroke-dashoffset:1; animation:lxDraw 1.1s cubic-bezier(.4,0,.2,1) .1s forwards; }
+        .lx .lx-line-fut { stroke:var(--tc); }
+        .lx .lx-line-past { stroke:#7d888e; stroke-width:1.8; }
+        .lx .lx-area { opacity:0; animation:lxFade .6s ease-out .8s forwards; }
+        @keyframes lxDraw { to { stroke-dashoffset:0; } }
+        @keyframes lxFade { to { opacity:1; } }
+        .lx .lx-run { fill:none; stroke:#fff; stroke-width:3.2; stroke-linecap:round; stroke-dasharray:.035 .965; stroke-dashoffset:.035; opacity:0;
+            filter:drop-shadow(0 0 4px var(--tc)) drop-shadow(0 0 8px var(--tc)); animation:lxRun 3.6s cubic-bezier(.45,0,.55,1) 1.4s infinite; }
+        @keyframes lxRun { 0% { stroke-dashoffset:.035; opacity:0; } 6% { opacity:1; } 70% { stroke-dashoffset:-.965; opacity:1; } 76%, 100% { stroke-dashoffset:-.965; opacity:0; } }
+        @media (prefers-reduced-motion: reduce) { .lx .lx-run { display:none; } }
+        .lx .lx-now { stroke:var(--lx-faint); stroke-width:1; stroke-dasharray:1 3; }
+        .lx .lx-hotdot { fill:var(--tc); stroke:var(--lx-panel); stroke-width:1.5; opacity:0; animation:lxFade .3s ease-out forwards; animation-delay:var(--d); }
+        .lx .lx-cross { transition:none; }
+        .lx .lx-svg.scrub .lx-cross { transition:none; }
+        .lx .lx-cross-v { stroke:var(--lx-ink); stroke-width:1; opacity:.28; }
+        .lx .lx-cross-dot { fill:var(--lx-ink); stroke:var(--lx-surf); stroke-width:2; }
+        .lx .lx-cross.hot .lx-cross-dot { fill:var(--tc); }
+        .lx .lx-cross-halo { fill:var(--tc); opacity:.18; transition: cy .28s cubic-bezier(.3,.7,.2,1); }
+        .lx .lx-svg.scrub .lx-cross-dot, .lx .lx-svg.scrub .lx-cross-halo { transition:none; }
+        .lx .lx-hit { cursor:crosshair; }
+        @media (prefers-reduced-motion: reduce) { .lx .lx-line { animation:none; stroke-dashoffset:0; } .lx .lx-area, .lx .lx-hotdot { animation:none; opacity:1; } .lx .lx-cross, .lx .lx-cross-dot, .lx .lx-cross-halo { transition:none; } }
+        .lx .lx-legend { display:flex; flex-wrap:wrap; gap:4px 14px; margin:6px 0 0; font-size:11px; color:var(--lx-mute); }
+        .lx .lx-legend span { display:inline-flex; align-items:center; gap:5px; }
+        .lx .lx-legend svg { width:10px; height:10px; }
+        .lx .lx-lg-bar { display:inline-block; width:5px; height:11px; border-radius:1.5px; background:var(--tc); }
+        .lx .lx-lg-bar.half { background:var(--tcs); }
+        .lx .lx-lg-thr i { display:inline-block; width:12px; border-top:1px dashed var(--lx-faint); }
+        @media (prefers-reduced-motion: reduce) { .lx .lx-bar { animation:none; } }
+
+        /* 月曆跟著同一套語言：去掉漸層與光暈，分數改成格子底部的細條 */
+        .lx .lc-head { margin:0 0 12px; }
+        .lx .lc-title { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:17px; color:var(--lx-ink); letter-spacing:1px; }
+        .lx .lc-title small { font-family:inherit; color:var(--lx-mute); font-size:11px; letter-spacing:.5px; margin-top:3px; }
+        .lx .lw-nav-btn { border-color:var(--lx-line); color:var(--lx-mute); }
+        .lx .lc-grid { gap:3px; }
+        .lx .lc-wk { color:var(--lx-faint); font-size:11px; }
+        .lx .lc-cell { background:var(--lx-surf) !important; border:1px solid transparent; border-radius:8px; box-shadow:none !important; min-height:56px; overflow:hidden; }
+        .lx .lc-cell::after { content:''; position:absolute; left:0; bottom:0; height:2px; width:calc(var(--a) / .55 * 100%); background:var(--tcs); }
+        .lx .lc-cell.wang::after { background:var(--tc); }
+        .lx .lc-cell.empty { background:none !important; }
+        .lx .lc-cell.empty::after { display:none; }
+        .lx .lc-cell.wang { border-color:transparent; }
+        .lx .lc-cell.wang .lc-n { color:var(--tc); }
+        .lx .lc-cell.po, .lx .lc-cell.wang.po { border-color:transparent; }
+        .lx .lc-cell.today { outline:none; border-color:var(--lx-faint); }
+        .lx .lc-cell.sel { outline:none; border-color:var(--lx-ink); }
+        .lx .lc-cell.past { opacity:.45; }
+        .lx .lc-cell.past .lc-n { color:var(--lx-mute); }
+        .lx .lc-n { font-size:13px; font-weight:600; color:var(--lx-ink); }
+        .lx .lc-gz b { font-weight:500; }
+        .lx .lc-tags i { width:auto; height:auto; min-width:0; padding:0 1px; border:none !important; background:none !important; box-shadow:none !important; font-size:9px; border-radius:0; }
+        .lx .lc-wang { color:var(--tc) !important; }
+        .lx .lc-po, .lx .lc-xing { color:var(--lx-seal) !important; }
+        .lx .lc-ju { color:var(--tc) !important; }
+        .lx .lc-zh { color:#7fc79a !important; }
+        .lx .lc-he { color:var(--tc) !important; }
+        .lx .lc-detail { background:var(--lx-surf); border:1px solid var(--lx-line); border-radius:14px; }
+        .lx .lc-hint { border-style:solid; color:var(--lx-mute); }
+        .lx .lc-dt { color:var(--lx-ink); font-size:13px; }
+        .lx .lw-chip { box-shadow:none !important; border-radius:4px; }
+        .lx .lx-chart > svg { min-width:0 !important; max-width:100%; }
+        .lx .lx-msep { stroke:var(--lx-line); stroke-width:1; }
+        .lx .lx-mlab { font-size:10.5px; fill:var(--lx-mute); }
+        .lx .lx-ax { font-size:9px; fill:var(--lx-faint); }
+        .lx .lx-zgz { font-size:10px; font-weight:600; }
+        .lx .lx-col.past .lx-zgz { opacity:.5; }
+        /* 轉職：綠色代表「宜轉職」，其餘沿用同一套 */
+        .lx.topic-work .lw-pane[data-v="zh"] { --tc:#7fc79a; --tcs:rgba(127,199,154,.4); }
+        .lx .zh-head { color:var(--lx-ink); font-weight:600; font-size:13px; letter-spacing:.5px; }
+        .lx .zy { background:var(--lx-surf); border:1px solid transparent; border-radius:12px; box-shadow:none; }
+        .lx .zy.now { border-color:var(--lx-faint); }
+        .lx .zy.half { border-color:transparent; }
+        .lx .zy.full { background:var(--lx-surf); border-color:rgba(127,199,154,.55); box-shadow:none; }
+        .lx .zy.sel { outline:none; border-color:var(--lx-ink); }
+        .lx .zy-y { color:var(--lx-mute); }
+        .lx .zy-gz { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:17px; }
+        .lx .zy-dots i { background:#2a3135; }
+        .lx .zy-dots i.on { background:#7fc79a; box-shadow:none; }
+        .lx .zh-card, .lx .zh-card.is-today { background:var(--lx-surf); border:1px solid var(--lx-line); box-shadow:none; border-radius:14px; margin-top:12px; }
+        .lx .zh-card .liuri-advice-date { color:var(--lx-ink); font-size:13px; }
+        .lx .lw-zh-line .lw-chip { background:none !important; color:#7fc79a !important; border-color:rgba(127,199,154,.45) !important; }
+        .lx .zh-pl { color:var(--lx-mute); }
+        .lx .zh-ck { color:var(--lx-seal); }
+        .lx .zh-ck.on { color:#7fc79a; }
+        .lx .zh-chart { scrollbar-width:none; }
+        .lx .zh-chart::-webkit-scrollbar { display:none; }
+        .lx .lc-detail .lw-line .lw-chip { background:none !important; color:var(--tc) !important; border-color:var(--tcs) !important; }
+        .lx .lc-detail .lw-po-line .lw-chip, .lx .lc-detail .lw-xing-line .lw-chip { color:var(--lx-seal) !important; border-color:rgba(210,74,58,.5) !important; }
+        .lx .lc-detail .lw-平 .lw-chip { color:var(--lx-mute) !important; border-color:var(--lx-line) !important; }
+        .lx .lc-dt b { font-family:'Noto Serif TC', 'Songti TC', serif; font-weight:600; font-size:17px; }
+        .lx .lw-line { color:#dfe4e6; font-size:12px; }
+        .lx .lw-po-act { color:var(--lx-ink); opacity:.85; font-size:11.5px; margin-top:3px; line-height:1.55; }
     </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@600&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -1458,7 +1664,7 @@
     <div class="form-group" style="grid-template-columns: 1fr; margin-top: 15px; display: grid; gap: 10px; margin-bottom: 10px;">
         <button onclick="window.__strengthOverride = null; calculateBazi()">執行運算</button>
         <div class="privacy-pill">🔒 排盤全程在你的瀏覽器內完成・生日與命盤不會上傳</div>
-        <div class="wx-copt" id="wxCopt"><label class="wx-clbl"><span class="wx-cbox"><input type="checkbox" id="wxConsent" onchange="shareToggle(this)"></span><span class="wx-ctxt">匿名分享功能使用次數，一起讓五行動能更好用</span></label><i class="wx-cq" data-tip="1" data-tip-html="只記錄「哪個功能被點了幾次」，以及使用者年齡層與性別，用來了解不同族群最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
+        <div class="wx-copt" id="wxCopt"><label class="wx-clbl"><span class="wx-cbox"><input type="checkbox" id="wxConsent" onchange="shareToggle(this)"></span><span class="wx-ctxt">匿名分享使用情形，一起讓五行動能更好用</span></label><i class="wx-cq" data-tip="1" data-tip-html="記錄「哪個功能被點了幾次」、使用者年齡層與性別，裝置類型（手機或電腦、系統、瀏覽器），以及你在問題提詞自己填寫的職務與問題文字，用來了解大家最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
     </div>
     <div class="act-row act-row1" id="aiBtnContainer" style="display:none;">
         <button onclick="saveCurrentChartPrompt()" class="act-btn"><span class="ab-t">💾 儲存命盤</span><small>僅儲存於此瀏覽器</small></button>
@@ -3800,21 +4006,10 @@ ${hpTxt}`;
         s += `<g class="st-dy-layer"></g>`;
         s += `</svg>`;
 
-        // 大運捲軸
-        let items = '';
         let curIdx = daYunData.findIndex(dy => currentYear >= dy.startYear && currentYear < dy.startYear + 10);
-        daYunData.forEach((dy, i) => {
-            const past = dy.startYear + 10 <= currentYear, now = i === curIdx;
-            const gTg = SS_SHORT[getPreciseTenGod(dy.gan, ctx.dayGan)] || '';
-            const zMain = Object.keys(zhiHiddenWeights[dy.zhi] || {}).sort((a, b) => zhiHiddenWeights[dy.zhi][b] - zhiHiddenWeights[dy.zhi][a])[0];
-            const zTg = SS_SHORT[getPreciseTenGod(zMain, ctx.dayGan)] || '';
-            items += `<div class="st-dy-item ${past ? 'is-past' : ''} ${now ? 'is-now' : ''}" data-i="${i}" onclick="stDyPick(${i}, true)">
-                <div class="st-dy-age">${dy.startAge}歲${now ? '<span class="rel-now">現在</span>' : ''}</div>
-                <div class="st-dy-gz"><b style="color:${elementColors[ganElementMap[dy.gan]]}">${dy.gan}</b><b style="color:${elementColors[zhiElementMap[dy.zhi]]}">${dy.zhi}</b></div>
-                <div class="st-dy-tg">${gTg}・${zTg}</div>
-            </div>`;
-        });
         window.__starCtx.curIdx = curIdx < 0 ? 0 : curIdx;
+        window.__starCtx.selIdx = window.__starCtx.curIdx;
+        window.__starCtx.lyYear = currentYear;
 
         return `
             <div class="st-panel">
@@ -3822,7 +4017,6 @@ ${hpTxt}`;
                     <span>十神</span>
                     <span class="st-head-r">
                         <button class="pe-anim pe-badge st-badge ${window.__strengthOverride ? 'ov' : ''}" style="--d:1.15s;" onclick="stOvOpen()" title="量化判定：${ctx.autoStrengthLabel}・${totalScore}分">${strengthLabel}・${window.__strengthOverride ? '手動' : totalScore + '分'} ▾</button>
-                        ${daYunData.length ? `<label class="st-switch"><input type="checkbox" onchange="stToggleDayun(this.checked)"><span class="st-knob"></span>大運</label>` : ''}
                     </span>
                 </div>
                 <div class="st-ov" id="stOv" hidden>
@@ -3831,81 +4025,91 @@ ${hpTxt}`;
                 </div>
                 <div class="st-body">
                     <div class="st-svg-wrap">${s}</div>
-                    <div class="st-dy">
-                        <button class="st-dy-btn" onclick="stDyStep(-1)" aria-label="上一步大運">▲</button>
-                        <div class="st-dy-list" onscroll="stDyOnScroll()">${items}</div>
-                        <button class="st-dy-btn" onclick="stDyStep(1)" aria-label="下一步大運">▼</button>
-                    </div>
                 </div>
+                ${daYunData.length ? `<div class="st-run">
+                    <div class="st-run-sw">
+                        <label class="st-switch st-sw-dy"><input type="checkbox" onchange="stToggleDayun(this.checked)"><span class="st-knob"></span>疊加大運</label>
+                        <label class="st-switch st-sw-ly"><input type="checkbox" onchange="stToggleLiunian(this.checked)"><span class="st-knob"></span>疊加流年</label>
+                    </div>
+                    <div class="st-strip st-strip-dy" id="stStripDy"></div>
+                    <div class="st-strip st-strip-ly" id="stStripLy"></div>
+                </div>` : ''}
             </div>`;
     }
-    // 在星圖上疊加某步大運的十神（琥珀色）
-    function stDrawDayun(i) {
+    // ===== 十神星圖：疊加大運（琥珀）／流年（紫） =====
+    function stTg(g, dayGan) { return SS_SHORT[getPreciseTenGod(g, dayGan)] || ''; }
+    function stMainOf(z) { const hw = zhiHiddenWeights[z] || {}; return Object.keys(hw).sort((a, b) => hw[b] - hw[a])[0]; }
+    function stRenderStrips() {
         const c = window.__starCtx; if (!c) return;
-        const layer = document.querySelector('.st-dy-layer'); if (!layer) return;
-        const dy = c.daYunData[i]; if (!dy) { layer.innerHTML = ''; return; }
-        c.selIdx = i;
-        const per = {}; // 五行 → [{label, strong}]
-        const push = (el, label, strong) => { (per[el] = per[el] || []).push({ label, strong }); };
-        push(ganElementMap[dy.gan], `運干 ${SS_SHORT[getPreciseTenGod(dy.gan, c.dayGan)]}`, true);
-        const hw = zhiHiddenWeights[dy.zhi] || {};
-        Object.keys(hw).sort((a, b) => hw[b] - hw[a]).forEach((hg, k) => {
-            push(ganElementMap[hg], `${k === 0 ? '運支' : '藏'} ${SS_SHORT[getPreciseTenGod(hg, c.dayGan)]}`, k === 0);
-        });
+        const panel = document.querySelector('.st-panel'); if (!panel) return;
+        const dyOn = panel.classList.contains('dy-on'), lyOn = panel.classList.contains('ly-on');
+        const sd = document.getElementById('stStripDy'), sl = document.getElementById('stStripLy');
+        const gz = (g, z) => `<span class="st-gz"><b style="color:${elementColors[ganElementMap[g]]}">${g}</b><b style="color:${elementColors[zhiElementMap[z]]}">${z}</b></span>`;
+        if (sd) sd.innerHTML = dyOn ? c.daYunData.map((dy, i) => {
+            const past = dy.startYear + 10 <= c.currentYear, now = i === c.curIdx;
+            return `<button type="button" class="st-it ${past ? 'past' : ''} ${now ? 'now' : ''} ${i === c.selIdx ? 'on' : ''}" data-i="${i}" onclick="stDyPick(${i}, true)">
+                <span class="st-it-t">${dy.startAge}–${dy.startAge + 9} 歲</span>${gz(dy.gan, dy.zhi)}<span class="st-it-s">${stTg(dy.gan, c.dayGan)}・${stTg(stMainOf(dy.zhi), c.dayGan)}</span>${now ? '<i class="st-it-now">現在</i>' : ''}</button>`;
+        }).join('') : '';
+        if (sl) {
+            if (!lyOn) { sl.innerHTML = ''; }
+            else {
+                const dy = c.daYunData[c.selIdx] || c.daYunData[c.curIdx];
+                const y0 = dyOn && dy ? dy.startYear : c.currentYear - 3, y1 = dyOn && dy ? dy.startYear + 9 : c.currentYear + 8;
+                if (c.lyYear < y0 || c.lyYear > y1) c.lyYear = (c.currentYear >= y0 && c.currentYear <= y1) ? c.currentYear : y0;
+                let h = '';
+                for (let y = y0; y <= y1; y++) {
+                    const g = iaYearGZ(y), d = c.daYunData.find(x => y >= x.startYear && y < x.startYear + 10);
+                    const age = d ? d.startAge + (y - d.startYear) : '';
+                    h += `<button type="button" class="st-it ${y < c.currentYear ? 'past' : ''} ${y === c.currentYear ? 'now' : ''} ${y === c.lyYear ? 'on' : ''}" data-y="${y}" onclick="stLyPick(${y}, true)">
+                        <span class="st-it-t">${y}${age !== '' ? `<em>${age} 歲</em>` : ''}</span>${gz(g.gan, g.zhi)}<span class="st-it-s">${stTg(g.gan, c.dayGan)}・${stTg(stMainOf(g.zhi), c.dayGan)}</span>${y === c.currentYear ? '<i class="st-it-now">今年</i>' : ''}</button>`;
+                }
+                sl.innerHTML = h;
+            }
+        }
+        requestAnimationFrame(() => { [sd, sl].forEach(st => { const on = st && st.querySelector('.st-it.on'); if (on) st.scrollTo({ left: on.offsetLeft - (st.clientWidth - on.offsetWidth) / 2, behavior: 'smooth' }); }); });
+    }
+    function stDrawOverlay() {
+        const c = window.__starCtx; if (!c) return;
+        const layer = document.querySelector('.st-dy-layer'), panel = document.querySelector('.st-panel'); if (!layer || !panel) return;
+        const per = {}, rings = {};
+        const solid = {};
+        const push = (el, label, strong, kind, main) => { (per[el] = per[el] || []).push({ label, strong, kind }); (rings[el] = rings[el] || new Set()).add(kind); if (main) (solid[el] = solid[el] || new Set()).add(kind); };
+        const addPillar = (g, z, kind, gl, zl) => {
+            push(ganElementMap[g], `${gl} ${stTg(g, c.dayGan)}`, true, kind);
+            const hw = zhiHiddenWeights[z] || {};
+            Object.keys(hw).sort((a, b) => hw[b] - hw[a]).forEach((hg, k) => push(ganElementMap[hg], `${k === 0 ? zl : '藏'} ${stTg(hg, c.dayGan)}`, k === 0, kind, k === 0));
+        };
+        if (panel.classList.contains('dy-on')) { const dy = c.daYunData[c.selIdx]; if (dy) addPillar(dy.gan, dy.zhi, 'dy', '運干', '運支'); }
+        if (panel.classList.contains('ly-on')) { const g = iaYearGZ(c.lyYear); addPillar(g.gan, g.zhi, 'ly', '年干', '年支'); }
         let h = '';
         Object.keys(per).forEach(el => {
             const n = c.nodes[el]; if (!n) return;
-            h += `<circle class="st-dy-ring" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="27" fill="none" stroke="#ffb347" stroke-width="1.6" stroke-dasharray="4 3"/>`;
-            // 膠囊放在節點「內側」（朝向圓心），避開外側的原局十神
-            const inX = n.x - Math.cos(n.a) * 34, inY = n.y - Math.sin(n.a) * 34 + 3;
-            const cosA = Math.cos(n.a);
+            const sd = k => solid[el] && solid[el].has(k) ? '' : 'stroke-dasharray="4 3"';
+            if (rings[el].has('dy')) h += `<circle class="st-dy-ring" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="27" fill="none" stroke="#ffb347" stroke-width="1.6" ${sd('dy')}/>`;
+            if (rings[el].has('ly')) h += `<circle class="st-dy-ring st-ly-ring" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${rings[el].has('dy') ? 31 : 27}" fill="none" stroke="#c49bff" stroke-width="1.6" ${sd('ly')}/>`;
+            const inX = n.x - Math.cos(n.a) * 34, inY = n.y - Math.sin(n.a) * 34 + 3, cosA = Math.cos(n.a);
             per[el].forEach((it, j) => {
                 const y = inY + j * 17 * (Math.sin(n.a) > 0.2 ? -1 : 1);
                 const w = it.label.length * 10 + 8;
-                // 置中（頂點）／節點在左側往右長／節點在右側往左長
                 const left = Math.abs(cosA) < 0.2 ? inX - w / 2 : (cosA < 0 ? inX - 12 : inX + 12 - w);
-                h += stChip(left, y, it.label, 'start', `st-dychip ${it.strong ? '' : 'weak'}`);
+                h += stChip(left, y, it.label, 'start', `st-dychip ${it.kind === 'ly' ? 'st-lychip' : ''} ${it.strong ? '' : 'weak'}`);
             });
         });
         layer.innerHTML = h;
-        document.querySelectorAll('.st-dy-item').forEach(el => el.classList.toggle('active', +el.dataset.i === i));
     }
+    function stDrawDayun(i) { const c = window.__starCtx; if (!c) return; c.selIdx = i; stDrawOverlay(); }
     function stToggleDayun(on) {
         const panel = document.querySelector('.st-panel'); if (!panel) return;
-        panel.classList.toggle('dy-on', on);
-        if (on) {
-            const c = window.__starCtx;
-            requestAnimationFrame(() => stDyPick(c.selIdx ?? c.curIdx, false));
-        } else {
-            const layer = document.querySelector('.st-dy-layer'); if (layer) layer.innerHTML = '';
-        }
+        panel.classList.toggle('dy-on', on); stRenderStrips(); stDrawOverlay();
     }
-    function stDyPick(i, smooth) {
-        const list = document.querySelector('.st-dy-list'); if (!list) return;
-        const item = list.querySelector(`.st-dy-item[data-i="${i}"]`); if (!item) return;
-        list._lock = true;
-        list.scrollTo({ top: item.offsetTop - (list.clientHeight - item.offsetHeight) / 2, behavior: smooth ? 'smooth' : 'auto' });
-        stDrawDayun(i);
-        clearTimeout(list._lockT); list._lockT = setTimeout(() => { list._lock = false; }, smooth ? 450 : 50);
+    function stToggleLiunian(on) {
+        const panel = document.querySelector('.st-panel'); if (!panel) return;
+        panel.classList.toggle('ly-on', on); stRenderStrips(); stDrawOverlay();
     }
-    function stDyStep(d) {
-        const c = window.__starCtx; if (!c) return;
-        const n = Math.max(0, Math.min(c.daYunData.length - 1, (c.selIdx ?? c.curIdx) + d));
-        stDyPick(n, true);
-    }
-    function stDyOnScroll() {
-        const list = document.querySelector('.st-dy-list'); if (!list || list._lock) return;
-        clearTimeout(list._t);
-        list._t = setTimeout(() => {
-            const mid = list.scrollTop + list.clientHeight / 2;
-            let best = 0, bd = Infinity;
-            list.querySelectorAll('.st-dy-item').forEach(el => {
-                const d = Math.abs(el.offsetTop + el.offsetHeight / 2 - mid);
-                if (d < bd) { bd = d; best = +el.dataset.i; }
-            });
-            if (best !== window.__starCtx.selIdx) stDrawDayun(best);
-        }, 90);
-    }
+    function stDyPick(i) { const c = window.__starCtx; if (!c || !c.daYunData[i]) return; c.selIdx = i; stRenderStrips(); stDrawOverlay(); }
+    function stLyPick(y) { const c = window.__starCtx; if (!c) return; c.lyYear = y; stRenderStrips(); stDrawOverlay(); }
+    function stDyStep(d) { const c = window.__starCtx; if (!c) return; stDyPick(Math.max(0, Math.min(c.daYunData.length - 1, (c.selIdx ?? c.curIdx) + d))); }
+    function stDyOnScroll() {}
 
     // 小卡左右滑動：手機上左滑看下一筆、右滑看上一筆
     function attachSwipe(el, onPrev, onNext) {
@@ -5820,19 +6024,9 @@ ${hpTxt}`;
                     });
                 }
 
-                // ---- 組裝 SVG 分組長條圖：X軸=10天，每天兩條bar（整體／財運），風格比照「原局五行」的漸層細長條 ----
-                const w = 40 * 21 + 30, h = lwTargetH(w); window.__lwLastH = h;
-                const padL = 26, padR = 10, padT = 40, padB = 46;
-                const plotW = w - padL - padR, plotH = h - padT - padB;
-                const n = days.length;
-                const groupW = plotW / n;
-                const barW = groupW * 0.22; // 變細，呼應「原局五行」的細長條風格
-                const gap = (groupW - barW * 2) / 3;
-                const baseY = padT + plotH;
-                const barRadius = barW / 2; // 圓角比照原局五行的膠囊造型
-
-                // 折線圖（股價趨勢風）：點＝當日財星能量；財旺日標「旺」；與下方小卡連動閃爍
-                const pts = days.map((dday, i) => ({ x: padL + i * groupW + groupW / 2, y: baseY - plotH * dday.wealth / 100, d: dday, i }));
+                // ---- 21 日長條尺：寬度依實際容器，高度補滿到導覽列上方 ----
+                const geo = lwGeom(); window.__lwLastH = geo.key;
+                const w = geo.w, h = geo.h, n = days.length, groupW = w / n, padL = 0;
                 // 單調三次插值（Fritsch–Carlson）：曲線平滑但不會超過相鄰點，數值不失真
                 const smooth = (P) => {
                     const n = P.length, dx = [], m = [], tg = [];
@@ -5851,36 +6045,47 @@ ${hpTxt}`;
                     }
                     return dd;
                 };
-                const linePath = smooth(pts);
-                const areaPath = `${linePath} L${pts[pts.length - 1].x.toFixed(1)},${baseY} L${pts[0].x.toFixed(1)},${baseY} Z`;
-                let svg = `<svg class="lw-svg" viewBox="0 0 ${w} ${h}" width="100%" style="display:block; max-width:100%; overflow:visible;">`;
-                svg += `<defs>
-                        <linearGradient id="lwArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${T.c}" stop-opacity="0.35"/><stop offset="100%" stop-color="${T.c}" stop-opacity="0"/></linearGradient>
-                        <linearGradient id="lwLine" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="${T.c2}"/><stop offset="50%" stop-color="${T.c3}"/><stop offset="100%" stop-color="${T.c2}"/></linearGradient>
-                        <filter id="lwGlow" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                const padT = 18, padB = 50, baseY = h - padB, plotH = baseY - padT;
+                const yOf = v => baseY - plotH * Math.max(0, Math.min(100, v)) / 100;
+                const todayI = days.findIndex(x => x.isToday);
+                const pts = days.map((dd, i) => ({ x: i * groupW + groupW / 2, y: yOf(dd.wealth) }));
+                const line = smooth(pts), tX = pts[todayI].x;
+                window.__lxPts = pts; window.__lxBase = baseY;
+                let svg = `<svg class="lx-svg" viewBox="0 0 ${w} ${h}" width="100%" style="display:block; overflow:visible;">
+                    <defs>
+                        <linearGradient id="lxArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" class="lx-ga0"/><stop offset="1" class="lx-ga1"/></linearGradient>
+                        <clipPath id="lxPast"><rect x="0" y="0" width="${tX.toFixed(1)}" height="${h}"/></clipPath>
+                        <clipPath id="lxFut"><rect x="${tX.toFixed(1)}" y="0" width="${(w - tX).toFixed(1)}" height="${h}"/></clipPath>
                     </defs>`;
-                [25, 50, 75].forEach(v => { const yy = padT + plotH * (1 - v / 100); svg += `<line x1="${padL}" y1="${yy}" x2="${w - padR}" y2="${yy}" stroke="#242424" stroke-width="0.8" stroke-dasharray="2,3"/><text x="${padL - 4}" y="${yy + 3}" text-anchor="end" font-size="7" fill="#444">${v}</text>`; });
-                svg += `<line x1="${padL}" y1="${baseY}" x2="${w - padR}" y2="${baseY}" stroke="#3a3a3a" stroke-width="1"/>`;
-                svg += `<path class="lw-area" d="${areaPath}" fill="url(#lwArea)"/>`;
-                svg += `<path class="lw-trend" d="${linePath}" fill="none" stroke="url(#lwLine)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="1" filter="url(#lwGlow)"/>`;
-                pts.forEach(pt => {
-                    const wang = isHot(pt.d.wealthTier);
-                    svg += `<g class="lw-pt ${wang ? 'wang' : ''}" data-i="${pt.i}" style="--d:${(0.35 + pt.i * 0.07).toFixed(2)}s; cursor:pointer;" onclick="lwPick(${pt.i})">
-                        <circle class="lw-pulse" cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="6" fill="none" stroke="#00d2ff" stroke-width="1.8"/>
-                        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${wang ? 6 : 4.4}" fill="${wang ? T.c : '#141414'}" stroke="${wang ? T.c3 : T.c2}" stroke-width="1.8"/>
-                        <circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="16" fill="transparent"/>
-                        ${wang ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y - 14).toFixed(1)}" text-anchor="middle" font-size="13" font-weight="bold" fill="${T.c3}">${T.mark}</text>` : ''}
-                        ${pt.d.career && pt.d.career.ok ? `<g class="lw-zhuan"><rect x="${(pt.x - 9).toFixed(1)}" y="${(pt.y - (wang ? 45 : 30)).toFixed(1)}" width="18" height="16" rx="4" fill="#2ed573"/><text x="${pt.x.toFixed(1)}" y="${(pt.y - (wang ? 45 : 30) + 12.5).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">轉</text></g>` : ''}
-                        ${pt.d.juList.some(j => j.type === 'boost') ? `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="11" fill="none" stroke="#b388ff" stroke-width="1.6" stroke-dasharray="3 2.5" class="lw-ju-ring"/>` : ''}
-                        ${pt.d.poCai.length ? `<g class="lw-po"><circle cx="${pt.x.toFixed(1)}" cy="${(Math.min(baseY - 12, pt.y + 18)).toFixed(1)}" r="9.5" fill="#2a0d0d" stroke="#ff5252" stroke-width="1.4"/><text x="${pt.x.toFixed(1)}" y="${(Math.min(baseY - 12, pt.y + 18) + 4.3).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff6b6b">破</text></g>` : ''}
-                        ${pt.d.tao && pt.d.tao.xing ? `<g class="lw-po"><circle cx="${pt.x.toFixed(1)}" cy="${(Math.min(baseY - 12, pt.y + 18)).toFixed(1)}" r="9.5" fill="#2a0d14" stroke="#ff5c8a" stroke-width="1.4"/><text x="${pt.x.toFixed(1)}" y="${(Math.min(baseY - 12, pt.y + 18) + 4.3).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff7ea3">刑</text></g>` : ''}
-                        ${pt.d.tao && pt.d.tao.he ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y + 22).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" class="lw-he">★</text>` : ''}
-                        ${pt.d.tao && pt.d.tao.dong ? `<text x="${pt.x.toFixed(1)}" y="${(pt.y - (wang ? 30 : 14)).toFixed(1)}" text-anchor="middle" font-size="13" class="lw-dong">⚡</text>` : ''}
-                        <title>${pt.d.dateShort}（${pt.d.weekLabel}）${pt.d.gan}${pt.d.zhi}｜${pt.d.wealth}</title>
+                svg += `<line x1="0" y1="${yOf(LIURI_HOT).toFixed(1)}" x2="${w}" y2="${yOf(LIURI_HOT).toFixed(1)}" class="lx-thr"/>`;
+                svg += `<line x1="0" y1="${baseY}" x2="${w}" y2="${baseY}" class="lx-base"/>`;
+                // 跨月分隔
+                days.forEach((dd, i) => { const d0 = dd.dateShort.split('/'); if (+d0[1] === 1 && i > 0) { const x = (pts[i].x - groupW / 2).toFixed(1); svg += `<line class="lx-msep" x1="${x}" y1="${padT - 4}" x2="${x}" y2="${baseY}"/><text class="lx-mlab" x="${(+x + 4).toFixed(1)}" y="${padT + 6}">${d0[0]} 月</text>`; } });
+                svg += `<path class="lx-area" d="${line} L${pts[pts.length - 1].x.toFixed(1)},${baseY} L${pts[0].x.toFixed(1)},${baseY} Z" fill="url(#lxArea)" clip-path="url(#lxFut)"/>`;
+                svg += `<path class="lx-line lx-line-past" d="${line}" pathLength="1" clip-path="url(#lxPast)"/>`;
+                svg += `<path class="lx-line lx-line-fut" d="${line}" pathLength="1" clip-path="url(#lxFut)"/>`;
+                svg += `<path class="lx-run" d="${line}" pathLength="1"/>`;
+                // 今天的位置：細直線
+                svg += `<line class="lx-now" x1="${tX.toFixed(1)}" y1="${padT - 4}" x2="${tX.toFixed(1)}" y2="${baseY}"/>`;
+                // 選取十字線
+                svg += `<g id="lxCross" class="lx-cross"><line class="lx-cross-v" x1="0" y1="${padT - 6}" x2="0" y2="${baseY}"/><circle class="lx-cross-dot" r="4.5"/></g>`;
+                days.forEach((dd, i) => {
+                    const cx = pts[i].x, hot = isHot(dd.wealthTier), half = !hot && dd.wealthTier !== '平', past = i < todayI;
+                    const marks = [];
+                    if (dd.poCai.length) marks.push('<rect class="lx-m-po" x="-3.5" y="-3.5" width="7" height="7" rx="1"/>');
+                    if (dd.tao && (dd.tao.xing || dd.tao.dong)) marks.push('<rect class="lx-m-xing" x="-3.2" y="-3.2" width="6.4" height="6.4" rx="1"/>');
+                    if (dd.juList.some(j => j.type === 'boost')) marks.push('<circle class="lx-m-ju" r="3.2"/>');
+                    const mk = marks.slice(0, 2).map((m, k, a) => `<g transform="translate(${(cx + (a.length > 1 ? (k ? 5 : -5) : 0)).toFixed(1)},${baseY + 9})">${m}</g>`).join('');
+                    svg += `<g class="lw-pt lx-col ${hot ? 'hot' : half ? 'half' : 'flat'} ${past ? 'past' : ''} ${dd.isToday ? 'today' : ''}" data-i="${i}" style="--d:${(0.5 + i * 0.03).toFixed(2)}s">
+                        ${hot ? `<circle class="lx-hotdot" cx="${cx.toFixed(1)}" cy="${pts[i].y.toFixed(1)}" r="3.8"/>` : ''}
+                        ${dd.tao && dd.tao.he ? `<path class="lx-m-he lx-star" transform="translate(${cx.toFixed(1)},${(pts[i].y - 12).toFixed(1)}) scale(1.35)" d="M0,-4.5 L1.3,-1.4 L4.5,-1.4 L1.9,0.6 L2.9,4 L0,2 L-2.9,4 L-1.9,0.6 L-4.5,-1.4 L-1.3,-1.4 Z"/>` : ''}
+                        ${mk}
+                        <text class="lx-dn" x="${cx.toFixed(1)}" y="${baseY + 29}" text-anchor="middle">${+dd.dateShort.split('/')[1]}</text>
+                        <text class="lx-wd" x="${cx.toFixed(1)}" y="${baseY + 43}" text-anchor="middle">${dd.isToday ? '今' : dd.weekLabel}</text>
                     </g>`;
-                    svg += `<text class="lw-xl" data-i="${pt.i}" x="${pt.x}" y="${h - padB + 15}" text-anchor="middle" font-size="9" fill="${pt.d.isToday ? 'var(--accent)' : '#888'}" font-weight="${pt.d.isToday ? 'bold' : 'normal'}">${pt.d.dateShort}</text>`;
-                    svg += `<text x="${pt.x}" y="${h - padB + 28}" text-anchor="middle" font-size="9" fill="${pt.d.isToday ? 'var(--accent)' : '#666'}">${pt.d.isToday ? '今日' : '週' + pt.d.weekLabel}</text>`;
                 });
+                // 觸控／滑鼠拖曳整張圖：手指滑到哪天就顯示哪天
+                svg += `<rect class="lx-hit" x="0" y="0" width="${w}" height="${h}" fill="transparent"/>`;
                 svg += `</svg>`;
 
                 // 轉職小卡：點選流月圓點顯示該月細節
@@ -5966,24 +6171,20 @@ ${hpTxt}`;
                     }
                     const W = 720, H = 222, pL = 26, pR = 10, pT = 34, pB = 50, pw = W - pL - pR, ph = H - pT - pB, gw = pw / ms.length, bY = pT + ph;
                     const P = ms.map((m, i) => ({ x: pL + i * gw + gw / 2, y: bY - ph * m.c.score / 100, m, i }));
-                    let svg = `<svg class="zh-svg" viewBox="0 0 ${W} ${H}" width="100%" style="display:block; overflow:visible;">
-                        <defs><linearGradient id="zhArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#2ed573" stop-opacity=".3"/><stop offset="100%" stop-color="#2ed573" stop-opacity="0"/></linearGradient></defs>`;
-                    [20, 40, 60, 80].forEach(v => { const yy = pT + ph * (1 - v / 100); svg += `<line x1="${pL}" y1="${yy}" x2="${W - pR}" y2="${yy}" stroke="${v === 60 ? 'rgba(46,213,115,.35)' : '#242424'}" stroke-width="0.8" stroke-dasharray="2,3"/><text x="${pL - 4}" y="${yy + 3}" text-anchor="end" font-size="8" fill="${v === 60 ? '#2ed573' : '#444'}">${v}</text>`; });
-                    // 年份分隔
-                    P.forEach((p, i) => { if (i > 0 && p.m.dm.getMonth() === 1) svg += `<line x1="${(p.x - gw / 2).toFixed(1)}" y1="${pT - 8}" x2="${(p.x - gw / 2).toFixed(1)}" y2="${bY}" stroke="#333" stroke-width="1"/><text x="${(p.x - gw / 2 + 3).toFixed(1)}" y="${pT - 10}" font-size="9" fill="#666">${p.m.dm.getFullYear()}</text>`; });
-                    const line = smooth(P);
-                    svg += `<path d="${line} L${P[P.length - 1].x.toFixed(1)},${bY} L${P[0].x.toFixed(1)},${bY} Z" fill="url(#zhArea)" class="lw-area"/>`;
-                    svg += `<path d="${line}" fill="none" stroke="#2ed573" stroke-width="1.8" stroke-linejoin="round" pathLength="1" class="lw-trend"/>`;
+                    const bw = Math.min(12, gw * 0.42);
+                    let svg = `<svg class="zh-svg lx-zsvg" viewBox="0 0 ${W} ${H}" width="100%" style="display:block; overflow:visible;">`;
+                    svg += `<line x1="${pL}" y1="${(pT + ph * .4).toFixed(1)}" x2="${W - pR}" y2="${(pT + ph * .4).toFixed(1)}" class="lx-thr lx-thr60"/><text x="${pL - 4}" y="${(pT + ph * .4 + 3).toFixed(1)}" text-anchor="end" class="lx-ax">60</text>`;
+                    svg += `<line x1="${pL}" y1="${bY}" x2="${W - pR}" y2="${bY}" class="lx-base"/>`;
+                    P.forEach((p, i) => { if (i > 0 && p.m.dm.getMonth() === 1) svg += `<line class="lx-msep" x1="${(p.x - gw / 2).toFixed(1)}" y1="${pT - 12}" x2="${(p.x - gw / 2).toFixed(1)}" y2="${bY}"/><text class="lx-mlab" x="${(p.x - gw / 2 + 4).toFixed(1)}" y="${pT - 4}">${p.m.dm.getFullYear()}</text>`; });
                     P.forEach(p => {
-                        const ok = p.m.c.ok, past = p.m.k < 0, now = p.m.k === 0;
-                        svg += `<g class="lw-pt zh-pt" data-i="${p.i}" onclick="lwZhPick(${p.i})" style="--d:${(0.3 + p.i * 0.03).toFixed(2)}s; cursor:pointer;">
-                            <circle class="lw-pulse" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6" fill="none" stroke="#00d2ff" stroke-width="1.8"/>
-                            <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="12" fill="transparent"/>
-                            <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${ok ? 5.8 : 4.2}" fill="${ok ? '#2ed573' : '#141414'}" stroke="${now ? '#00d2ff' : (ok ? '#c9ffdf' : '#2b7a4b')}" stroke-width="${now ? 2.4 : 1.7}" opacity="${past ? .55 : 1}"/>
-                            ${ok ? `<rect x="${(p.x - 9).toFixed(1)}" y="${(p.y - 29).toFixed(1)}" width="18" height="17" rx="4" fill="#2ed573" opacity="${past ? .55 : 1}"/><text x="${p.x.toFixed(1)}" y="${(p.y - 16.3).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="bold" fill="#000">轉</text>` : ''}
+                        const ok = p.m.c.ok, past = p.m.k < 0, now = p.m.k === 0, top = Math.min(bY - 2, p.y);
+                        svg += `<g class="lw-pt zh-pt lx-col ${ok ? 'hot' : (p.m.c.score >= 40 ? 'half' : 'flat')} ${past ? 'past' : ''} ${now ? 'today' : ''}" data-i="${p.i}" onclick="lwZhPick(${p.i})" style="--d:${(p.i * 0.02).toFixed(3)}s; cursor:pointer;">
+                            <rect class="lx-sel" x="${(p.x - gw / 2 + 1).toFixed(1)}" y="${pT - 8}" width="${(gw - 2).toFixed(1)}" height="${(H - pT + 6).toFixed(1)}" rx="6"/>
+                            <rect class="lx-bar" x="${(p.x - bw / 2).toFixed(1)}" y="${top.toFixed(1)}" width="${bw.toFixed(1)}" height="${(bY - top).toFixed(1)}" rx="2"/>
+                            <text class="lx-dn" x="${p.x.toFixed(1)}" y="${bY + 15}" text-anchor="middle">${p.m.dm.getMonth() + 1}月</text>
+                            <text x="${p.x.toFixed(1)}" y="${bY + 30}" text-anchor="middle" class="lx-zgz"><tspan fill="${elementColors[ganElementMap[p.m.mg]]}">${p.m.mg}</tspan><tspan fill="${elementColors[zhiElementMap[p.m.mz]]}">${p.m.mz}</tspan></text>
+                            <rect x="${(p.x - gw / 2).toFixed(1)}" y="0" width="${gw.toFixed(1)}" height="${H}" fill="transparent"/>
                         </g>`;
-                        svg += `<text x="${p.x.toFixed(1)}" y="${bY + 14}" text-anchor="middle" font-size="8.5" fill="${now ? '#00d2ff' : (past ? '#2b6a85' : '#888')}" font-weight="${now ? 'bold' : 'normal'}">${p.m.dm.getMonth() + 1}月</text>`;
-                        svg += `<text x="${p.x.toFixed(1)}" y="${bY + 27}" text-anchor="middle" font-size="9" font-weight="bold"><tspan fill="${elementColors[ganElementMap[p.m.mg]]}">${p.m.mg}</tspan><tspan fill="${elementColors[zhiElementMap[p.m.mz]]}">${p.m.mz}</tspan></text>`;
                     });
                     svg += `</svg>`;
                     const okList = ms.filter(m => m.c.ok && m.k >= 0).slice(0, 6).map(m => `${m.dm.getFullYear()}/${m.dm.getMonth() + 1}（${m.mg}${m.mz}）`).join('、');
@@ -6016,77 +6217,80 @@ ${hpTxt}`;
                     </div>`;
                 };
                 const ssShort = SS_SHORT;
-                const adviceCards = days.map(dday => {
-                    const relation = (dday.chongXingBadges || dday.hejuBadges)
-                        ? `${dday.chongXingBadges || ''} ${dday.hejuBadges || ''}`.trim()
-                        : '<span class="tag tag-neutral">無明顯沖合</span>';
-                    const zhiTgShort = dday.zhiHiddenGans.map((hg, k) => `<span style="color:${elementColors[ganElementMap[hg]]}">${ssShort[dday.zhiHiddenTenGods[k]] || dday.zhiHiddenTenGods[k]}</span>`).join('<span style="color:#555">/</span>');
+                const EL2 = { '木': '#79b26f', '火': '#de6a55', '土': '#cf9a52', '金': '#dcc27e', '水': '#6a9bd8' };
+                const tierTxt = t => t === '平' ? '平穩' : t;
+                const adviceCards = days.map((dday, i) => {
+                    const d0 = new Date(todayD.getFullYear(), todayD.getMonth(), todayD.getDate() + i - days.findIndex(x => x.isToday));
+                    const hot = isHot(dday.wealthTier), half = !hot && dday.wealthTier !== '平';
+                    const zhiTg = dday.zhiHiddenGans.map((hg, k) => ssShort[dday.zhiHiddenTenGods[k]] || dday.zhiHiddenTenGods[k]).join('・');
+                    const rows = [];
+                    if (dday.wealthDetail) rows.push(['能量', dday.wealthDetail]);
+                    dday.juList.filter(j => j.type === 'boost').forEach(j => rows.push([j.kind, `${j.name}・${j.label}（${j.from}＋流日）`]));
+                    if (dday.poCai.length) rows.push(['破財', dday.poCai.map(h => h.txt).join('；'), 'seal']);
+                    if (dday.tao && dday.tao.he) rows.push(['三合', dday.tao.he, 'acc']);
+                    if (dday.tao && dday.tao.dong) rows.push(['變動', dday.tao.dong]);
+                    if (dday.tao && dday.tao.xing) rows.push(['刑', dday.tao.xing, 'seal']);
+                    const tags = pillarTagsHtml(dday.gan, dday.zhi, topicEl), guard = tgGuardHtml(dday.gan, dday.zhi, baseZhis, '');
                     return `
-                        <div class="liuri-advice-card${dday.isToday ? ' is-today' : ''}" ${dday.isToday ? 'id="liuriAdviceToday"' : ''}>
-                            <div class="liuri-advice-topline">
-                                <span class="liuri-advice-date">${dday.dateShort}（${dday.weekLabel}）${dday.isToday ? '・今日' : ''}</span>
-                                <span class="liuri-advice-ganzhi">
-                                    <span style="color:${dday.cGan}">${dday.gan}</span><span class="liuri-advice-tg" style="color:${dday.cGan}">${ssShort[dday.ganTenGod] || dday.ganTenGod || '-'}</span>
-                                    <span style="color:${dday.cZhi}">${dday.zhi}</span><span class="liuri-advice-tg">${zhiTgShort || '-'}</span>
-                                </span>
+                        <div class="liuri-advice-card lx-hero ${hot ? 'hot' : half ? 'half' : 'flat'}${dday.isToday ? ' is-today' : ''}" ${dday.isToday ? 'id="liuriAdviceToday"' : ''}>
+                            <div class="lx-date">${d0.getMonth() + 1} 月 ${d0.getDate()} 日<span>星期${dday.weekLabel}</span>${dday.isToday ? '<em>今天</em>' : ''}</div>
+                            <div class="lx-main">
+                                <div class="lx-gz">
+                                    <span class="lx-ch"><b style="color:${EL2[ganElementMap[dday.gan]]}">${dday.gan}</b><small>${dday.ganTenGod || '—'}</small></span>
+                                    <span class="lx-ch"><b style="color:${EL2[zhiElementMap[dday.zhi]]}">${dday.zhi}</b><small>${zhiTg || '—'}</small></span>
+                                </div>
+                                <div class="lx-score"><b>${dday.wealth}</b><span>${tierTxt(dday.wealthTier)}</span></div>
                             </div>
-                            ${pillarTagsHtml(dday.gan, dday.zhi, topicEl) ? `<div class="lw-line pt-line">${pillarTagsHtml(dday.gan, dday.zhi, topicEl)}</div>` : ''}
-                            ${tgGuardHtml(dday.gan, dday.zhi, baseZhis, '')}
-                            <div class="lw-line lw-${dday.wealthTier}"><span class="lw-chip">${dday.wealthTier}${dday.wealthTier !== '平' ? ' ' + dday.wealth : ''}</span><span>${dday.wealthDetail || '—'}</span></div>
-                            ${dday.juList.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流日）</span></div>`).join('')}
-                            ${dday.career ? `<div class="lw-line lw-zh-line ${dday.career.ok ? 'ok' : ''}"><span class="lw-chip">轉職 ${dday.career.score}</span><span>流年${dday.career.yGZ}（${dday.career.y}/2）・流月${dday.career.mGZ}（${dday.career.m}/2）${dday.career.ok ? '・<b>宜轉職</b>' : ''}</span></div>` : ''}
-                            ${dday.poCai.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${dday.poCai.map(h => h.txt).join('；')}</span></div>` : ''}
-                            ${dday.tao && dday.tao.he ? `<div class="lw-line lw-he-line"><span class="lw-chip">生肖三合</span><span>${dday.tao.he}</span></div>` : ''}
-                            ${dday.tao && dday.tao.dong ? `<div class="lw-line lw-dong-line"><span class="lw-chip">⚡ 變動</span><span>${dday.tao.dong}</span></div>` : ''}
-                            ${dday.tao && dday.tao.xing ? `<div class="lw-line lw-xing-line"><span class="lw-chip">刑</span><span>${dday.tao.xing}</span></div>` : ''}
-                        </div>
-                    `;
+                            ${tags || guard ? `<div class="lx-tags">${tags}${guard}</div>` : ''}
+                            ${rows.length ? `<dl class="lx-rows">${rows.map(r => `<div class="${r[2] || ''}"><dt>${r[0]}</dt><dd>${r[1]}</dd></div>`).join('')}</dl>` : `<div class="lx-empty">今天沒有特別引動，照常安排即可</div>`}
+                        </div>`;
                 });
 
+                const legendItems = [
+                    `<span><svg viewBox="-5 -5 10 10"><circle r="3.6" fill="var(--tc)"/></svg>${T.hot}</span>`, `<span class="lx-lg-thr"><i></i>${T.hotShort}門檻</span>`,
+                    topic === 'cai' ? `<span><svg viewBox="-5 -5 10 10"><rect class="lx-m-po" x="-3.5" y="-3.5" width="7" height="7" rx="1"/></svg>破財</span>` : '',
+                    topic === 'tao' ? `<span><svg viewBox="-5 -5 10 10"><rect class="lx-m-xing" x="-3.2" y="-3.2" width="6.4" height="6.4" rx="1"/></svg>刑沖夫妻宮</span><span><svg viewBox="-5 -5 10 10"><path class="lx-m-he" d="M0,-4.5 L1.3,-1.4 L4.5,-1.4 L1.9,0.6 L2.9,4 L0,2 L-2.9,4 L-1.9,0.6 L-4.5,-1.4 L-1.3,-1.4 Z"/></svg>生肖三合</span>` : '',
+                    `<span><svg viewBox="-5 -5 10 10"><circle class="lx-m-ju" r="3.2"/></svg>${topic === 'tao' ? '夫妻星成局' : '三合／三會'}</span>`
+                ].filter(Boolean).join('');
+                const TOPICS = [['cai', '財運'], ['work', '工作'], ['ren', '人際'], ['tao', '桃花']];
                 const body = `
-                    <div class="lw-bar-top">
-                    <div class="lw-topics">
-                        <span class="lw-topic ${topic === 'cai' ? 'on' : ''}" onclick="lwTopic('cai')">💰 財運</span>
-                        <span class="lw-topic ${topic === 'work' ? 'on' : ''}" onclick="lwTopic('work')">💼 工作</span>
-                        <span class="lw-topic ${topic === 'ren' ? 'on' : ''}" onclick="lwTopic('ren')">🤝 人際</span>
-                        <span class="lw-topic ${topic === 'tao' ? 'on' : ''}" onclick="lwTopic('tao')">🌸 桃花</span>
+                    <div class="lw-bar-top lx-top">
+                        <div class="lw-topics lx-topics" role="tablist">${TOPICS.map(([k, nm]) => `<button type="button" role="tab" class="lw-topic lx-topic ${topic === k ? 'on' : ''}" data-k="${k}" onclick="lwTopic('${k}')">${nm}</button>`).join('')}</div>
+                        <div class="lw-view lx-view">
+                            <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
+                            <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
+                            ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : (topic === 'cai' || topic === 'tao') ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能</span>` : `<span class="lw-vbtn" data-v="fr" onclick="lwView('fr')">朋友</span>`}
+                        </div>
                     </div>
-                    <div class="lw-view">
-                        <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
-                        <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
-                        ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : (topic === 'cai' || topic === 'tao') ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能顏色</span>` : `<span class="lw-vbtn" data-v="fr" onclick="lwView('fr')">朋友</span>`}
-                    </div>
-                    </div>
-                    <div class="liuri-legend">
-                        <span><span class="liuri-legend-dot" style="background:${T.c}; border-radius:50%; box-shadow:0 0 6px ${T.c};"></span>${T.hot}</span>
-                        ${topic === 'cai' ? `<span><span class="liuri-legend-dot" style="background:#2a0d0d; border:1px solid #ff5252; border-radius:50%;"></span>破財（主動破財）</span>` : ''}
-                        ${topic === 'tao' ? `<span><span class="liuri-legend-dot" style="background:#2a0d14; border:1px solid #ff5c8a; border-radius:50%;"></span>刑夫妻宮</span><span>⚡ 沖夫妻宮</span><span style="color:#ffd1e6">★ 生肖三合</span>` : ''}
-                        <span><span class="liuri-legend-dot" style="border:1.2px dashed #b388ff; border-radius:50%;"></span>三合／三會</span>
-                    </div>
-                    ${topic === 'ren' ? `<div class="lw-tip">小人與貴人一線之隔：<b>謹言慎行、少說多聽</b>，避免在這天做重大表態。</div>` : ''}
+                    ${topic === 'ren' ? `<div class="lw-tip">慎言日：<b>謹言慎行、少說多聽</b>，避免在這天做重大表態。</div>` : ''}
+                    ${topic === 'tao' ? `<div class="lw-tip">刑沖夫妻宮：感情容易有摩擦或變動，<b>多溝通、少計較</b>。</div>` : ''}
+                    ${topic === 'cai' ? `<div class="lw-tip">破財日：利用破財日<b>投資自己、累積資產、行善社會</b>。</div>` : ''}
                     <div class="lw-pane" data-v="d10">
-                    <div class="liuri-chart-wrap lw-scroll">${svg}</div>
-                    <div id="liuriCard"></div>
+                        <div class="liuri-chart-wrap lw-scroll lx-chart">${svg}</div>
+                        <div class="liuri-legend lx-legend">${legendItems}</div>
+                        <div id="liuriCard"></div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
                     ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : (topic === 'cai' || topic === 'tao') ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : `<div class="lw-pane" data-v="fr" style="display:none;"><div id="friendPanel"></div></div>`}
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('<span style="display:inline-flex; align-items:center;"><svg class="sec-ic ic-pulse" viewBox="0 0 24 24" aria-hidden="true"><polyline points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".25"/><polyline class="ic-pulse-run" points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/></svg>流日動能</span>', body, true);
-                document.getElementById('liuriOutput').className = 'topic-' + topic;
+                document.getElementById('liuriOutput').className = 'lx topic-' + topic;
                 setTimeout(() => { try { lwFit(); } catch (e) {} }, 40);
 
                 const todayIdx = days.findIndex(d => d.isToday);
                 // 折線點 ↔ 單張小卡：點哪天就顯示哪天；手機版圖表可橫向滑動
                 const setActive = (idx) => {
                     const root = document.getElementById('liuriOutput');
-                    root.querySelectorAll('.lw-pane[data-v="d10"] .lw-pt').forEach(g => g.classList.toggle('active', +g.dataset.i === idx));
+                    root.querySelectorAll('.lw-pane[data-v="d10"] .lx-col').forEach(g => g.classList.toggle('active', +g.dataset.i === idx));
+                    const cr = document.getElementById('lxCross'), P = window.__lxPts;
+                    if (cr && P && P[idx]) { cr.style.transform = `translate(${P[idx].x}px, 0)`; cr.querySelectorAll('circle').forEach(c => c.setAttribute('cy', P[idx].y.toFixed(1))); cr.classList.toggle('hot', isHot(days[idx].wealthTier)); }
                     const card = document.getElementById('liuriCard'); if (card) card.innerHTML = adviceCards[idx] || '';
                     window.__lwIdx = idx;
                 };
                 const centerChart = (idx, smoothScroll) => {
                     const wrap = document.querySelector('#liuriOutput .lw-pane[data-v="d10"] .lw-scroll'), svgEl = wrap && wrap.querySelector('svg');
                     if (!wrap || !svgEl || svgEl.getBoundingClientRect().width <= wrap.clientWidth + 1) return;
-                    const x = (padL + idx * groupW + groupW / 2) / w * svgEl.getBoundingClientRect().width;
+                    const x = (idx + 0.5) / n * svgEl.getBoundingClientRect().width;
                     wrap.scrollTo({ left: x - wrap.clientWidth / 2, behavior: smoothScroll ? 'smooth' : 'auto' });
                 };
                 // ---- 月曆檢視 ----
@@ -6112,7 +6316,6 @@ ${hpTxt}`;
                         attachSwipe(document.getElementById('zhCard'), () => step(-1), () => step(1)); } }
                     if (v === 'cc') { const c = document.getElementById('lwCc'); if (c) c.innerHTML = buildColorView(); }
                     if (v === 'fr') renderFriendsTab();
-                    const lg = document.querySelector('#liuriOutput .liuri-legend'); if (lg) lg.style.display = (v === 'zh' || v === 'cc' || v === 'fr') ? 'none' : '';
                     const tp = document.querySelector('#liuriOutput .lw-tip'); if (tp) tp.style.display = v === 'fr' ? 'none' : '';
                 };
                 window.lwCalShift = (k) => { const m = window.__lwCalMonth; window.__lwCalMonth = new Date(m.getFullYear(), m.getMonth() + k, 1); window.__lwCalSel = null; renderLwCalendar(); };
@@ -6170,6 +6373,15 @@ ${hpTxt}`;
                 window.lwPick = (i) => { setActive(i); centerChart(i, true); };
                 setActive(todayIdx);
                 requestAnimationFrame(() => requestAnimationFrame(() => centerChart(todayIdx, false)));
+                {   const svgEl = document.querySelector('#liuriOutput .lx-svg');
+                    if (svgEl) {
+                        let drag = false;
+                        const at = e => { const r = svgEl.getBoundingClientRect(); const i = Math.max(0, Math.min(days.length - 1, Math.floor((e.clientX - r.left) / r.width * days.length))); if (i !== window.__lwIdx) setActive(i); };
+                        svgEl.addEventListener('pointerdown', e => { drag = true; svgEl.classList.add('scrub'); at(e); try { svgEl.setPointerCapture(e.pointerId); } catch (x) {} });
+                        svgEl.addEventListener('pointermove', e => { if (drag) at(e); });
+                        const end = () => { if (drag) { drag = false; svgEl.classList.remove('scrub'); try { track('lwPick'); } catch (x) {} } };
+                        svgEl.addEventListener('pointerup', end); svgEl.addEventListener('pointercancel', end);
+                    } }
                 attachSwipe(document.getElementById('liuriCard'),
                     () => { if (window.__lwIdx > 0) window.lwPick(window.__lwIdx - 1); },
                     () => { if (window.__lwIdx < days.length - 1) window.lwPick(window.__lwIdx + 1); });
@@ -6886,7 +7098,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.44';
+    const APP_VER = 'V3.45';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -6927,14 +7139,14 @@ ${hpTxt}`;
         const text = t.value.trim();
         if (text.length < 2) { t.focus(); t.placeholder = '請先寫下你希望的功能'; return; }
         b.disabled = true; b.textContent = '送出中…';
-        const body = JSON.stringify({ type: 'wish', ver: APP_VER, device: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '手機' : '電腦', text, contact: c.value.trim() });
+        const body = JSON.stringify({ type: 'wish', ver: APP_VER, device: devInfo(), text, contact: c.value.trim() });
         const ok = () => { b.textContent = '✅ 已送出，謝謝你！'; t.value = ''; c.value = ''; setTimeout(() => { closeWish(); b.disabled = false; b.textContent = '送出'; }, 1400); };
         try { fetch(SHARE_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body }).then(ok, () => { b.disabled = false; b.textContent = '送出失敗，請再試一次'; }); }
         catch (e) { b.disabled = false; b.textContent = '送出失敗，請再試一次'; }
     }
     function flushUsage() {
         if (!shareOn() || !Object.keys(__usage.ev).length) return;
-        const body = JSON.stringify({ sid: __usage.sid, ver: APP_VER, device: /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? '手機' : '電腦', events: __usage.ev });
+        const body = JSON.stringify({ sid: __usage.sid, ver: APP_VER, device: devInfo(), events: __usage.ev });
         __usage.ev = {};
         try {
             if (navigator.sendBeacon) navigator.sendBeacon(SHARE_URL, new Blob([body], { type: 'text/plain;charset=utf-8' }));
@@ -7320,10 +7532,32 @@ ${sec.join('\n\n')}`;
         track('問題提詞・修改後複製');
         copyWithAiGo(t, btn, 'aiGoAsk', '✅ 已複製修改後的提詞');
     }
+    // 有勾選匿名分享時，回傳使用者在問題提詞自己打的字（職務、其他問題），寫進「功能許願」分頁，聯絡欄標「提詞自填」
+    // 裝置：類型・系統・瀏覽器（例如「手機・iOS・LINE」），不含任何可辨識個人的資訊
+    function devInfo() {
+        const u = navigator.userAgent || '', ipad = /iPad/.test(u) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const type = ipad || /Tablet/.test(u) || (/Android/.test(u) && !/Mobile/.test(u)) ? '平板' : (/Mobi|iPhone|Android/.test(u) ? '手機' : '電腦');
+        const os = /iPhone|iPad|iPod/.test(u) || ipad ? 'iOS' : /Android/.test(u) ? 'Android' : /Windows/.test(u) ? 'Windows' : /Mac OS X/.test(u) ? 'Mac' : /CrOS/.test(u) ? 'ChromeOS' : /Linux/.test(u) ? 'Linux' : '其他';
+        const br = /Line\//i.test(u) ? 'LINE' : /FBAN|FBAV/.test(u) ? 'Facebook' : /Instagram/.test(u) ? 'Instagram' : /SamsungBrowser/.test(u) ? 'Samsung' : /Edg\//.test(u) ? 'Edge'
+            : /CriOS|Chrome\//.test(u) ? 'Chrome' : /FxiOS|Firefox\//.test(u) ? 'Firefox' : /Safari\//.test(u) ? 'Safari' : '其他';
+        return `${type}・${os}・${br}`;
+    }
+    function askReport(o) {
+        try {
+            if (!shareOn()) return;
+            const role = (o.role || '').trim(), other = (o.other || '').trim();
+            if (!role && !other) return;
+            const topics = o.topics.map(k => (ASK_TOPICS.find(x => x[0] === k) || [k, k])[1]).join('、');
+            const text = [role ? `職務：${role}` : '', other ? `問題：${other}` : '', topics ? `題目：${topics}` : ''].filter(Boolean).join('｜');
+            const body = JSON.stringify({ type: 'wish', ver: APP_VER, device: devInfo(), text, contact: '提詞自填' });
+            fetch(SHARE_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body }).catch(() => {});
+        } catch (e) {}
+    }
     function askCopy(btn) {
         const o = askRead();
         if (!o.topics.length && !o.other.trim() && !o.kFrom) { const e = document.getElementById('askErr'); e.textContent = '請至少選一題，或在「其他問題」輸入'; return; }
         askSave(o);
+        askReport(o);
         const txt = buildAskPrompt(o);
         if (!txt) { alert('請先執行運算'); return; }
         o.topics.forEach(k => track('問題提詞・' + (ASK_TOPICS.find(x => x[0] === k) || [k, k])[1]));
@@ -7505,7 +7739,7 @@ ${d.safetyScan || '無'}`;
         if (tab.k === 'pro' && window.__proSub === 'iaOutput' && window.__ia) requestAnimationFrame(() => { try { window.__ia.needCenter = true; iaDrawArcs(); } catch (e) {} });
         document.body.classList.toggle('nav-sub', tab.k !== 'home');
         document.getElementById('fabStack').style.display = 'flex';
-        if (tab.k === 'luck' && window.__renderLiuri && lwTargetH(40 * 21 + 30) !== window.__lwLastH) { try { window.__renderLiuri(); } catch (e) {} }
+        if (tab.k === 'luck' && window.__renderLiuri && lwTargetH() !== window.__lwLastH) { try { window.__renderLiuri(); } catch (e) {} }
         navRender(); miniRender();
     }
     function whoRender() {
@@ -7589,7 +7823,7 @@ ${d.safetyScan || '無'}`;
         const now = Solar.fromDate(new Date()).getLunar().getEightChar();
         const dy = String(d.currentDaYun || ''), ln = String(d.currentYear || '');
         const P = i => ps[i] || '--';
-        box.innerHTML = `<div class="mbz-grid">
+        box.innerHTML = `<button type="button" class="mbz-close" onclick="miniToggle()" aria-label="收回八字">收回 ▾</button><div class="mbz-grid">
             ${col('流月', now.getMonthGan(), now.getMonthZhi(), 'yun')}${col('流年', ln[0], ln[1], 'yun')}${col('大運', dy[0], dy[1], 'yun')}
             ${col('時柱', P(3)[0], P(3)[1], 'sep')}${col('日柱', P(2)[0], P(2)[1], '', true)}${col('月柱', P(1)[0], P(1)[1])}${col('年柱', P(0)[0], P(0)[1])}
         </div>`;
@@ -7602,30 +7836,26 @@ ${d.safetyScan || '無'}`;
         if (window.scrollY > y) window.scrollTo({ top: y, behavior: 'smooth' });
     }
     // 運勢頁：趨勢圖高度依螢幕剩餘空間拉長，讓畫面填滿到導覽列
-    function lwTargetH(w) {
-        if (!document.body.classList.contains('has-bnav')) return 230;
-        if (window.__lwFitH) return window.__lwFitH;
+    function lwGeom() {
         const box = document.getElementById('liuriOutput');
-        const disp = Math.max(640, (box && box.clientWidth) || 640), sc = disp / w;
-        const avail = window.innerHeight - 500;          // 標題列＋主題分頁＋當日小卡＋導覽列＋懸浮鈕 約 500px
-        return Math.round(Math.max(230, Math.min(640, avail / sc)));
+        let cw = box ? box.clientWidth : 0;
+        if (!cw) cw = Math.min(window.innerWidth, 560) - 20;
+        cw = Math.max(300, Math.round(cw));
+        let h = 210;
+        if (document.body.classList.contains('has-bnav')) h = window.__lwFitH || Math.round(Math.max(170, Math.min(320, window.innerHeight - 540)));
+        return { w: cw, h, key: cw + 'x' + h };
     }
-    // 依實際版面微調：讓當日小卡剛好停在「⋯」按鈕上方，不留大片空白
+    function lwTargetH() { return lwGeom().key; }
     window.addEventListener('resize', () => { window.__lwFitH = 0; });
+    // 依實際版面微調：長條尺底部停在「⋯」按鈕上方
     function lwFit() {
         if (!document.body.classList.contains('has-bnav') || window.__navTab !== 'luck') return;
-        const wrap = document.querySelector('#liuriOutput .lw-scroll'), svg = wrap && wrap.querySelector('svg');
-        const card = document.getElementById('liuriCard'), nav = document.getElementById('bnav');
-        if (!svg || !card || !nav || !card.offsetHeight) return;
-        const navTop = nav.getBoundingClientRect().top;
-        const cardBottom = card.getBoundingClientRect().bottom + window.scrollY;      // 以頁面頂端為基準
-        const delta = (navTop - 62) - cardBottom;                                      // 62＝「⋯」按鈕的空間
-        if (Math.abs(delta) < 12) return;
-        const vb = svg.viewBox.baseVal, dispH = svg.getBoundingClientRect().height;
-        if (!vb || !dispH) return;
-        const sc = dispH / vb.height;
-        const next = Math.round(Math.max(230, Math.min(900, (dispH + delta) / sc)));
-        if (next === window.__lwLastH) return;
+        const svg = document.querySelector('#liuriOutput .lx-svg'), lg = document.getElementById('liuriCard'), nav = document.getElementById('bnav');
+        if (!svg || !lg || !nav || !lg.offsetHeight) return;
+        const delta = (nav.getBoundingClientRect().top - 66) - lg.getBoundingClientRect().bottom;
+        if (Math.abs(delta) < 10) return;
+        const cur = svg.getBoundingClientRect().height, next = Math.round(Math.max(170, Math.min(420, cur + delta)));
+        if (next === lwGeom().h) return;
         window.__lwFitH = next; window.__renderLiuri();
     }
     function navGo(k) { window.__navTab = k; navApply(); navScrollTop(); }
