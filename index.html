@@ -7288,10 +7288,11 @@ ${hpTxt}`;
         else { const v = parseInt((document.getElementById('baziYear') || {}).value); if (v && v !== ny) by = v; }
         const age = ny - by;
         const band = !(age >= 0 && age < 130) ? '不明' : age < 18 ? '未滿18' : age < 25 ? '18–24' : age < 30 ? '25–29' : age < 35 ? '30–34' : age < 40 ? '35–39' : age < 50 ? '40–49' : age < 60 ? '50–59' : '60以上';
-        __chartTag = { band, sex: (document.getElementById('gender') || {}).value === '0' ? '女' : '男' };
+        // 7 歲以下的命盤（多半是家長幫小孩排）完全不記錄
+        __chartTag = { band, sex: (document.getElementById('gender') || {}).value === '0' ? '女' : '男', skip: age >= 0 && age < 7 };
     }
     function track(name) {
-        if (!shareOn() || !name) return;
+        if (!shareOn() || !name || __chartTag.skip) return;
         const k = `${__chartTag.band}|${__chartTag.sex}|${name}`;
         __usage.ev[k] = (__usage.ev[k] || 0) + 1;
     }
@@ -7708,7 +7709,7 @@ ${sec.join('\n\n')}`;
     }
     function askReport(o) {
         try {
-            if (!shareOn()) return;
+            if (!shareOn() || __chartTag.skip) return;
             const role = (o.role || '').trim(), other = (o.other || '').trim();
             if (!role && !other) return;
             const topics = o.topics.map(k => (ASK_TOPICS.find(x => x[0] === k) || [k, k])[1]).join('、');
