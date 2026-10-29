@@ -229,7 +229,7 @@
         .pg-gauge.pg-done .pg-status { opacity:1; transform:none; animation: pgPop .5s ease-out; }
         .pg-detail { margin-top:4px; font-size:10px; color:#888; line-height:1.4; text-align:center; padding:0 2px; word-break:keep-all; overflow-wrap:anywhere; }
         @keyframes pgPop { 0%{ box-shadow:0 0 0 0 currentColor; } 100%{ box-shadow:0 0 0 8px transparent; } }
-        .pg-val { font-variant-numeric: tabular-nums; }
+        .pg-val { font-variant-numeric: tabular-nums; display:none; }
 
         /* ===== 格局：中控顯示屏 ===== */
         .gj-wrap { display:flex; flex-direction:column; gap:12px; width:100%; text-align:left; }
@@ -299,6 +299,16 @@
         .gj-cb.bad .gj-cb-tag { background:#ff5252; box-shadow:0 0 6px #ff5252; }
         .gj-lamp.bad.jie { color:#8fa3ad; border-color:#4a5a63; background:rgba(143,163,173,.08); box-shadow:none; font-weight:normal; text-decoration:line-through; text-decoration-color:rgba(143,163,173,.6); }
         .gj-lamp.bad.jie i { background:#4a5a63; color:#dfe8ec; box-shadow:none; }
+        .gj-lamp.ok.wait { color:#7fd8ef; border-color:rgba(127,216,239,.55); border-style:dashed; background:rgba(127,216,239,.07); box-shadow:none; }
+        .gj-lamp.ok.wait i { background:#7fd8ef; color:#0b1418; box-shadow:none; }
+        .gj-cb.ok.wait { border-color:rgba(127,216,239,.4); border-style:dashed; box-shadow: inset 3px 0 0 #7fd8ef; }
+        .gj-cb.ok.wait b { color:#7fd8ef; text-shadow:none; }
+        .gj-cb.ok.wait .gj-cb-tag { background:#7fd8ef; box-shadow:none; }
+        .gj-lamp.ok.broken { color:#8fa3ad; border-color:#4a5a63; background:rgba(143,163,173,.08); box-shadow:none; text-decoration:line-through; text-decoration-color:rgba(255,82,82,.8); }
+        .gj-lamp.ok.broken i { background:#4a5a63; color:#dfe8ec; box-shadow:none; }
+        .gj-cb.ok.broken { border-color:rgba(143,163,173,.35); box-shadow: inset 3px 0 0 #8fa3ad; }
+        .gj-cb.ok.broken b { color:#8fa3ad; text-shadow:none; text-decoration:line-through; text-decoration-color:rgba(255,82,82,.8); }
+        .gj-cb.ok.broken .gj-cb-tag { background:#8fa3ad; box-shadow:none; }
         .gj-lamp.bad.qing { color:#ffa94d; border-color:#ffa94d; background:rgba(255,169,77,.1); box-shadow:0 0 6px rgba(255,169,77,.35); }
         .gj-lamp.bad.qing i { background:#ffa94d; box-shadow:0 0 4px #ffa94d; }
         .gj-cb.bad.jie { border-color:rgba(143,163,173,.35); box-shadow: inset 3px 0 0 #8fa3ad; }
@@ -309,6 +319,8 @@
         .gj-cb.bad.qing .gj-cb-tag { background:#ffa94d; box-shadow:0 0 6px #ffa94d; }
         .gj-cb-cond { font-size:10.5px; color:#aaa; margin-top:3px; }
         .gj-cb-why { font-size:10px; color:#5f8a99; margin-top:1px; }
+        .gj-cb-read { margin-top:6px; padding-top:6px; border-top:1px dashed rgba(255,255,255,.08); display:flex; flex-direction:column; gap:3px; font-size:11.5px; line-height:1.55; color:#c9d3d8; }
+        .gj-cb-read b { display:inline-block; font-size:10px; font-weight:normal; color:#5f8a99; border:1px solid #2c3a40; border-radius:3px; padding:0 4px; margin-right:6px; letter-spacing:1px; }
         .gj-cb-none { font-size:11px; color:#666; text-align:center; padding:8px 0; border:1px dashed #2a2a2a; border-radius:6px; }
         .anim-on .gj-anim { animation: gjBoot .45s ease-out both; animation-delay: var(--d, 0s); }
         @keyframes gjBoot { 0% { opacity:0; transform:scale(.85); filter:brightness(2); } 60% { opacity:1; filter:brightness(1.6); } }
@@ -1628,6 +1640,14 @@
         .sx-pro .rel-ev-title { color:var(--ink); font-size:12.5px; font-weight:600; }
         .sx-pro .tag { border-radius:4px; box-shadow:none; }
         @media (max-width: 380px) { .sx-gz { font-size:17px; } .sx-g5 { gap:4px; } }
+        /* 十神星圖：相剋光點（同流日趨勢線的跑光） */
+        .st-ray { fill:none; stroke-linecap:round; stroke-dasharray:.16 .84; stroke-dashoffset:.16; opacity:0; pointer-events:none; }
+        .st-ray-ke { stroke:#ffd0d0; stroke-width:2.2; filter:drop-shadow(0 0 3px #ff5252) drop-shadow(0 0 7px #ff5252); }
+        .anim-on .st-ray-ke { animation: stRay 5s linear infinite; animation-delay: calc(1.4s + var(--k) * 1s); }
+        @keyframes stRay { 0% { stroke-dashoffset:.16; opacity:0; } 2% { opacity:1; } 18% { stroke-dashoffset:-.84; opacity:1; } 20%, 100% { stroke-dashoffset:-.84; opacity:0; } }
+        @media (prefers-reduced-motion: reduce) { .anim-on .st-ray { animation:none; } }
+
+
 
         /* ===== 合盤 V2：與平安同一套語言，主色合盤粉 ===== */
         .hx { --ink:#f4f6f7; --mute:#aab4b9; --faint:#6f7a80; --line:#34404a; --surf:#232c33; --panel:#1c242a; --pk:#ff7eb0; font-variant-numeric:tabular-nums; }
@@ -3876,14 +3896,14 @@ ${hpTxt}`;
     }
     // 各格局可能出現的成格／破格標籤（用於亮燈面板，未成立者熄燈）
     const COMBO_CATALOG = {
-        '正官格': [['財官相生','成'],['官印相生','成'],['官印雙全','成'],['傷官見官','破'],['官殺混雜','破']],
-        '正財格': [['財旺生官','成'],['食神生財','成'],['財格佩印','成'],['比劫奪財','破'],['財黨七殺','破']],
-        '正印格': [['官印相生','成'],['殺印相生','成'],['印格洩秀','成'],['棄印就財','成'],['貪財壞印','破']],
-        '食神格': [['食神生財','成'],['食神制殺','成'],['食神佩印','成'],['梟神奪食','破']],
-        '七殺格': [['食神制殺','成'],['殺印相生','成'],['財滋弱殺','成'],['身殺兩停','成'],['殺重身輕','破']],
-        '傷官格': [['傷官佩印','成'],['傷官生財','成'],['傷官駕殺','成'],['傷官見官','破']],
-        '建祿格': [['祿劫用官','成'],['祿劫用財','成'],['祿劫用殺','成'],['祿劫洩秀','成']],
-        '羊刃格': [['羊刃駕殺','成'],['羊刃露官','成'],['羊刃逢沖','破']]
+        '正官格': [['財官相生','成'],['官印相生','成'],['官印雙全','成'],['傷官見官','破'],['官殺混雜','破'],['官星逢沖','破'],['重官','破'],['佩印逢財','破'],['剋洩交加','破'],['孤官無輔','減']],
+        '正財格': [['財旺生官','成'],['食神生財','成'],['財格佩印','成'],['比劫奪財','破'],['財黨七殺','破'],['比劫幫身','成'],['財旺生官逢傷','破'],['財旺生官逢殺','破']],
+        '正印格': [['官印相生','成'],['殺印相生','成'],['印格洩秀','成'],['棄印就財','成'],['印制食傷','成'],['貪財壞印','破'],['印重透殺','破']],
+        '食神格': [['食神生財','成'],['食神制殺','成'],['食神佩印','成'],['棄食就殺印','成'],['梟神奪食','破'],['食神生財露殺','破'],['制殺太過','破'],['制殺不及','減']],
+        '七殺格': [['殺邀食制','成'],['殺印相生','成'],['劫財合殺','成'],['財滋弱殺','成'],['身殺兩停','成'],['殺重身輕','破'],['剋洩交加','破'],['財黨七殺','破'],['制化兩立','破'],['殺印逢財','破'],['制殺太過','破'],['制殺不及','減']],
+        '傷官格': [['傷官佩印','成'],['傷官生財','成'],['傷官駕殺','成'],['金水傷官喜見官','成'],['傷官見官','破'],['身弱財多','破'],['佩印逢財','破'],['傷官生財透殺','破'],['傷官駕殺逢印','破'],['制殺太過','破'],['制殺不及','減']],
+        '建祿格': [['祿劫用官','成'],['祿劫用財','成'],['祿劫用殺','成'],['祿劫洩秀','成'],['食傷生財','成'],['祿劫用官逢傷','破'],['祿劫用財逢劫','破'],['祿劫用殺無制','破'],['祿劫用財透印','破'],['財殺生旺','破']],
+        '羊刃格': [['羊刃駕殺','成'],['羊刃露官','成'],['食傷生財','成'],['印多用財','成'],['財多有制','成'],['羊刃逢沖','破'],['羊刃駕殺逢制','破'],['食傷生財逢劫','破']]
     };
     COMBO_CATALOG['偏財格'] = COMBO_CATALOG['正財格'];
     COMBO_CATALOG['偏印格'] = COMBO_CATALOG['正印格'];
@@ -3892,16 +3912,94 @@ ${hpTxt}`;
     COMBO_CATALOG['從強格'] = [['從強洩秀','成'],['印比成勢','成'],['從強逢官殺','破'],['群劫爭財','破']];
     COMBO_CATALOG['從弱格'] = [['從勢流通','成'],['比劫逆勢','破'],['印星逆勢','破']];
     const COMBO_WARNINGS = ['官殺混雜','傷官見官','梟神奪食','比劫奪財','貪財壞印'];
+    // 格局解讀詞典（傳統子平一般論法；只放進提詞給 AI 參考，不上畫面）
+    const COMBO_READ = {
+        '財官相生': ['有資源支撐的穩定上升，重規矩、守信用，容易被組織信任', '借重組織與職位，以穩定收入、升遷和信用累積財富'],
+        '官印相生': ['在制度中被保護與栽培，個性端正、重名譽、肯學習', '借重學歷、資格、長官提拔，以專業與職位帶來收入'],
+        '官印雙全': ['名位與資源兼備，做事有分寸，適合穩步經營', '借重體制內的長期累積，職位、專業、人脈三者並進'],
+        '傷官見官': ['才華與規範衝突，有想法但容易和上司、制度起摩擦，口快易得罪人', '借重專業與表達，選擇能發揮創意、規範較寬的環境；化解要靠財（把才華變現）或印（收斂鋒芒）'],
+        '官殺混雜': ['標準與壓力來源多頭，容易猶豫、方向搖擺，或同時被多方要求', '借重聚焦，先選一條主線深耕；可用食神制殺、專業能力去掉雜音'],
+        '官星逢沖': ['職位、名份或上司關係較不穩定，容易遇到變動', '借重可攜帶的專業能力，不把收入全押在單一職位上'],
+        '重官': ['規範與壓力疊加，責任重、容易被要求過多', '借重分工與授權，練習拒絕與排序，避免一肩扛起'],
+        '佩印逢財': ['原本靠學習與規範保護的優勢，被追求利益沖淡，容易為錢放棄原則或專業', '借重先守專業與名聲、再談收入，避免急功近利'],
+        '剋洩交加': ['身弱又同時受壓、又要付出，容易疲累、心力透支', '借重休養與資源補充（比劫、印），先顧好身心再擴張'],
+        '孤官無輔': ['有名份或責任，但缺少資源與後援，常單打獨鬥', '借重主動建立人脈與後援，找能提供資源或支持的平台'],
+        '財旺生官': ['錢能轉成地位，務實、會經營，重視成果', '借重經營與管理，以財生官：用資源換取職位、影響力'],
+        '食神生財': ['靠能力、手藝、內容賺錢，生活感強、懂得享受', '借重技能與產出，作品、服務、專業變現'],
+        '財格佩印': ['財多身弱時，有學習與貴人撐住，懂得量力而為', '借重專業與穩健配置，財印分開、不讓求財壞了根本'],
+        '比劫奪財': ['同儕、合夥或競爭者分走資源，容易因人際花錢、借錢', '借重清楚的財務界線，獨資或分潤明確，避免共同出資與借貸'],
+        '財黨七殺': ['求財帶來壓力與風險，財越多壓力越大', '借重風控與節奏，量力而為，先求穩再求多'],
+        '比劫幫身': ['財多身弱時，有同儕、朋友、團隊幫忙扛', '借重合作與團隊，但分潤要清楚'],
+        '財旺生官逢傷': ['靠財換來的地位，容易被衝動言行或越權打亂', '借重低調與合規，保護好得來不易的職位與信用'],
+        '財旺生官逢殺': ['財與地位之間夾雜外來壓力或風險', '借重制度與保障，避免為求快而承擔過度風險'],
+        '殺印相生': ['把壓力與挑戰轉成實力，抗壓、穩重、重名譽，越有制度越有表現', '借重平台、資格、貴人，以名帶利；要留意財運壞印'],
+        '印格洩秀': ['學識深厚又能表達，善於教學、寫作、整理知識', '借重知識輸出，教學、寫作、顧問、內容創作'],
+        '棄印就財': ['資源過多反成負擔，轉向務實求財後反而打開局面', '借重實務與行動，從想轉成做，以財剋印打破舒適圈'],
+        '印制食傷': ['身弱時用學習與規範收住過度的付出，懂得保護自己', '借重專業與穩定平台，輸出要有節制'],
+        '貪財壞印': ['為了利益犧牲學習、信用或長期根本，容易短視', '借重長期主義，先守專業與信用，避免為錢放棄根本'],
+        '印重透殺': ['殺印相生的結構，但身強印重而太過：資源與保護過剩、想多做少、思慮重', '借重財星與食傷，以行動、實務、輸出變現；行財、食傷運較易打開局面'],
+        '食神制殺': ['以才華與冷靜化解壓力，遇事能想辦法，臨危不亂', '借重專業能力解決難題，技術型主管、專家角色'],
+        '食神佩印': ['身弱時有學習與貴人支撐，能穩定輸出', '借重專業進修與穩定平台，持續累積作品'],
+        '棄食就殺印': ['付出太多時，改走體制與資格路線反而穩定', '借重組織、職位與資格，輸出量要節制'],
+        '梟神奪食': ['想法被打斷、福氣被搶走，容易半途而廢或心思反覆', '借重專注與完成度，一次只做一件事；財星可制梟'],
+        '食神生財露殺': ['靠能力賺錢的同時，壓力與風險也跟著來', '借重風控，賺到的先保住，不因收入增加而過度擴張'],
+        '制殺太過': ['壓力被壓到沒有、缺少挑戰，容易失去動力或過度自信', '借重主動挑戰與目標設定，讓能力有施展舞台'],
+        '制殺不及': ['壓力大於應對能力，常覺得被事情追著跑', '借重提升專業與求助，先處理最關鍵的壓力來源'],
+        '殺邀食制': ['面對挑戰會主動出擊，用智慧與方法化解危機，能掌實權', '借重解決難題的能力，危機處理、管理、專業決策'],
+        '劫財合殺': ['有同伴、團隊替你擋住壓力，講義氣、敢衝', '借重團隊與夥伴，一起面對挑戰'],
+        '財滋弱殺': ['身強有餘力時，主動找挑戰、承擔責任，越挑戰越有成就', '借重爭取責任與職權，用資源換取影響力'],
+        '身殺兩停': ['實力與壓力相當，有魄力、敢承擔，越挑戰越成長', '借重高壓高回報的角色，領導、開創、競爭型工作'],
+        '殺重身輕': ['壓力遠大於承受力，容易焦慮、被環境逼迫', '借重印（學習、貴人）化壓或食神（方法）制壓，先降低壓力再求表現'],
+        '制化兩立': ['同時想用方法化解又想靠保護逃避，做法不一，容易兩頭落空', '借重選定一種策略貫徹，不要同時走兩條路'],
+        '殺印逢財': ['靠學習與體制化解壓力的路，被追求利益打亂', '借重先守平台與專業，求財要排在穩定之後'],
+        '傷官佩印': ['才華有規範約束，聰明又知分寸，表達有深度', '借重專業權威，用知識與口才建立名聲'],
+        '傷官生財': ['才華直接變現，點子多、行動快、商業感強', '借重創意、業務、內容與自媒體，以作品和表現賺錢'],
+        '傷官駕殺': ['能用才華與膽識駕馭壓力，敢挑戰權威、能打硬仗', '借重高難度任務、談判、競爭型工作'],
+        '金水傷官喜見官': ['聰明有才又守分寸，才華能被體制欣賞', '借重在體制或專業機構中發揮才華'],
+        '身弱財多': ['想做很多、賺很多，但體力心力跟不上，容易越忙越虧', '借重量力而為，先建立團隊或後援再擴張'],
+        '傷官生財透殺': ['才華賺來的錢，伴隨壓力、糾紛或風險', '借重合約與風控，賺錢的同時保護好自己'],
+        '傷官駕殺逢印': ['駕馭壓力的鋒芒被收住，想衝又被綁住', '借重選擇：要衝就放手衝，要穩就專心走專業路線'],
+        '祿劫用官': ['靠自己起家又守規矩，適合在組織中晉升', '借重職位與制度，穩定升遷'],
+        '祿劫用財': ['自力更生、靠雙手賺錢，最好有能力或產品帶動', '借重自己的能力或產品經營收入'],
+        '祿劫用殺': ['有魄力，敢接挑戰與責任', '借重開創、競爭、需要擔當的角色'],
+        '祿劫洩秀': ['精力旺盛又能輸出，才華與行動力兼備', '借重技藝、表現、創作與服務'],
+        '食傷生財': ['能力與產出直接帶來收入，靠本事吃飯', '借重技能、作品、服務變現；天干若透劫財要防爭財'],
+        '祿劫用官逢傷': ['有機會升遷，卻容易因言行或衝動壞了職位', '借重低調與合規，守住職位'],
+        '祿劫用財逢劫': ['賺錢時常有人分一杯羹，容易因人破財', '借重財務獨立與清楚分潤'],
+        '祿劫用殺無制': ['壓力與挑戰來了卻缺少方法應對', '借重先培養專業與方法，再接大挑戰'],
+        '祿劫用財透印': ['想賺錢卻被保守或想太多卡住', '借重先行動再修正，別讓猶豫錯過時機'],
+        '財殺生旺': ['錢與壓力同時放大，收入越多風險越大', '借重風控與節奏，不追求擴張速度'],
+        '羊刃駕殺': ['剛強有魄力，能用紀律與壓力收住衝勁，適合掌權', '借重管理、紀律型、需要魄力與決斷的工作'],
+        '羊刃露官': ['剛強又守規矩，有領導與執行力', '借重組織內的領導職'],
+        '印多用財': ['資源多卻容易安逸，用務實求財打開局面', '借重實務與行動，把資源變現'],
+        '財多有制': ['能扛大財，又有方法或制度管住同儕競爭', '借重經營與管理，把資源組織起來'],
+        '羊刃逢沖': ['衝勁大、情緒起伏大，容易因衝動而有變動或損傷', '借重冷靜與紀律，重大決定先停一下'],
+        '羊刃駕殺逢制': ['原本能收住衝勁的紀律被打散，容易失控或過度自信', '借重外部規範與夥伴提醒'],
+        '食傷生財逢劫': ['靠能力賺錢，卻常有人搶功或分利', '借重保護自己的成果，合作時分潤要清楚'],
+        '從強洩秀': ['氣勢強旺又能宣洩，才華與行動力兼具', '借重順勢發揮所長，創作、表現、開創'],
+        '印比成勢': ['資源與自信都足，氣勢一致', '借重專注本業、累積名聲與人脈'],
+        '從強逢官殺': ['強旺的氣勢遇到壓制，容易和權威或規範硬碰', '借重順勢不硬碰，用專業或印（學習、貴人）化解衝突'],
+        '群劫爭財': ['資源被眾人分食，錢容易散', '借重把財轉成能力或作品（食傷），避免共同出資'],
+        '從勢流通': ['順著環境與大勢發展，彈性大、適應力強', '借重順勢而為，跟著產業與平台成長'],
+        '比劫逆勢': ['不甘順勢，想靠自己硬撐，容易事倍功半', '借重順勢合作，放下逞強'],
+        '印星逆勢': ['想依靠保護或舊方法，反而跟不上環境', '借重主動調整，跟隨環境變化'],
+        '雜氣開庫': ['藏著的資源或機會被打開，容易有突發的轉機', '借重抓住變動帶來的機會，例如換環境、新專案'],
+        '月令逢沖': ['根基或環境較不穩定，人生變動、遷移較多', '借重彈性與可攜帶的能力，不把一切押在單一環境'],
+        '月令逢刑': ['根基處有內耗或摩擦，容易糾結、心累', '借重整理環境與作息，減少內耗'],
+        '格神合絆': ['核心優勢被牽絆，有能力卻常被人事或情感綁住', '借重劃清界線，把時間留給最重要的事']
+    };
+    // 通用（不分格局），只在命中時才顯示燈號
+    const COMBO_GENERAL = [['雜氣開庫','成'],['月令逢沖','破'],['月令逢刑','減'],['格神合絆','減']];
     const ALL_GEJU = ['正官','七殺','正財','偏財','食神','傷官','正印','偏印','建祿','羊刃','月劫','從強','從弱'];
 
     // ===== 組合成格／破格偵測（傳統子平：旺衰以透干、通根、月令判斷；身強弱用儀表板三得） =====
     // gans/zhis：[年,月,日,時]；baseName：定格名稱；isStrong：儀表板「得令/得地/得勢 三得其二」
-    function detectGeJuCombos(gans, zhis, dg, baseName, isStrong) {
+    function detectGeJuCombos(gans, zhis, dg, baseName, isStrong, geJuGan, dayun, nowYear) {
         const pN = ['年', '月', '日', '時'];
         const TG = g => getPreciseTenGod(g, dg);
         const SETS = {
             官: ['正官'], 殺: ['七殺'], 官殺: ['正官', '七殺'], 財: ['正財', '偏財'], 印: ['正印', '偏印'],
-            正印: ['正印'], 梟: ['偏印'], 食: ['食神'], 傷: ['傷官'], 食傷: ['食神', '傷官'], 比劫: ['比肩', '劫財']
+            正印: ['正印'], 梟: ['偏印'], 食: ['食神'], 傷: ['傷官'], 食傷: ['食神', '傷官'], 比劫: ['比肩', '劫財'], 劫: ['劫財']
         };
         // 透干（年、月、時三干）
         const stems = [0, 1, 3].filter(i => gans[i] && gans[i] !== '-').map(i => {
@@ -3925,60 +4023,127 @@ ${hpTxt}`;
         };
         const desc = k => tou(k).map(s => `${pN[s.i]}干${s.g}${s.tg}${s.rooted ? '·有根' : '·無根'}`).join('、');
         const adjacent = (k1, k2) => tou(k1).some(a => tou(k2).some(b => Math.abs(a.i - b.i) === 1));
+        // 不是年時遙隔（距離 3）才算能作用
+        const near = (k1, k2) => tou(k1).some(a => tou(k2).some(b => Math.abs(a.i - b.i) < 3));
+        // 地支本氣為某十神的柱位
+        const mainAt = k => zhis.map((z, zi) => ({ z, zi, hw: zhiHiddenWeights[z] || {} }))
+            .filter(o => { const m = Object.keys(o.hw).sort((x, y) => o.hw[y] - o.hw[x])[0]; return m && SETS[k].includes(TG(m)); });
         const out = [];
         const add = (name, type, cond, why) => { if (!out.some(o => o.name === name)) out.push({ name, type, cond, why }); };
+        const note = (name, txt) => { const o = out.find(x => x.name === name); if (o) o.why += txt; };
+        // 條件不全降一級：需日干強的成格，身弱時標「待運」（並列出印比補身的大運）；有強弱條件的破格，不符時標「減」
+        // 食傷類的結構怕印剋食傷，只取比劫運補身；其他取印比運
+        const yunBu = onlyBi => (dayun || []).filter(d => d.startYear + 10 > (nowYear || 0)).filter(d => {
+            const m = Object.keys(zhiHiddenWeights[d.zhi] || {}).sort((a, b) => zhiHiddenWeights[d.zhi][b] - zhiHiddenWeights[d.zhi][a])[0];
+            return [d.gan, m].some(g => g && (onlyBi ? ['比肩', '劫財'] : ['比肩', '劫財', '正印', '偏印']).includes(TG(g)));
+        }).map(d => `${d.gan}${d.zhi}運（${d.startAge}歲起）`);
+        const SHI = ['食神生財', '食神制殺', '殺邀食制', '傷官生財', '傷官駕殺', '食傷生財'];
+        const addS = (name, cond, why) => {
+            if (isStrong) return add(name, '成', '日干強，' + cond, `${bodyTxt}；${why}`);
+            const bi = SHI.includes(name), y = yunBu(bi);
+            add(name, '待運', `結構已具，原局日干弱，行${bi ? '比劫' : '印比'}運補身時較能發揮（${cond}${bi ? '；印運會剋食傷，不取' : ''}）`, `${bodyTxt}；${why}${y.length ? '；可補身的大運：' + y.join('、') : '；之後的大運無' + (bi ? '比劫' : '印比') + '補身'}`);
+        };
+        const addB = (name, ok, cond, why) => add(name, ok ? '破' : '減', cond + (ok ? '' : '（強弱條件不全，風險較輕）'), `${bodyTxt}；${why}`);
+        // 制化比：制方力量 ÷ 被制方力量；≥2 制太過（破），≤0.5 制不及（減），其間兩停
+        const ctrlRatio = (kc, kk, mainName) => {
+            if (!tou(kc).length || !tou(kk).length) return;
+            const pc = power(kc), pk = power(kk), r = pk ? pc / pk : 9;
+            const t = `制化比 ${r.toFixed(2)}（${kc} ${pc.toFixed(1)} ÷ ${kk} ${pk.toFixed(1)}）`;
+            if (r >= 2) add('制殺太過', '破', '制方力量是七殺的 2 倍以上，殺被制盡', t);
+            else if (r <= 0.5) add('制殺不及', '減', '制方力量不到七殺的一半，制不住殺', t);
+            else note(mainName, `；${t}，兩停`);
+        };
         const STRONG = 2.5;
         const bodyTxt = isStrong ? '身強' : '身弱';
 
+        const dEl = ganElementMap[dg];
+        const jinShui = dEl === '金' && ['亥', '子', '丑'].includes(zhis[1]);
         switch (baseName) {
             case '正官格': {
                 const cai = touRoot('財'), yin = touRoot('印');
                 if (cai && yin) add('官印雙全', '成', '財、印皆透干有根，官居其中', `${desc('財')}；${desc('印')}`);
                 else {
-                    if (cai) add('財官相生', '成', '財星透干有根，生官', desc('財'));
-                    if (yin) add('官印相生', '成', '印星透干有根，官生印、印生身', desc('印'));
+                    if (cai) addS('財官相生', '財星透干有根生官', desc('財'));
+                    if (yin && !isStrong) add('官印相生', '成', '日干弱，印星透干有根，官生印、印生身', `${bodyTxt}；${desc('印')}`);
                 }
                 if (tou('傷').length) add('傷官見官', '破', '傷官透干，剋正官', desc('傷'));
                 if (tou('殺').length) add('官殺混雜', '破', '正官格又見七殺透干', desc('殺'));
+                if (tou('官').length >= 2) add('重官', '破', '正官重複透干，重官似殺', desc('官'));
+                if (tou('傷').length && touRoot('印') && tou('財').length) add('佩印逢財', '破', '靠印制傷護官，財星又透干剋印，傷官復起', `${desc('傷')}；${desc('印')}；${desc('財')}`);
+                if (!isStrong && touRoot('食傷')) add('剋洩交加', '破', '日干弱，官剋身、食傷又洩身', `${bodyTxt}；${desc('食傷')}`);
+                if (!tou('財').length && !tou('印').length) add('孤官無輔', '減', '正官無財生、無印護', '天干不見財星、印星');
+                { // 官星逢沖：正官坐支或本氣為正官的地支，被原局其他地支沖
+                    const at = [...new Set([...tou('官').map(st => st.i), ...mainAt('官').map(m => m.zi)])];
+                    const hit = [];
+                    const ku = '辰戌丑未'.includes(zhis[1]);   // 四庫月令被沖算開庫，不算官星逢沖
+                    at.forEach(i => zhis.forEach((z, j) => { if (j !== i && !(ku && (i === 1 || j === 1)) && zhiChongMap[zhis[i]] === z) { const [x, y] = [i, j].sort(); hit.push(`${pN[x]}支${zhis[x]}${pN[y]}支${zhis[y]}相沖`); } }));
+                    if (hit.length) add('官星逢沖', '破', '正官所在地支被沖', [...new Set(hit)].join('、'));
+                }
                 break;
             }
             case '正財格': case '偏財格': {
-                if (power('財') >= STRONG && touRoot('官')) add('財旺生官', '成', '財旺，正官透干有根', `財力 ${power('財').toFixed(1)}；${desc('官')}`);
+                const shengGuan = power('財') >= STRONG && touRoot('官');
+                if (shengGuan) add('財旺生官', '成', '財旺，正官透干有根', `財力 ${power('財').toFixed(1)}；${desc('官')}`);
                 if (touRoot('食傷')) add('食神生財', '成', '食傷透干有根，生財', desc('食傷'));
                 if (!isStrong && power('財') >= STRONG && tou('印').length && !adjacent('財', '印'))
                     add('財格佩印', '成', '身弱財重，印星透干，且財印不相礙', `${bodyTxt}；財力 ${power('財').toFixed(1)}；${desc('印')}`);
-                if (touRoot('比劫') && power('比劫') > power('財')) add('比劫奪財', '破', '比劫透干有根，財星輕', `${desc('比劫')}；比劫 ${power('比劫').toFixed(1)} ＞ 財 ${power('財').toFixed(1)}`);
-                if (tou('殺').length && !tou('食').length && !tou('印').length) add('財黨七殺', '破', '財生七殺，殺重無制', `${desc('殺')}；無食神制、無印化`);
+                if (!isStrong && power('財') >= STRONG && touRoot('比劫')) add('比劫幫身', '成', '日干弱、財多，比劫透干有根幫身任財', `${bodyTxt}；財力 ${power('財').toFixed(1)}；${desc('比劫')}`);
+                if (isStrong && touRoot('比劫') && power('比劫') > power('財')) add('比劫奪財', '破', '日干強，比劫透干有根，財星輕', `${desc('比劫')}；比劫 ${power('比劫').toFixed(1)} ＞ 財 ${power('財').toFixed(1)}`);
+                if (tou('殺').length && !tou('食').length && !tou('印').length) addB('財黨七殺', !isStrong, '日干弱，財生七殺，殺重無制', `${desc('殺')}；無食神制、無印化`);
+                if (shengGuan && tou('傷').length) add('財旺生官逢傷', '破', '財旺生官，又透傷官剋官', desc('傷'));
+                if (shengGuan && tou('殺').length) add('財旺生官逢殺', '破', '財旺生官，又透七殺混官', desc('殺'));
                 break;
             }
             case '正印格': case '偏印格': {
-                if (touRoot('官')) add('官印相生', '成', '正官透干有根，生印', desc('官'));
-                if (touRoot('殺')) add('殺印相生', '成', '七殺透干有根，生印', desc('殺'));
+                if (power('印') < STRONG && touRoot('官')) addS('官印相生', '印輕，正官透干有根生印', `印 ${power('印').toFixed(1)}；${desc('官')}`);
+                if (!isStrong && touRoot('殺')) add('殺印相生', '成', '日干弱，七殺透干有根，印化殺生身', `${bodyTxt}；${desc('殺')}`);
+                if (!isStrong && power('食傷') >= STRONG && tou('印').length) add('印制食傷', '成', '日干弱、食傷洩重，印制食傷生身', `${bodyTxt}；食傷 ${power('食傷').toFixed(1)}；${desc('印')}`);
                 if (isStrong && power('印') >= STRONG && touRoot('食傷')) add('印格洩秀', '成', '印旺身強，用食傷洩秀', `${bodyTxt}；${desc('食傷')}`);
                 if (isStrong && power('印') >= 3.5 && power('印') > power('財') && touRoot('財')) add('棄印就財', '成', '印太重，用財抑印', `${bodyTxt}；印 ${power('印').toFixed(1)} ＞ 財 ${power('財').toFixed(1)}；${desc('財')}`);
-                if (tou('財').length && power('財') > power('印')) add('貪財壞印', '破', '印輕，財星透干剋印', `${desc('財')}；財 ${power('財').toFixed(1)} ＞ 印 ${power('印').toFixed(1)}`);
+                if (!isStrong && tou('財').length && power('財') > power('印') && near('財', '印')) add('貪財壞印', '破', '日干弱、印輕，財星透干剋印', `${desc('財')}；財 ${power('財').toFixed(1)} ＞ 印 ${power('印').toFixed(1)}`);
+                if (isStrong && power('印') >= STRONG && tou('殺').length) add('印重透殺', '破', '身強印已重，又透殺生印，太過（殺印相生結構）', `${bodyTxt}；印 ${power('印').toFixed(1)}；${desc('殺')}`);
                 break;
             }
             case '食神格': {
-                if (touRoot('財')) add('食神生財', '成', '財星透干有根', desc('財'));
-                if (tou('殺').length) add('食神制殺', '成', '七殺透干，食神制住', desc('殺'));
+                if (touRoot('財')) addS('食神生財', '財星透干有根，食神生財', desc('財'));
+                if (tou('殺').length && !tou('財').length) addS('食神制殺', '七殺透干，食神制住，且不見財', desc('殺'));
                 if (!isStrong && power('食') >= STRONG && tou('正印').length) add('食神佩印', '成', '身弱食重，印星護身', `${bodyTxt}；${desc('正印')}`);
-                if (touRoot('梟')) add('梟神奪食', '破', '偏印透干有根，剋食神', desc('梟'));
+                if (!isStrong && power('食') >= STRONG && touRoot('殺') && tou('印').length) add('棄食就殺印', '成', '身弱食重，改取七殺生印、印護身', `${bodyTxt}；${desc('殺')}；${desc('印')}`);
+                if (isStrong && power('食') < STRONG && touRoot('梟') && near('梟', '食')) add('梟神奪食', '破', '日干強、食神輕，偏印透干有根剋食神', `${bodyTxt}；食 ${power('食').toFixed(1)}；${desc('梟')}`);
+                if (tou('財').length && tou('殺').length) addB('食神生財露殺', !isStrong, '日干弱，財、殺並透：財洩食神又生七殺', `${desc('財')}；${desc('殺')}`);
+                ctrlRatio('食', '殺', '食神制殺');
                 break;
             }
             case '七殺格': {
-                if (touRoot('食')) add('食神制殺', '成', '食神透干有根，制殺', desc('食'));
-                if (touRoot('印')) add('殺印相生', '成', '印星透干有根，化殺生身', desc('印'));
+                if (touRoot('食')) addS('殺邀食制', '食神透干有根制殺', desc('食'));
+                if (!isStrong && touRoot('食傷')) add('剋洩交加', '破', '日干弱，殺剋身、食傷又洩身', `${bodyTxt}；${desc('食傷')}`);
+                if (!isStrong && touRoot('印')) add('殺印相生', '成', '日干弱，印星透干有根，化殺生身', `${bodyTxt}；${desc('印')}`);
                 if (isStrong && power('殺') < 2 && tou('財').length) add('財滋弱殺', '成', '身強殺輕，財星生殺', `${bodyTxt}；殺力 ${power('殺').toFixed(1)}；${desc('財')}`);
                 if (isStrong && power('殺') >= STRONG) add('身殺兩停', '成', '日主與七殺力量相當', `${bodyTxt}；殺力 ${power('殺').toFixed(1)}`);
                 if (!isStrong && power('殺') >= STRONG && !tou('食').length && !tou('印').length) add('殺重身輕', '破', '殺旺，又無制無化', `${bodyTxt}；殺力 ${power('殺').toFixed(1)}；無食神、無印`);
+                { // 劫財合殺：陽干日主，劫財與七殺天干相鄰五合，合絆住七殺
+                    const hit = stemPolarity[dg] === 1 ? tou('劫').filter(a => tou('殺').some(b => Math.abs(a.i - b.i) === 1 && ganHeMap[a.g] === b.g)) : [];
+                    if (hit.length) add('劫財合殺', '成', '劫財與七殺相鄰五合，合絆七殺', `${desc('劫')}；${desc('殺')}`);
+                }
+                if (tou('財').length && !tou('食').length && !tou('印').length && !(isStrong && power('殺') < 2)) addB('財黨七殺', !isStrong, '日干弱，殺格見財，無食神制、無印化', `${desc('財')}；${desc('殺')}`);
+                if (tou('食').length && tou('印').length) add('制化兩立', '破', '用食制殺又透印，印剋食神、制化不專', `${desc('食')}；${desc('印')}`);
+                if (touRoot('印') && tou('財').length && near('財', '印')) add('殺印逢財', '破', '靠印化殺，財星又透干剋印', `${desc('印')}；${desc('財')}`);
+                ctrlRatio('食', '殺', '殺邀食制');
                 break;
             }
             case '傷官格': {
-                if (touRoot('印')) add('傷官佩印', '成', '印星透干有根，制傷護身', desc('印'));
-                if (touRoot('財')) add('傷官生財', '成', '財星透干有根，傷官生財', desc('財'));
-                if (tou('殺').length) add('傷官駕殺', '成', '七殺透干，傷官制殺', desc('殺'));
-                if (tou('官').length) add('傷官見官', '破', '正官透干，被傷官剋', desc('官'));
+                if (!isStrong && touRoot('印')) add('傷官佩印', '成', '日干弱，印星透干有根，制傷護身', `${bodyTxt}；${desc('印')}`);
+                if (touRoot('財')) addS('傷官生財', '財星透干有根，傷官生財', desc('財'));
+                if (tou('殺').length) addS('傷官駕殺', '七殺透干，傷官制殺', desc('殺'));
+                if (tou('官').length) {
+                    if (jinShui) addS('金水傷官喜見官', '金日生亥子丑月，見官調候', `${desc('官')}；月支${zhis[1]}`);
+                    else addB('傷官見官', !isStrong, '日干弱，正官透干被傷官剋', desc('官'));
+                }
+                if (!isStrong && power('財') >= STRONG) add('身弱財多', '破', '日干弱，財多，傷官又生財', `${bodyTxt}；財力 ${power('財').toFixed(1)}`);
+                if (touRoot('印') && tou('財').length && near('財', '印')) add('佩印逢財', '破', '靠印制傷，財星又透干剋印', `${desc('印')}；${desc('財')}`);
+                if (touRoot('財') && tou('殺').length) add('傷官生財透殺', '破', '傷官生財，財又生殺', `${desc('財')}；${desc('殺')}`);
+                if (tou('殺').length && tou('印').length) add('傷官駕殺逢印', '破', '傷官駕殺又透印，印剋傷官、制化不專', `${desc('殺')}；${desc('印')}`);
+                ctrlRatio('傷', '殺', '傷官駕殺');
                 break;
             }
             case '建祿格': case '月劫格': {
@@ -3986,6 +4151,12 @@ ${hpTxt}`;
                 if (tou('財').length) add('祿劫用財', '成', '財星透干，最好有食傷通關', desc('財') + (tou('食傷').length ? '；有食傷通關' : '；無食傷通關'));
                 if (tou('殺').length && tou('食傷').length) add('祿劫用殺', '成', '七殺透干而且有制', `${desc('殺')}；${desc('食傷')}`);
                 if (touRoot('食傷')) add('祿劫洩秀', '成', '食傷透干有根', desc('食傷'));
+                if (tou('食傷').length && tou('財').length) addS('食傷生財', '食傷透干逢財星生發', `${desc('食傷')}；${desc('財')}`);
+                if (touRoot('官') && tou('傷').length && !tou('印').length) add('祿劫用官逢傷', '破', '用官，傷官透干剋官，又無印護', `${desc('官')}；${desc('傷')}`);
+                if (tou('財').length && tou('比劫').length && !tou('食傷').length) add('祿劫用財逢劫', '破', '用財，比劫透干爭財，又無食傷通關', `${desc('財')}；${desc('比劫')}`);
+                if (tou('殺').length && !tou('食傷').length) add('祿劫用殺無制', '破', '七殺透干，無食傷制殺', desc('殺'));
+                if (tou('財').length && tou('殺').length) add('財殺生旺', '破', '透財又逢七殺，財生殺旺', `${desc('財')}；${desc('殺')}`);
+                if (tou('財').length && tou('食傷').length && tou('印').length) add('祿劫用財透印', '破', '用財靠食傷通關，印又透干剋食傷', `${desc('食傷')}；${desc('印')}`);
                 break;
             }
             case '羊刃格': {
@@ -3994,6 +4165,11 @@ ${hpTxt}`;
                 const CHONG = { '子':'午','午':'子','丑':'未','未':'丑','寅':'申','申':'寅','卯':'酉','酉':'卯','辰':'戌','戌':'辰','巳':'亥','亥':'巳' };
                 const hit = zhis.map((z, i) => ({ z, i })).filter(o => o.i !== 1 && o.z === CHONG[zhis[1]]);
                 if (hit.length) add('羊刃逢沖', '破', '月支羊刃被沖', hit.map(o => `${pN[o.i]}支${o.z}沖月支${zhis[1]}`).join('、'));
+                if (tou('食傷').length && tou('財').length && !tou('劫').length) addS('食傷生財', '食傷透干見財星，天干不露劫財', `${desc('食傷')}；${desc('財')}`);
+                if (isStrong && power('印') >= STRONG && tou('財').length) add('印多用財', '成', '日干強、印多，見財星制印', `${bodyTxt}；印 ${power('印').toFixed(1)}；${desc('財')}`);
+                if (isStrong && power('財') >= STRONG && (tou('官殺').length || tou('食傷').length)) add('財多有制', '成', '日干強、財多，有官殺制比劫或食傷通關', `${bodyTxt}；財力 ${power('財').toFixed(1)}；${[desc('官殺'), desc('食傷')].filter(Boolean).join('；')}`);
+                if (tou('食傷').length && tou('財').length && tou('劫').length) add('食傷生財逢劫', '破', '食傷生財，天干又透劫財爭財', `${desc('劫')}；${desc('財')}`);
+                if (touRoot('殺') && tou('食傷').length) add('羊刃駕殺逢制', '破', '刃格靠七殺制刃，七殺又被食傷制住', `${desc('殺')}；${desc('食傷')}`);
                 break;
             }
         }
@@ -4025,10 +4201,30 @@ ${hpTxt}`;
         }
         // ---- 全盤警示（不分格局） ----
         if (tou('官').length && tou('殺').length) add('官殺混雜', '破', '正官、七殺同時透干', `${desc('官')}、${desc('殺')}`);
-        if (tou('傷').length && tou('官').length && adjacent('傷', '官')) add('傷官見官', '破', '傷官、正官同時透干，而且相鄰', `${desc('傷')}、${desc('官')}`);
-        if (tou('梟').length && tou('食').length && touRoot('梟')) add('梟神奪食', '破', '偏印、食神同時透干，而且偏印有根', `${desc('梟')}、${desc('食')}`);
+        if (baseName !== '傷官格' && tou('傷').length && tou('官').length && adjacent('傷', '官')) add('傷官見官', '破', '傷官、正官同時透干，而且相鄰', `${desc('傷')}、${desc('官')}`);
+        if (isStrong && !out.some(o => o.name === '印制食傷') && tou('梟').length && tou('食').length && touRoot('梟') && near('梟', '食')) add('梟神奪食', '破', '偏印、食神同時透干，而且偏印有根', `${desc('梟')}、${desc('食')}`);
         if (touRoot('比劫') && tou('財').length && power('財') < 1.5) add('比劫奪財', '破', '比劫透干有根，財星孤弱', `${desc('比劫')}；財力 ${power('財').toFixed(1)}`);
-        if (tou('財').length && tou('印').length && !touRoot('印')) add('貪財壞印', '破', '財星透干剋印，印星無根', `${desc('財')}、${desc('印')}`);
+        if (!out.some(o => o.name === '財格佩印') && tou('財').length && tou('印').length && !touRoot('印') && near('財', '印')) add('貪財壞印', '破', '財星透干剋印，印星無根', `${desc('財')}、${desc('印')}`);
+        // ---- 通用：月令刑沖（沖＝破、刑＝減；月支另有六合或完整三合＝會合和解，降一級）；四庫月論開庫 ----
+        {
+            const mz = zhis[1], others = zhis.map((z, i) => ({ z, i })).filter(o => o.i !== 1 && o.z && o.z !== '-');
+            const ch = others.filter(o => zhiChongMap[mz] === o.z), xg = others.filter(o => getXingType(mz, o.z));
+            const lbl = (o, t) => `${pN[o.i]}支${o.z}${t}月支${mz}`;
+            if ('辰戌丑未'.includes(mz)) {
+                if (!['建祿格', '月劫格', '羊刃格'].includes(baseName) && (ch.length || xg.length))
+                    add('雜氣開庫', '成', '辰戌丑未月，月令庫被刑沖打開', [...ch.map(o => lbl(o, '沖')), ...xg.map(o => lbl(o, '刑'))].join('、'));
+            } else if (baseName !== '羊刃格') {
+                const he = others.filter(o => zhiHeMap[mz] === o.z).map(o => `${pN[o.i]}支${o.z}合月支${mz}`)
+                    .concat(YY_SANHE.filter(g => g.includes(mz) && g.every(x => zhis.includes(x))).map(g => `${g.join('')}三合`));
+                const heTxt = he.length ? `；${he.join('、')}，會合和解 → 降一級` : '';
+                if (ch.length) add('月令逢沖', he.length ? '減' : '破', '格局出自月令，月支被沖，根基不穩', ch.map(o => lbl(o, '沖')).join('、') + heTxt);
+                if (xg.length && !he.length) add('月令逢刑', '減', '月支被刑', xg.map(o => lbl(o, getXingType(mz, o.z) === '自刑' ? '自刑' : '刑')).join('、'));
+            }
+            if (geJuGan && !out.some(o => o.name === '劫財合殺')) {
+                const hit2 = stems.filter(s => s.g === geJuGan).flatMap(s => stems.filter(t => Math.abs(t.i - s.i) === 1 && ganHeMap[s.g] === t.g).map(t => `${pN[t.i]}干${t.g}合${pN[s.i]}干${s.g}`));
+                if (hit2.length) add('格神合絆', '減', '定格的天干被相鄰天干五合合絆', hit2.join('、'));
+            }
+        }
         // ---- 通關（傳統子平）：A 剋 B 的破格，若有「A 生 X、X 生 B」的通關神，剋轉為生 ----
         //  透干有根 → 化解；透干無根或地支本氣 → 減輕；只在中餘氣或沒有 → 不算
         //  通關神本身被剋（例如食傷遭梟神奪食）→ 通關失效
@@ -4054,6 +4250,24 @@ ${hpTxt}`;
             o.guard = { k, pos: tou(k).length
                 ? tou(k).map(st => ({ i: st.i, row: 'gan', ch: st.g, el: ganElementMap[st.g] }))
                 : mainOf(k).map(m => { const hw = m.hw; const mg = Object.keys(hw).sort((x, y) => hw[y] - hw[x])[0]; return { i: m.zi, row: 'zhi', ch: m.z, el: ganElementMap[mg] }; }) };
+        });
+        // ---- 制（傳統子平）：用另一個十神把破格的那方壓住；透干有根 → 化解，透干無根 → 減輕 ----
+        const ZHI = { '比劫奪財': [['官殺', '官殺制劫']], '貪財壞印': [['比劫', '比劫制財']], '梟神奪食': [['財', '財星制梟']], '官殺混雜': [['食', '食神制殺留官']],
+            '傷官見官': [['印', '印星制傷']], '制殺太過': [['財', '財星通關'], ['印', '印星護殺']] };
+        out.forEach(o => {
+            const zs = o.type === '破' && ZHI[o.name]; if (!zs || o.mit === 'jie') return;
+            const best = zs.map(([k, label]) => ({ k, label, lv: touRoot(k) ? 'jie' : tou(k).length ? 'qing' : '' })).filter(x => x.lv).sort((a, b) => (a.lv === 'jie' ? 0 : 1) - (b.lv === 'jie' ? 0 : 1))[0];
+            if (!best || (o.mit === 'qing' && best.lv === 'qing')) return;
+            o.mit = best.lv; o.guard = null;
+            o.why += `；${best.label}：${desc(best.k)} → ${best.lv === 'jie' ? '已化解' : '減輕'}`;
+        });
+        // ---- 受破：破格直接打掉某個成格（破格未被化解時），成格標「受破」 ----
+        const BREAKS = { '殺印逢財': ['殺印相生'], '傷官駕殺逢印': ['傷官駕殺'], '祿劫用財透印': ['祿劫用財'], '羊刃駕殺逢制': ['羊刃駕殺'],
+            '財旺生官逢殺': ['財旺生官'], '財旺生官逢傷': ['財旺生官'], '佩印逢財': ['官印相生', '傷官佩印', '官印雙全'], '傷官生財透殺': ['傷官生財'], '食神生財露殺': ['食神生財'],
+            '制殺太過': ['殺邀食制', '食神制殺', '傷官駕殺'], '貪財壞印': ['官印相生', '殺印相生', '財格佩印', '傷官佩印'], '梟神奪食': ['食神生財', '食神制殺', '印格洩秀'], '財殺生旺': ['祿劫用財', '食傷生財'], '食傷生財逢劫': ['食傷生財'], '祿劫用財逢劫': ['祿劫用財', '食傷生財'] };
+        out.forEach(b => {
+            if (b.type !== '破' || b.mit === 'jie' || !BREAKS[b.name]) return;
+            out.forEach(o => { if ((o.type === '成' || o.type === '待運') && BREAKS[b.name].includes(o.name) && !o.broken) o.broken = b.name; });
         });
         return out;
     }
@@ -4126,6 +4340,8 @@ ${hpTxt}`;
         [['木','土'], ['土','水'], ['水','火'], ['火','金'], ['金','木']].forEach(([a, b], i) => {
             const A = nodes[a], B = nodes[b];
             s += `<line class="pe-anim pe-ke" style="--d:${(0.85 + i * 0.07).toFixed(2)}s;" x1="${A.x.toFixed(1)}" y1="${A.y.toFixed(1)}" x2="${B.x.toFixed(1)}" y2="${B.y.toFixed(1)}" stroke="#ff5252" stroke-width="1" stroke-dasharray="3,4" opacity="0.4"/>`;
+            // 相剋：紅色光點沿星形對角線依「剋」的順序跑（木→土→水→火→金→木）
+            s += `<line class="st-ray st-ray-ke" pathLength="1" style="--k:${i};" x1="${A.x.toFixed(1)}" y1="${A.y.toFixed(1)}" x2="${B.x.toFixed(1)}" y2="${B.y.toFixed(1)}"/>`;
         });
         // 節點：外圈＝該五行佔比環（滿圈 60%），內為錶盤
         const RING = 21, C = 2 * Math.PI * RING;
@@ -5574,8 +5790,12 @@ ${hpTxt}`;
             const extremeLabel = congGeResult === '從強' ? '從強格（專旺）' : '從弱格';
             geJuName = `${extremeLabel}（不依正格論，原局月令本屬${geJuBaseName}；依傳統子平通根＋滿盤判定，非量化系統分數）`;
         }
+        // 多層定格：本氣格（本氣未透時另列）、同宮雙透（月令兩個以上藏干透出）
+        const touHidden = sortedCandidates.filter(c => otherGans.includes(c));
+        const layerTxt = (geJuGan !== benQiGan ? `；本氣格：${(geJuNameMap[getPreciseTenGod(benQiGan, dGan)] || (getPreciseTenGod(benQiGan, dGan) === '比肩' ? '建祿格' : '劫財格'))}（${benQiGan}${otherGans.includes(benQiGan) ? '透' : '未透'}）` : '')
+            + (touHidden.length >= 2 ? `；同宮雙透：${touHidden.map(c => c + getPreciseTenGod(c, dGan)).join('、')}` : '');
         const geJuNote = `月支「${mz}」藏干以「${geJuGan}」定格${isTou ? '，且已透干（格局清晰）' : '，未透干，僅以藏干本氣論格'}` +
-            (skippedBiJie ? `；${skippedBiJie}為比劫透出，不另成格` : '');
+            (skippedBiJie ? `；${skippedBiJie}為比劫透出，不另成格` : '') + layerTxt;
 
         // ---- 2. 調候判斷（優先於扶抑） ----
         const pct = (el) => totalElements > 0 ? (elementCount[el] / totalElements) * 100 : 0;
@@ -6700,33 +6920,39 @@ ${hpTxt}`;
         const tradStrong = tradStrongCnt >= 2;
         const mk = b => b ? '<b style="color:#2ed573">✓</b>' : '<b style="color:#ff5252">✗</b>';
         let comboHtml = '', comboPromptText = '';
-        let comboMit = {};
+        let comboMit = {}, comboBroken = {}, comboType = {};
         const lampHtml = (name, type, lit, i) => {
-            const m = lit && comboMit[name];
-            return `<span class="gj-lamp gj-anim ${lit ? (type === '成' ? 'ok' : 'bad') : ''} ${m || ''}" style="--d:${(1.2 + i * 0.05).toFixed(2)}s;"><i>${m === 'jie' ? '解' : m === 'qing' ? '輕' : type}</i>${name}</span>`;
+            const m = lit && comboMit[name], br = lit && comboBroken[name];
+            const tt = lit && comboType[name] || type;
+            return `<span class="gj-lamp gj-anim ${lit ? (tt === '成' ? 'ok' : tt === '待運' ? 'ok wait' : (tt === '減' ? 'bad qing' : 'bad')) : ''} ${m || ''} ${br ? 'broken' : ''}" style="--d:${(1.2 + i * 0.05).toFixed(2)}s;"><i>${m === 'jie' ? '解' : m === 'qing' ? '輕' : tt === '待運' ? '待' : tt}</i>${name}</span>`;
         };
         window.__tgGuards = [];
         {
             const comboBase = geJuYongShen.isExtreme ? (geJuYongShen.congGeResult === '從強' ? '從強格' : '從弱格') : geJuYongShen.geJuBaseName;
-            const combos = detectGeJuCombos([yg, mg, dg, tg], [yz, mz, dz, tz], dg, comboBase, tradStrong);
+            const combos = detectGeJuCombos([yg, mg, dg, tg], [yz, mz, dz, tz], dg, comboBase, tradStrong, geJuYongShen.isExtreme ? null : geJuYongShen.geJuGan, daYunData, currentYear);
             window.__tgGuards = combos.filter(c => c.mit && c.guard);
             if (window.__tgGuards.length && window.__renderLiuri) window.__renderLiuri();
             const hitNames = combos.map(c => c.name);
-            combos.forEach(c => { if (c.mit) comboMit[c.name] = c.mit; });
+            combos.forEach(c => { comboType[c.name] = c.type; if (c.mit) comboMit[c.name] = c.mit; if (c.broken) comboBroken[c.name] = c.broken; });
             const cand = COMBO_CATALOG[comboBase] || [];
             const warn = geJuYongShen.isExtreme ? [] : COMBO_WARNINGS.filter(w => !cand.some(c => c[0] === w));
             let li = 0;
             comboHtml = `
                 <div class="gj-lamp-row"><span class="gj-lamp-lbl">本格</span><div class="gj-lamps">${cand.map(([n, t]) => lampHtml(n, t, hitNames.includes(n), li++)).join('') || '<span class="gj-lamp-empty">此格無組合標籤</span>'}</div></div>
-                ${warn.length ? `<div class="gj-lamp-row"><span class="gj-lamp-lbl">全盤</span><div class="gj-lamps">${warn.map(n => lampHtml(n, '破', hitNames.includes(n), li++)).join('')}</div></div>` : ''}
+                ${warn.length || COMBO_GENERAL.some(([n]) => hitNames.includes(n)) ? `<div class="gj-lamp-row"><span class="gj-lamp-lbl">全盤</span><div class="gj-lamps">${warn.map(n => lampHtml(n, '破', hitNames.includes(n), li++)).join('')}${COMBO_GENERAL.filter(([n]) => hitNames.includes(n)).map(([n, t]) => lampHtml(n, (combos.find(c => c.name === n) || {}).type || t, true, li++)).join('')}</div></div>` : ''}
                 ${combos.length ? `<div class="gj-cb-list">${combos.map((c, i) => `
-                    <div class="gj-cb ${c.type === '成' ? 'ok' : 'bad'} ${c.mit || ''} gj-anim" style="--d:${(1.5 + i * 0.1).toFixed(2)}s;">
-                        <div class="gj-cb-top"><span class="gj-cb-tag">${c.mit === 'jie' ? '破→解' : c.mit === 'qing' ? '破・輕' : c.type}</span><b>${c.name}</b><span class="gj-cb-cond">${c.cond}</span></div>
-                        <div class="gj-cb-why">${c.why}</div>
+                    <div class="gj-cb ${c.type === '成' ? 'ok' : c.type === '待運' ? 'ok wait' : (c.type === '減' ? 'bad qing' : 'bad')} ${c.mit || ''} ${c.broken ? 'broken' : ''} gj-anim" style="--d:${(1.5 + i * 0.1).toFixed(2)}s;">
+                        <div class="gj-cb-top"><span class="gj-cb-tag">${c.broken ? (c.type === '待運' ? '待運→受破' : '成→受破') : c.mit === 'jie' ? '破→解' : c.mit === 'qing' ? '破・輕' : c.type}</span><b>${c.name}</b><span class="gj-cb-cond">${c.cond}</span></div>
+                        <div class="gj-cb-why">${c.why}${c.broken ? `；被「${c.broken}」破` : ''}</div>
+                        ${COMBO_READ[c.name] ? `<div class="gj-cb-read"><span><b>狀態</b>${COMBO_READ[c.name][0]}</span><span><b>方向</b>${COMBO_READ[c.name][1].replace(/^借重/, '')}</span></div>` : ''}
                     </div>`).join('')}</div>` : ''}`;
             comboPromptText = combos.length
-                ? combos.map(c => `  - 【${c.type}格${c.mit === 'jie' ? '・已通關化解' : c.mit === 'qing' ? '・通關減輕' : ''}】${c.name}：條件「${c.cond}」；本盤依據：${c.why}`).join('\n')
+                ? combos.map(c => `  - 【${c.type === '減' ? '減分' : c.type === '待運' ? '待運' : c.type + '格'}${c.broken ? '・受破（被' + c.broken + '破）' : ''}${c.mit === 'jie' ? '・已化解' : c.mit === 'qing' ? '・減輕' : ''}】${c.name}：條件「${c.cond}」；本盤依據：${c.why}`).join('\n')
                 : '  - 未見成格／破格組合（格局平淡，以原局結構論）';
+            {   // 附上亮起組合的解讀參考（只給 AI，不上畫面）
+                const rd = [...new Set(combos.map(c => c.name))].filter(n => COMBO_READ[n]).map(n => `    - ${n}｜狀態：${COMBO_READ[n][0]}｜${COMBO_READ[n][1]}`);
+                if (rd.length) comboPromptText += '\n  - 解讀參考（傳統一般論法，屬傾向）：\n' + rd.join('\n');
+            }
         }
         const tradStrongText = `${tradStrong ? '身強' : '身弱'}（得令${isDeLing ? '✓' : '✗'}、得地${tradDeDi ? '✓' : '✗'}、得勢${isDeShi ? '✓' : '✗'}，三得其二為強）`;
         const activeGeJu = geJuYongShen.isExtreme ? geJuYongShen.congGeResult : geJuYongShen.geJuBaseName.replace('格', '');
@@ -7262,7 +7488,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.46';
+    const APP_VER = 'V3.47';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -7604,7 +7830,7 @@ ${tasks.map((x, i) => `${i + 1}. ${x}`).join('\n')}
 - 轉職分數：引用時數字必須和資料逐月一致，不可合併月份、取平均或自行估算；≥60 代表該月適合轉職。不需要列出全部 12 個月，只列重點月份（≥60、或有事業流月依據的月份）。
 - 破財日、破財月是風險提醒，不是必然發生。
 - 考試報名與考期、開學、求職旺季等實際時程以官方公告與市場為準；命盤月份只是輔助，若建議的月份和實際時程衝突（例如報名已截止），要直接指出。
-- 引用格局成敗時，若有破格（例如傷官見官、比劫奪財），要說明它對工作環境或做事方式的實際影響。
+- 引用格局成敗時，若有破格（例如傷官見官、比劫奪財），要說明它對工作環境或做事方式的實際影響；成格、待運、破格都只是傾向，不是定論，標「待運」的結構要說明哪段大運較能發揮。
 - 只談收入與投資的「方式」和風險屬性，不可點名任何股票、ETF、基金、幣種、指數或金融商品，也不可給買賣建議。
 - 命盤不能判斷一個人的投資能力、市場直覺或交易天分，不要做這類宣稱；風險承受度只用「宜保守／中性」等建議語氣，並提醒以實際財務狀況為準。
 - 判斷轉職時機時，除了分數，再引用 1～2 個事業流月或四庫的依據（例如官殺引透、官庫被打開）說明原因。
@@ -7796,6 +8022,7 @@ ${d.safetyScan || '無'}`;
 4. 標「已過」的時間點用來驗證，寫成「這段期間可能發生過…，可對照看看」；未來的時間點給提醒。每個推斷給 2～3 種可能情境，不要編造具體情節。
 5. 家人安全、健康相關只用「提醒留意、建議檢查」的語氣，不下斷言。
 6. 不要重抄資料本身，也不要解釋資料的定義。
+7. 格局成敗只是傾向，不是定論：成格＝可發揮的優勢、待運＝結構已具，行運補足時較能發揮、破格＝需要留意的風險、減分＝風險較輕；同一盤可以又成又破，請把優勢和風險一起講，並給具體的行動建議，不要說成「天生好命／壞命」。
 7. 避免「極其」「強烈」「一定」這類絕對化用語；不要使用 LaTeX 或數學公式語法，直接寫「≥」或文字。
 8. 不可點名任何股票、ETF、基金、指數或金融商品；命盤不能判斷投資能力或交易天分，不要做這類宣稱。
 
