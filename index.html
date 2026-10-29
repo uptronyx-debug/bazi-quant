@@ -72,6 +72,7 @@
             .liuri-advice-scroll { gap: 8px; }
             .liuri-advice-card { flex: 0 0 calc((100% - 16px) / 3) !important; width: auto !important; scroll-snap-align: center !important; }
             .st-svg { max-width: 420px !important; }
+            .dash-grid-top.pg-layout .pg-cluster { justify-content: flex-start !important; padding-top: 6px; }
         }
         /* 窄螢幕（手機）大幅收窄外層留白，讓內容盡量貼齊邊緣、減少不必要的左右滑動 */
         @media (max-width: 600px) {
@@ -4473,12 +4474,20 @@ ${hpTxt}`;
         layer.innerHTML = h;
     }
     function stDrawDayun(i) { const c = window.__starCtx; if (!c) return; c.selIdx = i; stDrawOverlay(); }
+    // 兩欄版面：疊加時鎖住右側五行卡高度，避免捲軸出現時電平表被拉長、整區跳動
+    function stLockBars(anyOn) {
+        const card = document.querySelector('.wx-panel')?.closest('.dash-card'); if (!card) return;
+        if (anyOn && window.innerWidth > 500) { if (!card.style.height) { card.style.height = getComputedStyle(card).height; card.style.alignSelf = 'start'; } }
+        else { card.style.height = ''; card.style.alignSelf = ''; }
+    }
     function stToggleDayun(on) {
         const panel = document.querySelector('.st-panel'); if (!panel) return;
+        stLockBars(on || panel.classList.contains('ly-on'));
         panel.classList.toggle('dy-on', on); stRenderStrips(); stDrawOverlay();
     }
     function stToggleLiunian(on) {
         const panel = document.querySelector('.st-panel'); if (!panel) return;
+        stLockBars(on || panel.classList.contains('dy-on'));
         panel.classList.toggle('ly-on', on); stRenderStrips(); stDrawOverlay();
     }
     function stDyPick(i) { const c = window.__starCtx; if (!c || !c.daYunData[i]) return; c.selIdx = i; stRenderStrips(); stDrawOverlay(); }
