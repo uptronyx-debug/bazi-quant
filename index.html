@@ -1691,6 +1691,72 @@
         .hp-warn li::marker { color:var(--tc); }
         .hp-warn li small { display:block; color:var(--mute); font-size:12.5px; }
         @media (prefers-reduced-motion: reduce) { .hp-flow, .hp-ring, .hp-scan, .hp-pulse, .hp-heat, .hp-lbl g, .hp-warn { animation:none; } }
+        .hp-tl .sx-rows > div { align-items:flex-start; padding:5px 0; border-bottom:1px dashed var(--line); }
+        .hp-tl .sx-rows > div:last-child { border-bottom:0; }
+        .hp-tl .sx-rows dt { flex:0 0 4.2em; font-variant-numeric:tabular-nums; }
+        .hp-tl .sx-rows dd small { display:block; color:var(--mute); font-size:11.5px; line-height:1.5; margin-top:1px; }
+        .hp-tl .hp-cur { background:color-mix(in srgb, var(--ink) 5%, transparent); border-radius:6px; }
+        .hp-dgz { font-size:15px; margin-right:8px; letter-spacing:1px; }
+        .hp-lv { font-size:12px; font-weight:600; color:var(--ok); } .hp-lv.warn { color:var(--warn); } .hp-lv.bad { color:var(--bad); }
+        .hp-now { font-style:normal; font-size:10px; margin-left:6px; padding:0 6px; border-radius:999px; border:1px solid var(--ink); color:var(--ink); }
+        .hp-sub { font-size:12px; color:var(--mute); letter-spacing:1px; margin:14px 2px 8px; }
+        /* 健康分頁（精簡版） */
+        .hpx-hero { display:grid; grid-template-columns:minmax(0,40%) minmax(0,1fr); gap:10px; align-items:stretch; }
+        .hpx-body { margin-top:0; border-radius:14px; display:flex; align-items:center; justify-content:center; padding:6px 0; }
+        .hpx-body svg { max-height:250px; width:auto; height:250px; }
+        .hpx-side { display:flex; flex-direction:column; gap:4px; min-width:0; }
+        .hpx-cap { display:flex; justify-content:space-between; font-size:11px; color:var(--mute); letter-spacing:1px; padding:0 2px 2px; }
+        .hpx-cap span { color:var(--faint); letter-spacing:0; }
+        .hpx-row { all:unset; box-sizing:border-box; display:grid; grid-template-columns:20px 1fr auto auto; align-items:center; gap:6px; padding:6px 8px; border-radius:9px; border:1px solid var(--line); background:var(--panel); cursor:pointer; -webkit-tap-highlight-color:transparent; }
+        .hpx-row b { color:var(--ec); font-size:15px; }
+        .hpx-row small { color:var(--faint); font-size:11px; }
+        .hpx-row i { font-style:normal; font-size:10px; padding:0 6px; border-radius:999px; line-height:16px; }
+        .hpx-row i.w { color:#fff; background:var(--bad); } .hpx-row i.g { color:var(--warn); border:1px solid var(--warn); }
+        .hpx-row.on { border-color:var(--ec); background:color-mix(in srgb, var(--ec) 12%, var(--panel)); }
+        .hpx-row:focus-visible { outline:1px solid var(--ec); }
+        .hpx-dots { display:flex; gap:3px; align-items:center; }
+        .hpx-dots s { width:8px; height:8px; border-radius:50%; background:var(--ec); }
+        .hpx-dots em { font-style:normal; font-size:11px; color:var(--bad); }
+        .hpx-sel { font-size:11.5px; line-height:1.5; color:var(--ink); padding:4px 4px 0; border-top:1px dashed var(--line); margin-top:2px; }
+        .hpx-sel b { color:var(--warn); }
+        .hpx-focus { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin-top:10px; }
+        .hpx-f { border:1px solid color-mix(in srgb, var(--ec) 45%, var(--line)); border-left:3px solid var(--ec); border-radius:10px; padding:8px 10px; background:color-mix(in srgb, var(--ec) 6%, var(--panel)); }
+        .hpx-fh { display:flex; align-items:baseline; gap:6px; flex-wrap:wrap; }
+        .hpx-fh b { color:var(--ec); font-size:18px; }
+        .hpx-fh span { font-size:11.5px; color:var(--mute); }
+        .hpx-fh em { font-style:normal; margin-left:auto; font-size:11px; color:var(--bad); }
+        .hpx-fo { font-size:12.5px; color:var(--ink); margin-top:3px; line-height:1.5; }
+        .hpx-ft { font-size:11.5px; color:var(--mute); margin-top:2px; line-height:1.5; }
+        .hpx-even { margin-top:10px; font-size:12.5px; color:var(--mute); }
+        .hpx-card { margin-top:12px; border:1px solid var(--line); border-radius:12px; padding:10px; background:var(--panel); }
+        .hpx-ch { display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px; }
+        .hpx-ch b { font-size:13.5px; color:var(--ink); letter-spacing:1px; }
+        .hpx-ch span { font-size:11px; color:var(--mute); display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+        .hpx-ch span i { width:8px; height:8px; border-radius:50%; display:inline-block; }
+        .hpx-mon { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+        .hpx-mon b { font-size:13px; color:var(--ink); } .hpx-mon span { font-size:11px; color:var(--bad); margin-right:auto; }
+        .hpx-mon button { all:unset; cursor:pointer; width:26px; height:24px; text-align:center; border:1px solid var(--line); border-radius:6px; color:var(--ink); }
+        .hpx-grid { display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:3px; }
+        .hpx-grid .hd { font-size:10.5px; color:var(--faint); text-align:center; padding-bottom:2px; }
+        .hpx-d { all:unset; box-sizing:border-box; text-align:center; font-size:12px; color:var(--faint); padding:4px 0 3px; border-radius:6px; line-height:1.15; min-height:34px; }
+        .hpx-d i { display:block; font-style:normal; font-size:9.5px; }
+        .hpx-d.hit { cursor:pointer; color:#fff; background:color-mix(in srgb, var(--ec) 28%, transparent); border:1px solid color-mix(in srgb, var(--ec) 60%, transparent); }
+        .hpx-d.hit i { color:color-mix(in srgb, var(--ec) 40%, #fff); }
+        .hpx-d.today { outline:1px solid var(--ink); }
+        .hpx-d.sel { box-shadow:0 0 0 2px var(--ec) inset; }
+        .hpx-dd { margin-top:8px; border-left:3px solid var(--ec); padding:4px 0 2px 9px; font-size:12.5px; color:var(--ink); }
+        .hpx-dd.none { border-color:var(--line); color:var(--mute); }
+        .hpx-strip { display:flex; gap:5px; overflow-x:auto; scrollbar-width:none; padding:2px 0; }
+        .hpx-strip::-webkit-scrollbar { display:none; }
+        .hpx-c { all:unset; box-sizing:border-box; flex:0 0 auto; min-width:52px; text-align:center; padding:4px 6px 5px; border-radius:8px; border:1px solid var(--line); border-bottom:3px solid var(--ok); cursor:pointer; position:relative; font-size:14px; }
+        .hpx-c small { display:block; font-size:9.5px; color:var(--faint); }
+        .hpx-c.warn { border-bottom-color:var(--warn); } .hpx-c.bad { border-bottom-color:var(--bad); background:color-mix(in srgb, var(--bad) 8%, transparent); }
+        .hpx-c.sel { border-color:var(--ink); border-bottom-width:3px; }
+        .hpx-c i { position:absolute; top:-7px; left:50%; transform:translateX(-50%); font-style:normal; font-size:9px; padding:0 4px; border-radius:999px; background:var(--ink); color:#000; white-space:nowrap; }
+        .hpx-line { font-size:12px; color:var(--mute); margin:5px 2px 9px; line-height:1.5; }
+        .hpx-line b { color:var(--ok); margin-right:6px; } .hpx-line.warn b { color:var(--warn); } .hpx-line.bad b { color:var(--bad); }
+        .hpx-strip + .hpx-line:last-child { margin-bottom:0; }
+        .hp-foot { font-size:11px; color:var(--faint); line-height:1.6; margin:12px 2px 0; }
         /* 十神星圖：相剋光點（同流日趨勢線的跑光） */
         .st-ray { fill:none; stroke-linecap:round; stroke-dasharray:.16 .84; stroke-dashoffset:.16; opacity:0; pointer-events:none; }
         .st-ray-ke { stroke:#ffd0d0; stroke-width:2.2; filter:drop-shadow(0 0 3px #ff5252) drop-shadow(0 0 7px #ff5252); }
@@ -5698,7 +5764,7 @@ ${hpTxt}`;
             <div class="sx-tabs" role="tablist">
                 <button type="button" role="tab" class="sx-tab ${tab === 'ts' ? 'on' : ''}" onclick="sfTab('ts')">安太歲</button>
                 <button type="button" role="tab" class="sx-tab ${tab === 'car' ? 'on' : ''}" onclick="sfTab('car')">行車・跌倒</button>
-                <button type="button" role="tab" class="sx-tab ${tab === 'hp' ? 'on' : ''}" onclick="sfTab('hp')">健康<small style="font-size:11px;color:var(--faint);margin-left:2px">（建構中）</small></button>
+                <button type="button" role="tab" class="sx-tab ${tab === 'hp' ? 'on' : ''}" onclick="sfTab('hp')">健康</button>
             </div>${body}</div>`;
     }
     function sfDetailHtml(sc, c, natalTxt) {
@@ -5740,22 +5806,21 @@ ${hpTxt}`;
 
     // ===================================================================
     // 平安・健康：五行對應器官人體掃描
-    // 太旺狀態目前為手動切換（window.__hpExcess）；之後的掃描條件算出結果後，
-    // 寫入 window.__hpExcess = { earth: true, ... } 即可自動亮起警訊。
+    // 太旺狀態由 computeHealth() 自動寫入 window.__hpExcess（土、火 ≥3 個）。
     // ===================================================================
     const HP_ORDER = ['wood', 'fire', 'earth', 'metal', 'water'];
     const HP_EL = {
         wood:  { g: '木', abbr: '肝膽', organs: ['肝', '膽', '四肢（手腳）'] },
         fire:  { g: '火', abbr: '心眼', organs: ['心臟', '心血管系統', '眼睛'] },
         earth: { g: '土', abbr: '脾胃', organs: ['脾胃（腸胃消化系統）'] },
-        metal: { g: '金', abbr: '肺腸', organs: ['肺', '支氣管', '大腸', '皮膚'] },
+        metal: { g: '金', abbr: '肺腸', organs: ['肺', '支氣管', '大腸', '皮膚', '口腔、牙齒'] },
         water: { g: '水', abbr: '腎', organs: ['腎臟', '膀胱', '泌尿系統', '循環系統'], f: ['婦科（子宮、卵巢、乳房）'], m: ['攝護腺'] }
     };
     const HP_LABELS = {
         wood: [['肝', 165, 308], ['膽', 174, 336], ['四肢（手腳）', 306, 320]],
         fire: [['心臟', 214, 250], ['心血管系統', 166, 600], ['眼睛', 215, 68]],
         earth: [['脾', 258, 300], ['胃', 240, 322], ['腸胃消化', 200, 388]],
-        metal: [['肺', 160, 240], ['支氣管', 226, 212], ['大腸', 234, 388], ['皮膚', 120, 205]],
+        metal: [['肺', 160, 240], ['支氣管', 226, 212], ['大腸', 234, 388], ['皮膚', 120, 205], ['口腔、牙齒', 214, 98]],
         water: [['腎臟', 232, 340], ['膀胱', 200, 442], ['泌尿系統', 180, 392], ['循環系統', 234, 600]]
     };
     const HP_LABELS_F = [['子宮、卵巢', 222, 416], ['乳房', 240, 232]], HP_LABELS_M = [['攝護腺', 200, 455]];
@@ -5767,6 +5832,91 @@ ${hpTxt}`;
                 labels: [['▲ 易發燒', 200, 36], ['▲ 燥熱・發炎', 170, 230]] }
     };
     const hpCol = k => elementColors[HP_EL[k].g];
+
+    // ===== 健康推算 =====
+    // 原局：只數八字本氣（天干＋地支主氣，不含藏干）。0～1 個＝偏弱；≥3 個＝太旺，所剋的五行視為受剋（弱勢）。
+    // 主要留意：數量最少者優先，同數量時優先被最旺五行所剋者，再以含藏干比重較低者。
+    // 大運／流年：天干 30%、地支 70% 合併判斷。正格看對「最弱五行」的生剋；從格看順勢／逆勢（破格）。
+    // 原則：只做提醒與建議檢查，不用補運。
+    const HP_KEY = { '木': 'wood', '火': 'fire', '土': 'earth', '金': 'metal', '水': 'water' };
+    const HP_CARE = {
+        '木': { care: '規律作息、不熬夜，多伸展，運動留意扭傷拉傷', check: '肝膽（肝功能、腹部超音波）、四肢筋骨' },
+        '火': { care: '避免過勞、控制血壓血脂，用眼適度休息', check: '心血管（血壓、血脂、心電圖）、眼睛' },
+        '土': { care: '飲食好消化、定時定量，少吃刺激性食物', check: '腸胃消化（胃鏡、大腸鏡、腹部超音波）' },
+        '金': { care: '戴口罩、留意空氣品質，皮膚保濕、口腔清潔', check: '呼吸道（胸部 X 光、肺功能）、皮膚、牙齒' },
+        '水': { care: '多喝水、不憋尿、注意保暖', check: '腎臟泌尿（尿液、腎功能）', f: '婦科（乳房、子宮卵巢）', m: '攝護腺' }
+    };
+    const HP_DAY = {
+        '金': { ji: '火', days: ['丙寅', '丙午', '丙戌', '丁巳', '丁未'], tips: ['外出戴口罩', '確實保養、清潔皮膚', '少燥熱飲食'] },
+        '木': { ji: '金', days: ['庚申', '辛酉', '辛丑'], tips: ['注意外傷，避免激烈運動', '早睡不熬夜'] },
+        '水': { ji: '土', days: ['戊戌', '戊辰', '戊午', '己未', '己丑', '己巳'], tips: ['多喝水、不憋尿', '飲食清淡、忌冷飲'] },
+        '火': { ji: '水', days: ['壬子', '壬申', '壬辰', '癸亥', '癸酉', '癸丑'], tips: ['注意保暖，促進血液循環', '高齡者留意血壓', '年輕人控制用眼時間'] },
+        '土': { ji: '木', days: ['甲寅', '甲子', '甲辰', '乙卯', '乙亥', '乙未'], tips: ['定時定量進食', '飲食溫熱、清淡，勿暴飲暴食'] }
+    };
+    const HP_XING = {
+        '寅巳申': '衝撞能量：留意外傷、手術、突發性疾病，行車與走路多注意',
+        '丑戌未': '堆積能量：留意腫瘤、結石；土剋水，腎臟泌尿、婦科多注意；也容易情緒鬱結、壓力大'
+    };
+    function computeHealth(c) {
+        const EL = ['木', '火', '土', '金', '水'];
+        const cnt = { '木': 0, '火': 0, '土': 0, '金': 0, '水': 0 };
+        c.gans.forEach(g => { if (ganElementMap[g]) cnt[ganElementMap[g]]++; });
+        c.zhis.forEach(z => { if (zhiElementMap[z]) cnt[zhiElementMap[z]]++; });
+        const keOf = e => EL.find(k => wuxingRel[k].ke === e), shengOf = e => EL.find(k => wuxingRel[k].sheng === e);
+        const wang = EL.filter(e => cnt[e] >= 3).sort((a, b) => cnt[b] - cnt[a]);
+        // 最缺五行（最多取兩個）：① 0 個且被最旺者剋 ② 0 個 ③ 1 個且被最旺者剋 ④ 1 個
+        const maxC = Math.max(...EL.map(e => cnt[e])), tops = EL.filter(e => cnt[e] === maxC && maxC >= 2);
+        const keBy = e => tops.find(t => wuxingRel[t].ke === e) || null;
+        const rank = e => cnt[e] === 0 ? (keBy(e) ? 1 : 2) : (cnt[e] === 1 ? (keBy(e) ? 3 : 4) : 9);
+        const why = {};
+        const weak = EL.filter(e => rank(e) < 9).sort((a, b) => (rank(a) - rank(b)) || ((c.hidden[a] || 0) - (c.hidden[b] || 0))).slice(0, 2);
+        weak.forEach(e => { why[e] = [`${cnt[e]} 個`].concat(keBy(e) ? [`被${keBy(e)}剋`] : []); });
+        const X = weak[0] || null;
+        // 單一五行對健康的作用：+1 有利、0 中性、-0.4 洩耗、-1 剋／逆勢
+        let f, rel;
+        if (c.cong === '從強') {
+            const help = [c.dayEl, shengOf(c.dayEl)], xie = wuxingRel[c.dayEl].sheng;
+            f = e => help.includes(e) ? 1 : (e === xie ? 0 : -1);
+            rel = e => help.includes(e) ? '順勢' : (e === xie ? '洩秀' : '逆勢');
+        } else if (c.cong === '從弱') {
+            const against = [c.dayEl, shengOf(c.dayEl)];
+            f = e => against.includes(e) ? -1 : 1;
+            rel = e => against.includes(e) ? '逆勢' : '順勢';
+        } else if (X) {
+            f = e => (e === X || wuxingRel[e].sheng === X) ? 1 : (wuxingRel[e].ke === X ? -1 : ((wuxingRel[X].sheng === e || wuxingRel[X].ke === e) ? -0.4 : 0));
+            rel = e => e === X ? `同${X}` : wuxingRel[e].sheng === X ? `生${X}` : wuxingRel[e].ke === X ? `剋${X}` : wuxingRel[X].sheng === e ? `洩${X}` : wuxingRel[X].ke === e ? `耗${X}` : '';
+        } else { f = () => 0; rel = e => { const t = wuxingRel[e].ke; return `剋${t}`; }; }
+        const judge = (g, z) => {
+            const ge = ganElementMap[g], ze = zhiElementMap[z], sc = 0.3 * f(ge) + 0.7 * f(ze);
+            const lvl = sc > 0 ? 'ok' : (sc >= -0.5 ? 'warn' : 'bad');
+            const bad = [ge, ze].filter(e => f(e) < 0);
+            return { ge, ze, sc, lvl, why: `${g}${ge}${rel(ge) ? '・' + rel(ge) : ''}／${z}${ze}${rel(ze) ? '・' + rel(ze) : ''}`, bad };
+        };
+        const xingOf = list => (list || []).filter(h => h.type === '刑').map(h => h.name.replace('三刑', ''));
+        const dys = (c.daYunData || []).map((dy, i) => {
+            const end = c.daYunData[i + 1] ? c.daYunData[i + 1].startYear - 1 : dy.startYear + 9;
+            const j = judge(dy.gan, dy.zhi);
+            return Object.assign(j, { i, gan: dy.gan, zhi: dy.zhi, y0: dy.startYear, y1: end, age: dy.startAge, cur: c.currentYear >= dy.startYear && c.currentYear <= end,
+                xing: xingOf(c.sc && c.sc.hits(dy.zhi, [])) });
+        });
+        const curDy = dys.find(d => d.cur) || null;
+        const yStart = curDy ? curDy.y0 : c.currentYear, yEnd = curDy ? curDy.y1 : c.currentYear + 9;
+        const COMBO = { ok: { ok: ['ok', '穩定'], warn: ['ok', '穩定'], bad: ['warn', '小病小痛', '流年過了就緩解'] },
+                        warn: { ok: ['ok', '穩定'], warn: ['warn', '留意'], bad: ['bad', '警訊'] },
+                        bad: { ok: ['warn', '好轉', '大運偏弱，這一年較緩解'], warn: ['bad', '警訊'], bad: ['bad', '重點留意', '大運流年都不利'] } };
+        const years = [];
+        for (let y = yStart; y <= yEnd; y++) {
+            const gz = iaYearGZ(y), dy = dys.find(d => y >= d.y0 && y <= d.y1), j = judge(gz.gan, gz.zhi);
+            const xing = xingOf(c.sc && c.sc.hits(gz.zhi, dy ? [dy.zhi] : []));
+            let [lvl, label, note] = (X || c.cong) ? COMBO[dy ? dy.lvl : 'ok'][j.lvl] : ['ok', '平穩'];
+            if (!X && !c.cong) note = `${j.ge}剋${wuxingRel[j.ge].ke}、${j.ze}剋${wuxingRel[j.ze].ke}，${[...new Set([wuxingRel[j.ge].ke, wuxingRel[j.ze].ke])].join('、')}對應部位多留意`;
+            if (xing.length) { lvl = 'bad'; label = '三刑'; }
+            years.push(Object.assign(j, { y, gan: gz.gan, zhi: gz.zhi, dyLvl: dy ? dy.lvl : null, lvl, label, note, xing, cur: y === c.currentYear, dyGz: dy ? dy.gan + dy.zhi : '' }));
+        }
+        const natalXing = c.sc ? c.sc.natal.filter(n => n.type === '刑').map(n => n.name.replace('三刑', '')) : [];
+        return { cnt, wang, why, weak, X, keBy: Object.fromEntries(weak.map(e => [e, keBy(e)])), cong: c.cong, dys, years, curDy, natalXing, sex: c.sex };
+    }
+    const HP_LV = { ok: '穩定期', warn: '留意期', bad: '警訊期' };
 
     function hpLabelsSvg(sel, sex, ex) {
         if (sel === 'all') return '';
@@ -5788,9 +5938,9 @@ ${hpTxt}`;
         return `<g class="hp-lbl">${out}</g>`;
     }
 
-    function hpSvg(sel, sex, ex) {
+    function hpSvg(sel, sex, ex, compact) {
         const o = (els, name, inner, extra = '') => `<g class="hp-org ${els.map(e => 'he-' + e).join(' ')} hc-${els[0]} ${extra}" data-els="${els.join(',')}" onclick="hpOrgan(this)"><title>${name}</title>${inner}</g>`;
-        return `<svg viewBox="0 0 560 780" role="img" aria-label="五行對應器官人體圖">
+        return `<svg viewBox="${compact ? '116 0 328 780' : '0 0 560 780'}" role="img" aria-label="五行對應器官人體圖">
         <defs>
           <g id="hp-sil" fill="#fff">
             <ellipse cx="200" cy="72" rx="40" ry="50"/><rect x="183" y="110" width="34" height="48" rx="8"/>
@@ -5847,42 +5997,103 @@ ${hpTxt}`;
             <g fill="none" stroke="${elementColors['土']}" stroke-width="1.3"><circle class="hp-pulse" cx="230" cy="346" r="10"/><circle class="hp-pulse" cx="170" cy="392" r="10" style="animation-delay:.5s"/><circle class="hp-pulse" cx="246" cy="318" r="13" style="animation-delay:1s"/></g>
           </g>
         </g>
-        ${hpLabelsSvg(sel, sex, ex)}
+        ${compact ? '' : hpLabelsSvg(sel, sex, ex)}
         </svg>`;
     }
 
+    function hpDayGZ(y, m, d) { const e = Solar.fromYmdHms(y, m, d, 12, 0, 0).getLunar().getEightChar(); return e.getDayGan() + e.getDayZhi(); }
     function renderHealthHtml() {
-        const sel = window.__hpSel || 'all', sex = window.__hpSex === 1 ? 1 : 0, exMap = window.__hpExcess || (window.__hpExcess = {});
+        const H = window.__health, sex = window.__hpSex === 1 ? 1 : 0, exMap = window.__hpExcess || (window.__hpExcess = {});
+        const sel = window.__hpSel || 'all';
         const ex = sel !== 'all' && !!exMap[sel] && !!HP_EXCESS[sel];
-        const cells = HP_ORDER.map(k => `<button type="button" class="sx-cell hp-cell ${exMap[k] && HP_EXCESS[k] ? 'bad' : ''} ${sel === k ? 'on' : ''}" style="--ec:${hpCol(k)}" onclick="hpPick('${k}')">
-            <span class="sx-gz">${HP_EL[k].g}</span><span class="sx-st">${exMap[k] && HP_EXCESS[k] ? '太旺' : HP_EL[k].abbr}</span></button>`).join('');
+        const ELK = { wood: '木', fire: '火', earth: '土', metal: '金', water: '水' };
+        const orgs = e => HP_EL[HP_KEY[e]].organs.concat(e === '水' ? (sex === 1 ? HP_EL.water.m : HP_EL.water.f) : []);
+        const gzH = (g, z) => `<b style="color:${elementColors[ganElementMap[g]]}">${g}</b><b style="color:${elementColors[zhiElementMap[z]]}">${z}</b>`;
         const vars = HP_ORDER.map(k => `--${k}:${hpCol(k)}`).join(';');
-        const stage = `<div class="hp-stage" data-sel="${sel}" data-excess="${ex ? 1 : 0}" style="${vars}">
-            <div class="hp-hud"><span>WU-XING · SCAN</span><span>${sel === 'all' ? 'OVERVIEW' : HP_EL[sel].g + (ex ? ' <b class="al">▲ 太旺</b>' : '')}</span></div>
-            ${hpSvg(sel, sex, ex)}</div>`;
-        let card;
-        if (sel === 'all') {
-            const rows = HP_ORDER.map(k => `<div><dt style="color:${hpCol(k)}">${HP_EL[k].g}</dt><dd>${HP_EL[k].organs.concat(k === 'water' ? (sex === 1 ? HP_EL[k].m : HP_EL[k].f) : []).join('、')}</dd></div>`).join('');
-            card = `<div class="sx-card ok" style="--tc:#5fd4ff"><div class="sx-top"><div class="sx-when">五行對應器官</div></div><dl class="sx-rows" style="margin-top:8px">${rows}</dl></div>`;
-        } else {
-            const e = HP_EL[sel], X = HP_EXCESS[sel], col = hpCol(sel);
-            const organs = e.organs.concat(sel === 'water' ? (sex === 1 ? e.m : e.f) : []);
-            card = `<div class="sx-card" style="--tc:${col}">
-                <div class="sx-top"><div class="sx-when">${e.g}・對應器官</div><span class="sx-badge">${ex ? '太旺' : '平衡'}</span></div>
-                <div class="sx-main"><span class="sx-big" style="color:${col}">${e.g}</span><span class="sx-verdict">${ex ? '健康警訊' : ''}</span></div>
-                <div class="hp-chips">${organs.map(x => `<span>${x}</span>`).join('')}</div>
-                <div class="hp-lvl"><button type="button" class="${ex ? '' : 'on'}" onclick="hpExcess(false)">平衡</button><button type="button" class="${ex ? 'on' : ''}" onclick="hpExcess(true)" ${X ? '' : 'disabled'}>${e.g}太旺</button></div>
-                ${ex ? `<div class="hp-warn"><h4>${e.g}太旺<span>|</span>健康警訊</h4><p class="lead">${X.lead}</p><ul>${X.items.map(([a, b]) => `<li>${a}${b ? `<small>${b}</small>` : ''}</li>`).join('')}</ul></div>` : ''}
+        // ① 人體＋五行（合併）
+        const rows = HP_ORDER.map(k => {
+            const e = ELK[k], n = H ? H.cnt[e] : 0, wi = H ? H.weak.indexOf(e) : -1;
+            const tag = wi >= 0 ? `<i class="w">留意</i>` : (n >= 3 ? `<i class="g">旺</i>` : '');
+            return `<button type="button" class="hpx-row ${sel === k ? 'on' : ''} ${wi >= 0 ? 'weak' : ''}" style="--ec:${hpCol(k)}" onclick="hpPick('${k}')">
+                <b>${e}</b><span class="hpx-dots">${'<s></s>'.repeat(Math.min(n, 5))}${n === 0 ? '<em>0</em>' : ''}</span><small>${HP_EL[k].abbr}</small>${tag}</button>`;
+        }).join('');
+        const selOrg = sel !== 'all' && !(H && H.weak.includes(ELK[sel]) && !ex) ? `<div class="hpx-sel" style="--ec:${hpCol(sel)}">${orgs(ELK[sel]).join('、')}${ex ? `<br><b>${ELK[sel]}太旺：</b>${HP_EXCESS[sel].lead}` : ''}</div>` : '';
+        const hero = `<div class="hpx-hero">
+            <div class="hp-stage hpx-body" data-sel="${sel}" data-excess="${ex ? 1 : 0}" style="${vars}">${hpSvg(sel, sex, ex, true)}</div>
+            <div class="hpx-side"><div class="hpx-cap">五行數量<span>八字本氣</span></div>${rows}${selOrg}</div></div>`;
+        // ② 最缺五行（最多兩個）
+        const focus = H && H.weak.length ? `<div class="hpx-focus">${H.weak.map((e, i) => `<div class="hpx-f" style="--ec:${elementColors[e]}">
+                <div class="hpx-fh"><b>${e}</b><span>${i === 0 ? '最缺' : '次缺'}・${H.why[e].join('、')}</span><em>忌${HP_DAY[e].ji}旺日</em></div>
+                <div class="hpx-fo">${orgs(e).join('、')}</div>
+                <div class="hpx-ft">${HP_DAY[e].tips.join('・')}</div></div>`).join('')}</div>`
+            : (H ? `<div class="hpx-even">五行分布平均，沒有特別缺的五行，多留意流年影響即可。</div>` : '');
+        // ③ 健康注意日（月曆）
+        let cal = '';
+        if (H && H.weak.length) {
+            const off = window.__hpMon || 0, now = new Date(), base = new Date(now.getFullYear(), now.getMonth() + off, 1);
+            const Y = base.getFullYear(), M = base.getMonth() + 1, days = new Date(Y, M, 0).getDate(), lead = base.getDay();
+            const mark = {}; const list = [];
+            for (let d = 1; d <= days; d++) {
+                const gz = hpDayGZ(Y, M, d), hit = H.weak.filter(e => HP_DAY[e].days.includes(gz));
+                if (hit.length) { mark[d] = { gz, hit }; list.push(d); }
+            }
+            const today = (off === 0) ? now.getDate() : -1;
+            const pick = window.__hpDay && window.__hpDay.y === Y && window.__hpDay.m === M ? window.__hpDay.d : (list.find(d => d >= today) || list[0]);
+            let g = ['日', '一', '二', '三', '四', '五', '六'].map(w => `<span class="hd">${w}</span>`).join('') + '<span></span>'.repeat(lead);
+            for (let d = 1; d <= days; d++) {
+                const mk = mark[d];
+                g += `<button type="button" class="hpx-d ${mk ? 'hit' : ''} ${d === today ? 'today' : ''} ${d === pick ? 'sel' : ''}" ${mk ? `style="--ec:${elementColors[mk.hit[0]]}" onclick="hpDayPick(${Y},${M},${d})"` : 'disabled'}>${d}${mk ? `<i>${mk.gz}</i>` : ''}</button>`;
+            }
+            const P = pick && mark[pick];
+            const det = P ? `<div class="hpx-dd" style="--ec:${elementColors[P.hit[0]]}"><div><b>${M}/${pick}</b> ${gzH(P.gz[0], P.gz[1])}　${P.hit.map(e => `${HP_DAY[e].ji}旺剋${e}`).join('、')}</div>
+                <div class="hpx-fo">${P.hit.map(e => orgs(e).join('、')).join('；')}</div><div class="hpx-ft">${[...new Set(P.hit.flatMap(e => HP_DAY[e].tips))].join('・')}</div></div>`
+                : `<div class="hpx-dd none">這個月沒有健康注意日</div>`;
+            cal = `<div class="hpx-card"><div class="hpx-ch"><b>健康注意日</b><span>${H.weak.map(e => `<i style="background:${elementColors[e]}"></i>忌${HP_DAY[e].ji}旺`).join(' ')}</span></div>
+                <div class="hpx-mon"><button type="button" onclick="hpMon(-1)" aria-label="上個月">‹</button><b>${Y} 年 ${M} 月</b><span>${list.length} 天</span><button type="button" onclick="hpMon(1)" aria-label="下個月">›</button></div>
+                <div class="hpx-grid">${g}</div>${det}</div>`;
+        }
+        // ④ 大運／流年（精簡）
+        let yun = '';
+        if (H && H.dys.length && (H.X || H.cong)) {
+            const dsel = window.__hpDy != null ? window.__hpDy : (H.curDy ? H.curDy.i : 0);
+            const dchips = H.dys.map(d => `<button type="button" class="hpx-c ${d.lvl} ${d.i === dsel ? 'sel' : ''}" onclick="hpDyPick(${d.i})"><small>${d.age}歲</small>${gzH(d.gan, d.zhi)}${d.cur ? '<i>現在</i>' : ''}</button>`).join('');
+            const ysel = window.__sfSel && window.__sfSel.hp != null ? window.__sfSel.hp : Math.max(0, H.years.findIndex(y => y.cur));
+            const ychips = H.years.map((y, k) => `<button type="button" class="hpx-c ${y.lvl} ${k === ysel ? 'sel' : ''}" onclick="sfPick('hp',${k})"><small>${y.y}</small>${gzH(y.gan, y.zhi)}${y.cur ? '<i>今年</i>' : ''}</button>`).join('');
+            const D = H.dys[dsel], Yr = H.years[ysel];
+            const LV = { ok: '穩定', warn: '留意', bad: '警訊' };
+            yun = `<div class="hpx-card"><div class="hpx-ch"><b>大運・流年</b><span>${H.cong ? H.cong + '格看順逆' : '看對「' + H.X + '」的生剋'}</span></div>
+                <div class="hpx-strip">${dchips}</div>
+                <div class="hpx-line ${D.lvl}"><b>${D.gan}${D.zhi}運・${LV[D.lvl]}</b>${D.why}${D.xing.length ? '；' + D.xing.join('、') + '三刑' : ''}</div>
+                <div class="hpx-strip">${ychips}</div>
+                ${Yr ? `<div class="hpx-line ${Yr.lvl}"><b>${Yr.y}・${Yr.label}</b>${Yr.note || Yr.why}${Yr.xing.map(x => '；' + x + '三刑：' + HP_XING[x]).join('')}</div>` : ''}
             </div>`;
         }
-        return `<div class="sx-grid sx-g5">${cells}</div>${stage}${card}`;
+        const foot = `<div class="hp-foot">只是提醒方向，不是醫療診斷；身體狀況以健康檢查與醫師評估為準。</div>`;
+        return `${hero}${focus}${cal}${yun}${foot}`;
     }
+    function hpMon(d) { window.__hpMon = (window.__hpMon || 0) + d; window.__hpDay = null; sfRerender(); }
+    function hpDayPick(y, m, d) { window.__hpDay = { y, m, d }; sfRerender(); }
+    function hpDyPick(i) { window.__hpDy = i; sfRerender(); }
     function hpPick(k) { window.__hpSel = window.__hpSel === k ? 'all' : k; sfRerender(); }
-    function hpExcess(on) { const s = window.__hpSel; if (!s || s === 'all') return; (window.__hpExcess = window.__hpExcess || {})[s] = on; sfRerender(); }
     function hpOrgan(g) {
         const els = g.dataset.els.split(','), cur = window.__hpSel;
         window.__hpSel = els.includes(cur) && els.length > 1 ? els[(els.indexOf(cur) + 1) % els.length] : els[0];
         sfRerender();
+    }
+    function buildHealthPromptText(H) {
+        const sexW = H.sex === 1 ? '攝護腺' : '婦科';
+        let t = `健康（依八字本氣數量，不含藏干；只做提醒，不是醫療診斷）：\n`;
+        t += '五行數量：' + ['木', '火', '土', '金', '水'].map(e => e + H.cnt[e]).join('、') + '\n';
+        t += H.X ? `最缺：${H.X}（${H.why[H.X].join('；')}）→ ${HP_EL[HP_KEY[H.X]].organs.join('、')}${H.X === '水' ? '、' + sexW : ''}\n` : '五行平均：沒有特別偏弱，多看流年影響\n';
+        if (H.weak.length) t += '健康注意日（流日）：' + H.weak.map(e => `${e}忌${HP_DAY[e].ji}旺日（${HP_DAY[e].days.join('、')}）：${HP_DAY[e].tips.join('、')}`).join('；') + '\n';
+        if (H.weak.length > 1) t += '次缺：' + H.weak.slice(1).map(e => `${e}（${H.why[e].join('；')}）`).join('、') + '\n';
+        if (H.wang.length) t += '太旺：' + H.wang.map(e => e + H.cnt[e]).join('、') + (H.cnt['土'] >= 3 ? '（土太旺：堆積，瘤、息肉、結石）' : '') + (H.cnt['火'] >= 3 ? '（火太旺：易發燒、發炎）' : '') + '\n';
+        if (H.cong) t += `從格：${H.cong}，大運流年順勢＝健康較穩，逆勢（破格）＝健康要留意\n`;
+        if (H.natalXing.length) t += '原局三刑：' + H.natalXing.join('、') + '\n';
+        t += '大運健康（天干30%、地支70%）：\n' + H.dys.map(d => `- ${d.age}–${d.age + 9}歲 ${d.gan}${d.zhi}：${HP_LV[d.lvl]}（${d.why}）${d.xing.length ? '；' + d.xing.join('、') + '三刑' : ''}${d.cur ? '（現在）' : ''}`).join('\n') + '\n';
+        t += '流年健康（目前大運內）：\n' + H.years.map(y => `- ${y.y} ${y.gan}${y.zhi}：${y.label}${y.note ? '（' + y.note + '）' : ''}${y.xing.length ? '；' + y.xing.join('、') + '三刑湊齊' : ''}${y.cur ? '（今年）' : ''}`).join('\n') + '\n';
+        t += '判讀原則：正格看大運流年對最弱五行是生扶（穩定）、剋（警訊）或洩耗（留意）；大運好流年差＝小病小痛，大運差流年好＝好轉；三刑湊齊（寅巳申＝外傷手術突發疾病；丑戌未＝腫瘤結石、腎臟婦科、情緒壓力）。建議以健康檢查、日常保養為主，不建議用補運處理。\n';
+        return t;
     }
     function buildSafetyPromptText(sc) {
         let t = '行車・跌倒（命主本人）：歲運地支沖原局任一柱，或與原局／大運／流年／流月湊齊三刑（寅巳申、丑戌未）。觸發對象是年支（父母宮）時，另外提醒家中長輩出入小心。\n';
@@ -7070,6 +7281,18 @@ ${hpTxt}`;
 
         // ---- 子平格局定式與用神／忌神判定 ----
         const geJuYongShen = determineGeJuAndYongShen(mz, dg, dayElement, baseGans, baseZhis, pNames, strengthLabel, elementCount, totalElements);
+        // ===== 平安・健康 =====
+        try {
+            const H = computeHealth({ gans: baseGans, zhis: baseZhis, daYunData, currentYear, dayEl: dayElement, hidden: elementCount, sex: gender,
+                cong: geJuYongShen.isExtreme ? geJuYongShen.congGeResult : null, sc: window.__safetyScan });
+            window.__health = H;
+            window.__hpExcess = { earth: H.cnt['土'] >= 3, fire: H.cnt['火'] >= 3 };
+            window.__hpSel = H.X ? HP_KEY[H.X] : 'all';
+            if (window.__sfSel) delete window.__sfSel.hp;
+            window.__hpMon = 0; window.__hpDay = null; window.__hpDy = null;
+            safetyPromptText += '\n' + buildHealthPromptText(H);
+            if (window.__sfTab === 'hp') sfRerender();
+        } catch (e) { console.warn('健康推算失敗:', e); window.__health = null; }
         
         // cmdHtml 於調候計算完成後組裝（體力＋調候 合併為汽車儀表面板）
 
@@ -7698,7 +7921,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.48';
+    const APP_VER = 'V3.49';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
