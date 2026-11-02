@@ -414,6 +414,15 @@
         .lc-head { display:flex; align-items:center; justify-content:space-between; margin:4px 0 10px; }
         .lc-title { text-align:center; font-size:15px; font-weight:bold; color:#ddd; letter-spacing:1px; }
         .lc-title small { display:block; font-size:10px; color:#888; font-weight:normal; letter-spacing:0; margin-top:2px; }
+        /* 運勢・年曆（流月，24 個月） */
+        .lc-grid.ly-grid { grid-template-columns:repeat(6, minmax(0,1fr)); }
+        .ly-yl { display:block; font-size:9.5px; line-height:12px; height:12px; color:#7f8a90; font-weight:400; }
+        .lc-cell.today .ly-yl { color:var(--tc, #00d2ff); font-weight:600; }
+        .ly-grid .lc-n small { font-size:9px; font-weight:400; margin-left:1px; opacity:.7; }
+        .ly-now { font-style:normal; font-size:9px; font-weight:600; margin-left:4px; padding:0 4px; border-radius:999px; background:var(--tc, #00d2ff); color:#000; vertical-align:1px; }
+        .ly-grid .lc-n small.ly-y { font-size:9.5px; margin:0; opacity:.6; }
+        .ly-rg { font-size:11px; font-weight:400; color:#7f8a90; margin-left:8px; }
+        .ly-go { all:unset; cursor:pointer; display:inline-block; margin-top:8px; font-size:12.5px; color:var(--tc, #00d2ff); padding:4px 10px; border-radius:999px; border:1px solid currentColor; }
         .lc-grid { display:grid; grid-template-columns:repeat(7, minmax(0,1fr)); gap:4px; }
         .lc-wk { text-align:center; font-size:10px; color:#666; padding-bottom:2px; }
         .lc-cell { position:relative; min-height:58px; border-radius:6px; border:1px solid #262626; padding:4px 3px 3px; cursor:pointer;
@@ -1426,6 +1435,8 @@
         .lx .lx-view { border:none; background:#1a1f22; border-radius:9px; padding:2px; flex-shrink:0; margin-bottom:5px; }
         .lx .lx-view .lw-vbtn { font-size:12px; padding:4px 9px; border-radius:7px; color:var(--lx-mute); }
         .lx .lx-view .lw-vbtn.on { background:#2a3135; color:var(--lx-ink); font-weight:600; }
+        .lx .lx-topic { white-space:nowrap; }
+        @media (max-width: 440px) { .lx .lx-topic { padding:6px 7px 9px; font-size:14px; letter-spacing:0; } .lx .lx-view .lw-vbtn { padding:4px 7px; font-size:11.5px; } }
         .lx .lw-tip b { color:var(--tc); }
         .lx .lw-tip { border-left-color:var(--tc); background:none; color:var(--lx-mute); padding:2px 0 2px 10px; margin:-4px 0 12px; font-size:12px; }
 
@@ -2949,8 +2960,8 @@ ${hpTxt}`;
     function stOvSet(v) {
         window.__strengthOverride = v || null;
         const y = window.scrollY;
-        calculateBazi();
-        window.scrollTo(0, y);
+        window.__keepScroll = true; calculateBazi(); window.__keepScroll = false;
+        window.scrollTo(0, y); setTimeout(() => window.scrollTo(0, y), 130);
         const el = document.getElementById('stOv'); if (el) el.hidden = false;
     }
     function saveCurrentChartPrompt() {
@@ -2971,8 +2982,6 @@ ${hpTxt}`;
         window.__strengthOverride = item.ov || null;
         window.__pendingName = item.name;
         calculateBazi();
-        const rb = document.getElementById('resultBox');
-        if (rb) rb.scrollIntoView({ behavior: 'smooth' });
     }
 
     function deleteSavedChart(idx, el) {
@@ -4055,6 +4064,7 @@ ${hpTxt}`;
         el._scr = requestAnimationFrame(step);
     }
     // 整個核心能量儀表板的進場動畫（儀表點火、格局燈號、十神星圖）
+    // 單一區塊的進場動畫（儀表、格局、十神星圖、五行電平各自觸發）
     function runDashAnims(root) {
         if (!root) return;
         root.classList.remove('anim-pending', 'anim-on');
@@ -4074,7 +4084,7 @@ ${hpTxt}`;
             el.firstChild.nodeValue = '0';
             requestAnimationFrame(tick);
         });
-        animateCarGauges(root.querySelector('.pg-cluster'));
+        const pc = root.querySelector('.pg-cluster'); if (pc) animateCarGauges(pc);
     }
     // 各格局可能出現的成格／破格標籤（用於亮燈面板，未成立者熄燈）
     const COMBO_CATALOG = {
@@ -4693,19 +4703,17 @@ ${hpTxt}`;
         }, { passive: true });
     }
 
+    // 儀表板動畫：每個區塊滑進畫面才開始跑（只跑一次）；手機版單欄時，下方的星圖、電平表捲到才播放
     function initDashAnims(root) {
         if (!root) return;
-        const details = root.closest('details');
-        if (details && !details._pgBound) {
-            details._pgBound = true;
-            details.addEventListener('toggle', () => { if (details.open) runDashAnims(details.querySelector('.dash-anim')); });
-        }
-        if ('IntersectionObserver' in window) {
-            const io = new IntersectionObserver(entries => {
-                entries.forEach(en => { if (en.isIntersecting) { runDashAnims(root); io.disconnect(); } });
-            }, { threshold: 0.1 });
-            io.observe(root);
-        } else runDashAnims(root);
+        const secs = [...root.querySelectorAll('.dash-sec')];
+        if (!('IntersectionObserver' in window)) { secs.forEach(runDashAnims); return; }
+        if (root._io) root._io.disconnect();
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(en => { if (en.isIntersecting) { runDashAnims(en.target); io.unobserve(en.target); } });
+        }, { threshold: 0.3, rootMargin: '0px 0px -8% 0px' });
+        root._io = io;
+        secs.forEach(sec => io.observe(sec));
     }
     
     const getTenGodForElement = (targetEl, dayEl) => {
@@ -7250,6 +7258,7 @@ ${hpTxt}`;
                         <div class="lw-view lx-view">
                             <span class="lw-vbtn on" data-v="d10" onclick="lwView('d10')">近日</span>
                             <span class="lw-vbtn" data-v="cal" onclick="lwView('cal')">月曆</span>
+                            <span class="lw-vbtn" data-v="yr" onclick="lwView('yr')">年曆</span>
                             ${topic === 'work' ? `<span class="lw-vbtn" data-v="zh" onclick="lwView('zh')">轉職</span>` : (topic === 'cai' || topic === 'tao') ? `<span class="lw-vbtn" data-v="cc" onclick="lwView('cc')">充能</span>` : `<span class="lw-vbtn" data-v="fr" onclick="lwView('fr')">朋友</span>`}
                         </div>
                     </div>
@@ -7262,6 +7271,7 @@ ${hpTxt}`;
                         <div id="liuriCard"></div>
                     </div>
                     <div class="lw-pane" data-v="cal" style="display:none;"><div id="lwCal"></div></div>
+                    <div class="lw-pane" data-v="yr" style="display:none;"><div id="lwYr"></div></div>
                     ${topic === 'work' ? `<div class="lw-pane" data-v="zh" style="display:none;"><div id="lwZh"></div></div>` : (topic === 'cai' || topic === 'tao') ? `<div class="lw-pane" data-v="cc" style="display:none;"><div id="lwCc"></div></div>` : `<div class="lw-pane" data-v="fr" style="display:none;"><div id="friendPanel"></div></div>`}
                 `;
                 document.getElementById('liuriOutput').innerHTML = wrapAccordion('<span style="display:inline-flex; align-items:center;"><svg class="sec-ic ic-pulse" viewBox="0 0 24 24" aria-hidden="true"><polyline points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".25"/><polyline class="ic-pulse-run" points="2,13 6,13 8.5,8 11.5,18 14.5,5 17,13 22,13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" pathLength="100"/></svg>流日動能</span>', body, true);
@@ -7292,7 +7302,7 @@ ${hpTxt}`;
                     window.__lwTopic = t;
                     const keepView = window.__lwViewCur || 'd10';
                     window.__renderLiuri();
-                    if (keepView === 'cal' || (keepView === 'zh' && t === 'work') || (keepView === 'cc' && (t === 'cai' || t === 'tao')) || (keepView === 'fr' && t === 'ren')) window.lwView(keepView);
+                    if (keepView === 'cal' || keepView === 'yr' || (keepView === 'zh' && t === 'work') || (keepView === 'cc' && (t === 'cai' || t === 'tao')) || (keepView === 'fr' && t === 'ren')) window.lwView(keepView);
                 };
                 window.lwView = (v) => {
                     window.__lwViewCur = v;
@@ -7300,6 +7310,7 @@ ${hpTxt}`;
                     root.querySelectorAll('.lw-vbtn').forEach(b => b.classList.toggle('on', b.dataset.v === v));
                     root.querySelectorAll('.lw-pane').forEach(pn => pn.style.display = pn.dataset.v === v ? '' : 'none');
                     if (v === 'cal') renderLwCalendar();
+                    if (v === 'yr') renderLwYear();
                     if (v === 'zh') { const z = document.getElementById('lwZh'); if (z) { z.innerHTML = buildCareerView(); window.lwZhPick(window.__zhMonths.findIndex(m => m.k === 0));
                         const step = d => { const sel = window.__zhSel || { t: 'm', i: 0 };
                             if (sel.t === 'y') { const n = sel.i + d; if (n >= 0 && n < 6) window.lwZyPick(n); }
@@ -7360,6 +7371,68 @@ ${hpTxt}`;
                         <div class="lc-grid">${weekChar.map(w => `<div class="lc-wk">${w}</div>`).join('')}${cells}</div>
                         <div id="lcDetailWrap">${detail}</div>`;
                     attachSwipe(document.getElementById('lcDetailWrap'), () => calStep(-1), () => calStep(1));
+                };
+                // ---- 年曆檢視（流月）：與流日同一套邏輯，只是把流日干支換成流月干支 ----
+                // 三合／三會來源：原局＋大運＋流年（＋流月本身）；桃花生肖三合同理；每格以該國曆月 15 日的節氣月為準
+                const TM = { hot: T.hot.replace('日', '月'), hotShort: T.hotShort };
+                const monthInfo = (dm) => {
+                    const bz = Solar.fromYmdHms(dm.getFullYear(), dm.getMonth() + 1, 15, 12, 0, 0).getLunar().getEightChar();
+                    const px = { getDayGan: () => bz.getMonthGan(), getDayZhi: () => bz.getMonthZhi(), getYearZhi: () => bz.getYearZhi(), getMonthZhi: () => '' };
+                    const info = fullDay(px, dm.getFullYear());
+                    return Object.assign(info, { range: (() => { const r = getJieQiRange(Solar.fromYmd(dm.getFullYear(), dm.getMonth() + 1, 15)); return r ? `${r.startLabel}～${r.endLabel}` : ''; })() });
+                };
+                window.__lwMonthInfo = monthInfo;
+                const curMonthStart = (() => { // 今天所在的節氣月 → 以國曆 15 日取樣的那個月
+                    const t = Solar.fromYmdHms(todayD.getFullYear(), todayD.getMonth() + 1, todayD.getDate(), 12, 0, 0).getLunar().getEightChar().getMonthZhi();
+                    const m15 = Solar.fromYmdHms(todayD.getFullYear(), todayD.getMonth() + 1, 15, 12, 0, 0).getLunar().getEightChar().getMonthZhi();
+                    return new Date(todayD.getFullYear(), todayD.getMonth() - (t === m15 ? 0 : 1), 1);
+                })();
+                window.__lwYrOff = 0; window.__lwYrSel = null;
+                window.lwYrShift = (k) => { window.__lwYrOff += k * 12; window.__lwYrSel = null; renderLwYear(); };
+                window.lwYrPick = (k) => { window.__lwYrSel = k; renderLwYear(); };
+                window.lwYrGo = (k) => { const dm = new Date(curMonthStart.getFullYear(), curMonthStart.getMonth() + window.__lwYrOff + k, 1); window.__lwCalMonth = dm; window.__lwCalSel = null; window.lwView('cal'); };
+                const yrStep = (d) => { const n = (window.__lwYrSel == null ? -1 : window.__lwYrSel) + d; if (n >= 0 && n < 24) window.lwYrPick(n); };
+                const renderLwYear = () => {
+                    const off = window.__lwYrOff;
+                    let cells = '', cntWang = 0, cntPo = 0, sel = null, first = null, last = null;
+                    for (let k = 0; k < 24; k++) {
+                        const dm = new Date(curMonthStart.getFullYear(), curMonthStart.getMonth() + off + k, 1), info = monthInfo(dm);
+                        if (!first) first = dm; last = dm;
+                        const wang = isHot(info.w.tier), po = info.po.length > 0;
+                        if (wang) cntWang++; if (po) cntPo++;
+                        const isCur = off + k === 0, isPast = off + k < 0;
+                        if (window.__lwYrSel === k) sel = { dm, info, k };
+                        const a = (info.w.score / 100 * 0.55).toFixed(2);
+                        cells += `<div class="lc-cell ${wang ? 'wang' : ''} ${po ? 'po' : ''} ${isCur ? 'today' : ''} ${isPast ? 'past' : ''} ${window.__lwYrSel === k ? 'sel' : ''}"
+                                style="--a:${a}; --d:${(k * 0.015).toFixed(3)}s;" onclick="lwYrPick(${k})">
+                            <span class="ly-yl">${isCur ? '本月' : (dm.getMonth() === 0 || k === 0 ? dm.getFullYear() + ' 年' : '')}</span><span class="lc-n">${dm.getMonth() + 1}<small>月</small></span>
+                            <span class="lc-gz"><b style="color:${elementColors[ganElementMap[info.g]]}">${info.g}</b><b style="color:${elementColors[zhiElementMap[info.z]]}">${info.z}</b></span>
+                            <span class="lc-tags">${wang ? `<i class="lc-wang">${T.mark}</i>` : ''}${info.ju.some(j => j.type === 'boost') ? '<i class="lc-ju">局</i>' : ''}${po ? '<i class="lc-po">破</i>' : ''}${info.tao && info.tao.he ? '<i class="lc-ju">合</i>' : ''}${info.tao && (info.tao.dong || info.tao.xing) ? '<i class="lc-po">⚡</i>' : ''}</span>
+                        </div>`;
+                    }
+                    let detail = `<div class="lc-detail lc-hint">點選月份查看當月${T.energy}；流月是「這個月有沒有車」，月曆的流日是「哪一天到站」</div>`;
+                    if (sel) {
+                        const { dm, info, k } = sel;
+                        detail = `<div class="lc-detail">
+                            <div class="lc-dt">${dm.getFullYear()} 年 ${dm.getMonth() + 1} 月 <b style="color:${elementColors[ganElementMap[info.g]]}">${info.g}</b><b style="color:${elementColors[zhiElementMap[info.z]]}">${info.z}</b>月<small class="ly-rg">${info.range}</small></div>
+                            <div class="lw-line lw-${info.w.tier}"><span class="lw-chip">${isHot(info.w.tier) ? TM.hot : info.w.tier.replace('日', '月')}${info.w.tier !== '平' ? ' ' + info.w.score : ''}</span><span>${info.w.detail || '—'}</span></div>
+                            ${info.ju.filter(j => j.type === 'boost').map(j => `<div class="lw-line lw-ju-line"><span class="lw-chip">${j.kind}</span><span>${j.name}・${j.label}（${j.from}＋流月）</span></div>`).join('')}
+                            ${info.po.length ? `<div class="lw-line lw-po-line"><span class="lw-chip">破財</span><span>${info.po.map(h => h.txt.replace(/流日/g, '流月')).join('；')}</span></div>` : ''}
+                            ${info.tao && info.tao.he ? `<div class="lw-line lw-he-line"><span class="lw-chip">生肖三合</span><span>${info.tao.he}</span></div>` : ''}
+                            ${info.tao && info.tao.dong ? `<div class="lw-line lw-dong-line"><span class="lw-chip">⚡ 變動</span><span>${info.tao.dong}</span></div>` : ''}
+                            ${info.tao && info.tao.xing ? `<div class="lw-line lw-xing-line"><span class="lw-chip">刑</span><span>${info.tao.xing}</span></div>` : ''}
+                            <button type="button" class="ly-go" onclick="lwYrGo(${k})">看這個月的月曆 ›</button>
+                        </div>`;
+                    }
+                    document.getElementById('lwYr').innerHTML = `
+                        <div class="lc-head">
+                            <span class="lw-nav-btn" onclick="lwYrShift(-1)">‹</span>
+                            <div class="lc-title">${first.getFullYear()}/${first.getMonth() + 1} – ${last.getFullYear()}/${last.getMonth() + 1}<small>${TM.hot} ${cntWang} 個${topic === 'cai' ? `・破財 ${cntPo} 個` : ''}</small></div>
+                            <span class="lw-nav-btn" onclick="lwYrShift(1)">›</span>
+                        </div>
+                        <div class="lc-grid ly-grid">${cells}</div>
+                        <div id="lyDetailWrap">${detail}</div>`;
+                    attachSwipe(document.getElementById('lyDetailWrap'), () => yrStep(-1), () => yrStep(1));
                 };
                 window.lwPick = (i) => { setActive(i); centerChart(i, true); };
                 setActive(todayIdx);
@@ -7721,23 +7794,23 @@ ${hpTxt}`;
         let svgHtml = renderTenGodStar({ dayElement, dayGan, orderedElements, elementSpecificShiShen, elementPct, strengthLabel, autoStrengthLabel, totalScore, daYunData, currentYear });
 
         // --- 組裝成完整儀表板 ---
-        let dashboardHtml = `<div class="dash-anim anim-pending">
+        let dashboardHtml = `<div class="dash-anim">
                 <div class="dash-grid-top pg-layout">
-                    <div class="dash-card" style="padding-top: 15px; align-items: stretch; justify-content: flex-start;">${cmdHtml}</div>
-                    <div class="dash-card" style="padding-top: 15px; align-items: stretch;">${penHtml}</div>
+                    <div class="dash-card dash-sec anim-pending" style="padding-top: 15px; align-items: stretch; justify-content: flex-start;">${cmdHtml}</div>
+                    <div class="dash-card dash-sec anim-pending" style="padding-top: 15px; align-items: stretch;">${penHtml}</div>
                 </div>
                 <div class="dash-grid-bottom">
-                    <div class="dash-card" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
+                    <div class="dash-card dash-sec anim-pending" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
                         ${svgHtml}
                     </div>
-                    <div class="dash-card" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
+                    <div class="dash-card dash-sec anim-pending" style="padding-top: 15px; display: flex; flex-direction: column; align-items: stretch;">
                         ${barHtml}
                     </div>
                 </div>
         </div>`;
         document.getElementById('energyDashboardOutput').innerHTML = wrapAccordion('<span style="flex:1; display:flex; align-items:center; justify-content:center;"><svg class="sec-ic ic-gauge" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 16.5a8.5 8.5 0 0 1 17 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity=".35"/><path d="M3.5 16.5a8.5 8.5 0 0 1 13.2-7.1" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><g class="ic-needle"><line x1="12" y1="16.5" x2="12" y2="9" stroke="#ffb347" stroke-width="2" stroke-linecap="round"/></g><circle cx="12" cy="16.5" r="1.8" fill="currentColor"/></svg>核心能量儀表板</span>', dashboardHtml, true);
         try { initDashAnims(document.querySelector('#energyDashboardOutput .dash-anim')); }
-        catch (e) { console.warn('儀表板動畫失敗:', e); const d = document.querySelector('#energyDashboardOutput .dash-anim'); if (d) d.classList.remove('anim-pending'); }
+        catch (e) { console.warn('儀表板動畫失敗:', e); document.querySelectorAll('#energyDashboardOutput .dash-sec').forEach(d => d.classList.remove('anim-pending')); }
 
         // ------------------------------------------------------------------------------------------
         // --- 原局靜態與動態引動維持原狀 (V2.1邏輯無更動) ---
@@ -8108,7 +8181,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.50';
+    const APP_VER = 'V3.51';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -8229,6 +8302,7 @@ ${hpTxt}`;
         try {
             navApply(); sheetClose();
             whoRender();
+            if (!window.__keepScroll) pageTop();
         } catch (e) { console.warn('導覽失敗', e); }
     };
 
@@ -8845,11 +8919,12 @@ ${d.safetyScan || '無'}`;
         box.style.display = 'block';
         document.documentElement.style.setProperty('--mini-h', box.offsetHeight + 'px');
     }
-    function navScrollTop() {
-        const rb = document.getElementById('resultBox'); if (!rb) return;
-        const y = rb.getBoundingClientRect().top + window.scrollY - 8;
-        if (window.scrollY > y) window.scrollTo({ top: y, behavior: 'smooth' });
+    // 回到頁面最上方（排盤、載入命盤、切換大分頁時）：避免八字表或分頁標籤被切掉
+    function pageTop() {
+        const go = () => window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+        go(); requestAnimationFrame(go); setTimeout(go, 120);
     }
+    function navScrollTop() { pageTop(); }
     // 運勢頁：趨勢圖高度依螢幕剩餘空間拉長，讓畫面填滿到導覽列
     function lwGeom() {
         const box = document.getElementById('liuriOutput');
