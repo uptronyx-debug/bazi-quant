@@ -883,6 +883,19 @@
         #chartSheet .cs-save .ab-t { color:#e9f7fb !important; font-size:14.5px !important; font-weight:600; letter-spacing:1px; }
         #chartSheet .cs-save small { color:#7f9aa5 !important; font-size:11px !important; }
         #chartSheet .cs-go { color:#00d2ff; font-size:20px; line-height:1; opacity:.8; }
+        /* 命盤抽屜：我的命盤收放卡（同問題提詞卡的樣式，主色改藍） */
+        .cm-tog { all:unset; box-sizing:border-box; cursor:pointer; position:relative; display:flex; flex-direction:column; gap:3px; width:100%; padding:12px 36px 12px 14px; border-radius:14px; text-align:left;
+            background:linear-gradient(150deg, color-mix(in srgb, #00d2ff 18%, #1d252b) 0%, #1d252b 62%); border:1px solid color-mix(in srgb, #00d2ff 32%, #2f3a42); -webkit-tap-highlight-color:transparent; }
+        .cm-tog b { font-size:15px; color:#5fd8f0; letter-spacing:.5px; display:flex; align-items:center; gap:8px; }
+        .cm-tog b .cm-n { font-size:11px; color:#0b1a22; background:#5fd8f0; border-radius:999px; padding:0 7px; line-height:17px; font-weight:700; }
+        .cm-tog small { font-size:11.5px; color:#cfd8dc; }
+        .cm-tog em { position:absolute; right:14px; top:50%; transform:translateY(-50%); font-style:normal; font-size:22px; color:#5fd8f0; transition:transform .2s; }
+        .cm-tog.open em { transform:translateY(-50%) rotate(90deg); }
+        .cm-tog.open { border-bottom-left-radius:6px; border-bottom-right-radius:6px; }
+        .cm-panel { margin-top:6px; }
+        .cm-bar { display:flex; justify-content:flex-end; padding:0 2px 6px; }
+        .cm-dt { font-family:ui-monospace, Menlo, Consolas, monospace; letter-spacing:.3px !important; }
+        .who-menu .cm-cur { display:none; }
         /* 瀏覽人次：小字一行 */
         .vc-line { font-size:12px; color:#7f8a90; } .vc-line[hidden] { display:none; }
         .vc-k { margin-right:8px; opacity:.85; } .vc-num { font-family:'Roboto Mono', ui-monospace, Menlo, monospace; color:#b8c2c7; }
@@ -3047,15 +3060,16 @@ ${hpTxt}`;
     // ===== 我的命盤：清單（標題列下拉與命盤抽屜共用）＋編輯模式（排序、改名、刪除） =====
     const cmEsc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
     function cmSub(it) {
-        if (it.pz) return it.pz;
         const i = it.inputs || {};
         if (i.mode === 'bazi' && i.yg) return [i.yg + i.yz, i.mg + i.mz, i.dg + i.dz, i.tg + i.tz].join(' ');
         const p2 = n => String(n).padStart(2, '0');
         // 相容舊版存檔格式：birthDate／birthDateTime（datetime-local）／year、month、day 分開
-        let date = i.birthDate || '', hour = i.birthHour;
-        if (!date && i.birthDateTime) { const [dp, tp] = String(i.birthDateTime).split('T'); date = dp; hour = tp ? parseInt(tp) : ''; }
-        if (!date && i.year) { date = `${i.year}-${p2(i.month)}-${p2(i.day)}`; hour = i.hour != null ? parseInt(i.hour) : ''; }
-        return date ? date.replace(/-/g, '/') + (hour !== '' && hour != null && !isNaN(hour) ? ` ${hour}時` : '') : '';
+        let date = i.birthDate || '', hour = i.birthHour, min = i.birthMinute;
+        if (!date && i.birthDateTime) { const [dp, tp] = String(i.birthDateTime).split('T'); date = dp; hour = tp ? parseInt(tp) : ''; min = tp ? parseInt(tp.split(':')[1]) : ''; }
+        if (!date && i.year) { date = `${i.year}-${p2(i.month)}-${p2(i.day)}`; hour = i.hour != null ? parseInt(i.hour) : ''; min = parseInt(i.minute || 0); }
+        if (!date) return it.pz || '';
+        const hasH = hour !== '' && hour != null && !isNaN(parseInt(hour));
+        return date.replace(/-/g, '/') + (hasH ? ` ${p2(parseInt(hour))}:${p2(parseInt(min) || 0)}` : '　時辰不詳');
     }
     const CM_IC = {
         up: '<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>', down: '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
@@ -3074,7 +3088,7 @@ ${hpTxt}`;
         const list = getSavedCharts(), edit = !!window.__cmEdit;
         if (!list.length) return `<div class="cm-empty">尚無儲存的命盤<small>排盤後按「儲存命盤」就會出現在這裡</small></div>`;
         return list.map((it, i) => {
-            const cur = it.name === window.__chartName, sub = it.pz ? `<small class="cm-gz">${cmGz(it.pz)}</small>` : `<small>${cmEsc(cmSub(it))}</small>`;
+            const cur = it.name === window.__chartName, sub = `<small class="cm-dt">${cmEsc(cmSub(it))}</small>`;
             if (!edit) return `<button type="button" class="cm-row ${cur ? 'on' : ''}" onclick="cmLoad(${i})">${cmAv(it)}<span class="cm-nm"><b>${cmEsc(it.name)}</b>${sub}</span>${cur ? '<i class="cm-cur">目前</i>' : ''}</button>`;
             return `<div class="cm-row edit ${cur ? 'on' : ''}">${cmAv(it)}<span class="cm-nm"><b>${cmEsc(it.name)}</b>${sub}</span>
                 <span class="cm-acts"><button type="button" aria-label="上移" ${i === 0 ? 'disabled' : ''} onclick="cmMove(event,${i},-1)">${CM_IC.up}</button><button type="button" aria-label="下移" ${i === list.length - 1 ? 'disabled' : ''} onclick="cmMove(event,${i},1)">${CM_IC.down}</button><button type="button" aria-label="改名" onclick="cmRename(event,${i})">${CM_IC.edit}</button><button type="button" class="cm-del" aria-label="刪除" onclick="cmDel(event,${i},this)">${CM_IC.del}</button></span></div>`;
@@ -3105,8 +3119,16 @@ ${hpTxt}`;
         const list = getSavedCharts();
         const container = document.getElementById('savedChartsList');
         if (!container) return;
-        container.innerHTML = `<div class="cm-head"><b>我的命盤</b>${list.length ? `<span class="cm-n">${list.length}</span><button type="button" class="cm-edit" onclick="cmToggleEdit(event)">${window.__cmEdit ? '完成' : '編輯'}</button>` : ''}</div>
-            <div class="cm-list cm-sheet ${window.__cmEdit ? 'editing' : ''}">${cmRowsHtml('sheet')}</div>`;
+        const open = list.length > 0 && cmSheetOpen(), cur = list.find(x => x.name === window.__chartName);
+        container.innerHTML = `<button type="button" class="cm-tog ${open ? 'open' : ''}" onclick="cmSheetToggle()" aria-expanded="${open}">
+                <b>我的命盤${list.length ? `<span class="cm-n">${list.length}</span>` : ''}</b>
+                <small>${list.length ? (cur ? `目前：${cmEsc(cur.name)}・點開切換或編輯` : '點開選擇已儲存的命盤') : '還沒有儲存的命盤，排盤後按「儲存命盤」'}</small><em aria-hidden="true">›</em></button>
+            ${open ? `<div class="cm-panel"><div class="cm-bar"><button type="button" class="cm-edit" onclick="cmToggleEdit(event)">${window.__cmEdit ? '完成' : '編輯'}</button></div>
+                <div class="cm-list cm-sheet ${window.__cmEdit ? 'editing' : ''}">${cmRowsHtml('sheet')}</div></div>` : ''}`;
+    }
+    // 命盤抽屜的「我的命盤」收放：預設收合，記在本機瀏覽器
+    function cmSheetOpen() { try { return localStorage.getItem('cmSheetOpen') === '1'; } catch (e) { return !!window.__cmSheetMem; } }
+    function cmSheetToggle() { const o = !cmSheetOpen(); window.__cmSheetMem = o; try { localStorage.setItem('cmSheetOpen', o ? '1' : '0'); } catch (e) {} if (!o) window.__cmEdit = false; renderSavedChartsList();
     }
 
     const ganElementMap = { '甲': '木', '乙': '木', '丙': '火', '丁': '火', '戊': '土', '己': '土', '庚': '金', '辛': '金', '壬': '水', '癸': '水' };
@@ -8281,7 +8303,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.52b';
+    const APP_VER = 'V3.52c';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
