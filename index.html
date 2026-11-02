@@ -1726,6 +1726,8 @@
         .hp-org .ln { fill:none; stroke:var(--c); stroke-linecap:round; stroke-linejoin:round; }
         .hp-org.hp-limbs .ln { stroke-opacity:.22; }
         .hp-org.hp-skin { opacity:0; pointer-events:none; }
+        .hp-org.hp-bone .ln { stroke-opacity:.55; } .hp-org.hp-bone .fl { fill-opacity:.2; stroke-width:.8; }
+        .hp-stage[data-sel="all"] .hp-org.hp-bone { opacity:.35; }
         .hc-wood { --c:var(--wood); } .hc-fire { --c:var(--fire); } .hc-earth { --c:var(--earth); } .hc-metal { --c:var(--metal); } .hc-water { --c:var(--water); }
         .hp-stage:not([data-sel="all"]) .hp-org { opacity:.1; }
         .hp-stage[data-sel="wood"] .he-wood, .hp-stage[data-sel="fire"] .he-fire, .hp-stage[data-sel="earth"] .he-earth,
@@ -1794,8 +1796,9 @@
         .hpx-dots { display:flex; gap:3px; align-items:center; }
         .hpx-dots s { width:8px; height:8px; border-radius:50%; background:var(--ec); }
         .hpx-dots em { font-style:normal; font-size:11px; color:var(--bad); }
-        .hpx-sel { font-size:11.5px; line-height:1.5; color:var(--ink); padding:4px 4px 0; border-top:1px dashed var(--line); margin-top:2px; }
-        .hpx-sel b { color:var(--warn); }
+        .hpx-sel { font-size:11.5px; line-height:1.5; color:var(--ink); padding:5px 4px 0; border-top:1px dashed var(--line); margin-top:2px; display:flex; flex-direction:column; gap:4px; }
+        .hpx-sel b { color:var(--ec); margin-right:6px; font-weight:600; }
+        .hpx-sel em { display:block; font-style:normal; color:var(--warn); }
         .hpx-focus { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:8px; margin-top:10px; }
         .hpx-f { transition:opacity .25s, box-shadow .25s; }
         .hpx-f.dim { opacity:.35; } .hpx-f.on { box-shadow:0 0 0 1px var(--ec), 0 0 14px color-mix(in srgb, var(--ec) 35%, transparent); }
@@ -6174,6 +6177,7 @@ ${hpTxt}`;
           <g mask="url(#hp-mask)"><rect width="400" height="780" fill="url(#hp-bodyG)"/><rect width="400" height="780" fill="url(#hp-grid)" opacity=".18"/><rect class="hp-scan" x="0" y="-60" width="400" height="70" fill="url(#hp-scanG)"/></g>
           <use href="#hp-sil" filter="url(#hp-edge)"/>
           ${o(['metal'], '皮膚', '<use href="#hp-sil" filter="url(#hp-edgeM)"/>', 'hp-skin')}
+          ${o(['water'], '骨骼', `<rect class="fl" x="195" y="118" width="10" height="7" rx="2"/><rect class="fl" x="195" y="130" width="10" height="7" rx="2"/><rect class="fl" x="195" y="142" width="10" height="7" rx="2"/><rect class="fl" x="195" y="154" width="10" height="7" rx="2"/><rect class="fl" x="195" y="166" width="10" height="7" rx="2"/><rect class="fl" x="195" y="178" width="10" height="7" rx="2"/><rect class="fl" x="195" y="190" width="10" height="7" rx="2"/><rect class="fl" x="195" y="202" width="10" height="7" rx="2"/><rect class="fl" x="195" y="214" width="10" height="7" rx="2"/><rect class="fl" x="195" y="226" width="10" height="7" rx="2"/><rect class="fl" x="195" y="238" width="10" height="7" rx="2"/><rect class="fl" x="195" y="250" width="10" height="7" rx="2"/><rect class="fl" x="195" y="262" width="10" height="7" rx="2"/><rect class="fl" x="195" y="274" width="10" height="7" rx="2"/><rect class="fl" x="195" y="286" width="10" height="7" rx="2"/><rect class="fl" x="195" y="298" width="10" height="7" rx="2"/><rect class="fl" x="195" y="310" width="10" height="7" rx="2"/><rect class="fl" x="195" y="322" width="10" height="7" rx="2"/><rect class="fl" x="195" y="334" width="10" height="7" rx="2"/><rect class="fl" x="195" y="346" width="10" height="7" rx="2"/><rect class="fl" x="195" y="358" width="10" height="7" rx="2"/><rect class="fl" x="195" y="370" width="10" height="7" rx="2"/><rect class="fl" x="195" y="382" width="10" height="7" rx="2"/><rect class="fl" x="195" y="394" width="10" height="7" rx="2"/><rect class="fl" x="195" y="406" width="10" height="7" rx="2"/><rect class="fl" x="195" y="418" width="10" height="7" rx="2"/><path class="ln" stroke-width="2.2" d="M152 166 Q176 158 196 162 M248 166 Q224 158 204 162"/><path class="ln" stroke-width="1.6" d="M196 196 Q170 196 158 214 M204 196 Q230 196 242 214 M196 216 Q168 218 156 238 M204 216 Q232 218 244 238 M196 236 Q170 240 160 260 M204 236 Q230 240 240 260"/><path class="ln" stroke-width="2.2" d="M168 404 Q200 396 232 404 Q238 426 222 438 Q200 446 178 438 Q162 426 168 404 Z"/><path class="ln" stroke-width="2.4" d="M136 178 L106 300 M104 306 L84 432 M264 178 L294 300 M296 306 L316 432 M182 442 L172 584 M172 592 L166 716 M218 442 L228 584 M228 592 L234 716"/><circle class="fl" cx="105" cy="303" r="3"/><circle class="fl" cx="295" cy="303" r="3"/><circle class="fl" cx="172" cy="588" r="3.5"/><circle class="fl" cx="228" cy="588" r="3.5"/>`, 'hp-bone')}
           ${o(['wood'], '四肢（手腳）', `<path class="ln" d="M130 170 Q102 250 94 320 Q88 380 80 440" stroke-width="22"/><path class="ln" d="M270 170 Q298 250 306 320 Q312 380 320 440" stroke-width="22"/><path class="ln" d="M170 436 Q164 560 166 716" stroke-width="36"/><path class="ln" d="M230 436 Q236 560 234 716" stroke-width="36"/>`, 'hp-limbs')}
           ${o(['fire', 'water'], '心血管／循環系統', '<path class="ln hp-flow" stroke-width="2" d="M200 150 L200 432 M200 166 Q160 164 132 176 Q104 256 96 322 Q90 380 80 452 M200 166 Q240 164 268 176 Q296 256 304 322 Q310 380 320 452 M200 432 Q172 442 168 560 L166 724 M200 432 Q228 442 232 560 L234 724 M196 150 L190 96 M204 150 L210 96"/>')}
           ${o(['water'], '腎臟', '<path class="fl" d="M164 322 Q182 318 182 338 Q178 346 176 352 Q182 362 176 370 Q160 372 160 348 Q158 330 164 322 Z"/><path class="fl" d="M236 322 Q218 318 218 338 Q222 346 224 352 Q218 362 224 370 Q240 372 240 348 Q242 330 236 322 Z"/>')}
@@ -6287,7 +6291,13 @@ ${hpTxt}`;
         const hlEls = F && (F.hit.length || F.wang.length) ? [...new Set([...F.hit, ...F.wang])] : null;
         const hlSel = hlEls ? (hlEls.length === 1 ? HP_KEY[hlEls[0]] : 'multi') : sel;
         const hlCls = hlEls ? hlEls.map(e => 'hl-' + HP_KEY[e]).concat(F.wang.filter(w => HP_EXCESS[HP_KEY[w]]).map(w => 'hx-' + HP_KEY[w])).join(' ') : '';
-        const selOrg = sel !== 'all' && !(H && H.weak.includes(ELK[sel]) && !ex) && !F ? `<div class="hpx-sel" style="--ec:${hpCol(sel)}">${orgs(ELK[sel]).join('、')}${ex ? `<br><b>${ELK[sel]}太旺：</b>${HP_EXCESS[sel].lead}` : ''}</div>` : '';
+        // 五行列下方的部位說明：一律顯示目前人體亮起的五行（點選曆法格子時＝受剋＋過旺；否則＝目前選的五行）
+        const selEls = hlEls || (sel !== 'all' ? [ELK[sel]] : []);
+        const selOrg = selEls.length ? `<div class="hpx-sel">${selEls.map(e => {
+                const k = HP_KEY[e], tag = F ? (F.hit.includes(e) ? '受剋' : (F.wang.includes(e) ? '過旺' : '')) : '';
+                const exLine = HP_EXCESS[k] && (F ? F.wang.includes(e) : (ex && k === sel)) ? `<em>${e}太旺：${HP_EXCESS[k].lead.replace(/^.*→\s*/, '')}</em>` : '';
+                return `<div style="--ec:${hpCol(k)}"><b>${e}${tag ? `・${tag}` : ''}</b>${orgs(e).join('、')}${exLine}</div>`;
+            }).join('')}</div>` : '';
         const fbar = F ? `<div class="hpx-fbar ${F.lvl}"><span>${F.title}</span><i class="gz">${gzH(F.gan, F.zhi)}<em>${F.unit}</em></i><b>${F.verdict}</b><button type="button" onclick="hpFocusClear()" aria-label="清除">×</button></div>` : '';
         const hero = `${fbar}<div class="hpx-hero">
             <div class="hp-stage hpx-body ${hlCls}" data-sel="${hlSel}" data-excess="${ex ? 1 : 0}" style="${vars}">${hpSvg(sel, sex, ex, true)}</div>
@@ -8303,7 +8313,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.52c';
+    const APP_VER = 'V3.52d';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
