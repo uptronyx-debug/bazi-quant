@@ -837,39 +837,52 @@
         }
         .saved-chart-del:hover { color: #fff; background: rgba(255,82,82,0.5); }
 
-        /* ===== 我的命盤（清單＋編輯） ===== */
-        .cm-head { display:flex; align-items:center; gap:8px; padding:2px 4px 8px; }
-        .cm-head b { font-size:13px; color:#cfd6da; letter-spacing:1px; }
-        .cm-n { font-size:11px; color:#8a959b; background:#262c30; border-radius:999px; padding:0 7px; line-height:18px; }
-        .cm-edit { all:unset; margin-left:auto; cursor:pointer; font-size:12.5px; color:#7fd8ef; padding:3px 10px; border-radius:999px; border:1px solid rgba(127,216,239,.4); }
-        .cm-list { display:flex; flex-direction:column; gap:4px; }
-        .cm-row { all:unset; box-sizing:border-box; display:flex; align-items:center; gap:10px; width:100%; padding:8px 10px; border-radius:10px; cursor:pointer; color:#e3e8ea; -webkit-tap-highlight-color:transparent; }
-        .cm-row:hover { background:rgba(255,255,255,.04); }
-        .cm-row.on { background:rgba(0,210,255,.10); }
-        .cm-row.edit { cursor:default; background:#1f2427; }
-        .cm-av { flex:0 0 30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#0b1a22; background:linear-gradient(135deg, #7fd8ef, #4fa3c0); }
-        .cm-row.on .cm-av { background:linear-gradient(135deg, #00e0ff, #00a8cc); }
-        .cm-nm { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.3; text-align:left; align-items:flex-start; }
+        /* ===== 我的命盤（清單＋編輯）：沿用介面的細框＋主色＋五行色 ===== */
+        .cm-head { display:flex; align-items:center; gap:8px; padding:4px 6px 8px; }
+        .cm-head b { font-size:11px; font-weight:600; color:#7f95a3; letter-spacing:2px; }
+        .cm-n { font-size:10.5px; color:#5fd8f0; font-family:ui-monospace, Menlo, Consolas, monospace; }
+        .cm-edit { all:unset; margin-left:auto; cursor:pointer; font-size:12px; color:#8fa3ad; padding:2px 10px; border-radius:6px; border:1px solid #2f3a40; letter-spacing:1px; }
+        .cm-edit:hover { color:#00d2ff; border-color:rgba(0,210,255,.5); }
+        .cm-list { display:flex; flex-direction:column; gap:2px; }
+        .cm-row { all:unset; box-sizing:border-box; position:relative; display:flex; align-items:center; gap:11px; width:100%; padding:8px 10px; border-radius:8px; cursor:pointer; color:#e3e8ea; -webkit-tap-highlight-color:transparent; transition:background .15s; }
+        .cm-row:hover { background:rgba(255,255,255,.035); }
+        .cm-row.on { background:linear-gradient(90deg, rgba(0,210,255,.10), rgba(0,210,255,.02)); }
+        .cm-row.on::before { content:''; position:absolute; left:0; top:8px; bottom:8px; width:2px; border-radius:2px; background:#00d2ff; box-shadow:0 0 6px #00d2ff; }
+        .cm-row.edit { cursor:default; }
+        .cm-av { flex:0 0 30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600;
+            color:var(--ec); border:1.5px solid var(--ec); background:color-mix(in srgb, var(--ec) 10%, transparent); box-shadow:0 0 8px color-mix(in srgb, var(--ec) 25%, transparent); }
+        .cm-av.plain { --ec:#5f7380; color:#aab6bc; font-size:13px; box-shadow:none; }
+        .cm-nm { flex:1; min-width:0; display:flex; flex-direction:column; line-height:1.35; text-align:left; align-items:flex-start; }
         .who-menu .cm-head, .who-menu .cm-list { text-align:left; }
         #savedChartsList.saved-charts-list { display:block; }
-        .cm-nm b { font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .cm-nm small { font-size:11px; color:#8a959b; letter-spacing:.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-        .cm-cur { font-style:normal; font-size:10px; color:#00d2ff; border:1px solid rgba(0,210,255,.5); border-radius:999px; padding:0 6px; }
-        .cm-acts { display:flex; gap:4px; }
-        .cm-acts button { all:unset; cursor:pointer; width:28px; height:28px; border-radius:7px; text-align:center; line-height:28px; font-size:12px; color:#cfd6da; background:#2a3034; }
-        .cm-acts button:disabled { opacity:.25; cursor:default; }
-        .cm-acts .cm-del { color:#ff8a8a; } .cm-acts .cm-del.arm { width:auto; padding:0 8px; background:rgba(255,82,82,.25); color:#fff; font-size:11px; }
+        .cm-nm b { font-size:14px; font-weight:600; letter-spacing:.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+        .cm-nm small { font-size:11px; color:#7f8a90; letter-spacing:.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
+        .cm-gz { display:flex; gap:6px; } .cm-gz i { font-style:normal; }
+        .cm-cur { font-style:normal; font-size:10px; color:#00d2ff; letter-spacing:1px; }
+        .cm-acts { display:flex; gap:3px; }
+        .cm-acts button { all:unset; cursor:pointer; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; color:#9fb0b8; border:1px solid #2a3338; }
+        .cm-acts button svg, .cm-foot svg { width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+        .cm-acts button:hover { color:#00d2ff; border-color:rgba(0,210,255,.45); }
+        .cm-acts button:disabled { opacity:.22; cursor:default; }
+        .cm-acts .cm-del { color:#e07a7a; } .cm-acts .cm-del.arm { width:auto; padding:0 8px; font-size:11px; color:#fff; border-color:#ff5252; background:rgba(255,82,82,.2); }
         .cm-empty { font-size:13px; color:#99a3a8; padding:8px 6px; } .cm-empty small { display:block; font-size:11px; color:#6f7a80; margin-top:2px; }
-        .cm-foot { display:flex; gap:6px; border-top:1px solid #2a2f32; margin-top:6px; padding-top:6px; }
-        .cm-foot button { all:unset; cursor:pointer; flex:1; text-align:center; font-size:13px; padding:8px 6px; border-radius:8px; }
-        .cm-save { color:#7fd8ef; background:rgba(127,216,239,.08); } .cm-new { color:#ffd166; }
-        .who-menu { min-width:260px; }
+        .cm-foot { display:flex; gap:6px; border-top:1px solid #262d31; margin-top:6px; padding-top:6px; }
+        .cm-foot button { all:unset; cursor:pointer; flex:1; display:flex; align-items:center; justify-content:center; gap:6px; font-size:13px; padding:8px 6px; border-radius:8px; color:#9fb0b8; letter-spacing:1px; }
+        .cm-foot button:hover { background:rgba(255,255,255,.04); }
+        .cm-save { color:#00d2ff !important; } .cm-new { color:#cfd6da; }
+        .who-menu { min-width:296px; background:linear-gradient(180deg, #161b1e, #111517) !important; border-color:#263037 !important; }
         .saved-charts-panel { margin-bottom:14px; }
-        .cm-sheet { max-height:212px; overflow-y:auto; padding-right:2px; border:1px solid #262c30; border-radius:12px; padding:4px; background:#15191b; }
-        /* 儲存命盤：主色外框，排盤後更顯眼 */
-        #chartSheet .cs-save { background:rgba(0,210,255,.08) !important; border:1px solid rgba(0,210,255,.55); }
-        #chartSheet .cs-save .ab-t { color:#00d2ff !important; font-size:15px !important; display:inline-flex; align-items:center; gap:6px; }
-        #chartSheet .cs-save small { color:#8fb7c4 !important; }
+        .cm-sheet { max-height:220px; overflow-y:auto; border:1px solid #232a2e; border-radius:12px; padding:4px; background:#121618; }
+        /* 儲存命盤：細框＋主色圖示，與介面一致 */
+        #chartSheet .cs-save { flex-direction:row !important; align-items:center !important; justify-content:flex-start !important; gap:12px !important; padding:12px 14px !important; text-align:left;
+            background:linear-gradient(90deg, rgba(0,210,255,.08), rgba(0,210,255,.02)) !important; border:1px solid rgba(0,210,255,.35); border-radius:12px; }
+        #chartSheet .cs-save:hover { border-color:rgba(0,210,255,.7); }
+        #chartSheet .cs-ic { flex:0 0 34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#00d2ff; border:1px solid rgba(0,210,255,.45); box-shadow:0 0 10px rgba(0,210,255,.18); }
+        #chartSheet .cs-ic svg { width:17px; height:17px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+        #chartSheet .cs-tx { flex:1; display:flex; flex-direction:column; gap:2px; min-width:0; }
+        #chartSheet .cs-save .ab-t { color:#e9f7fb !important; font-size:14.5px !important; font-weight:600; letter-spacing:1px; }
+        #chartSheet .cs-save small { color:#7f9aa5 !important; font-size:11px !important; }
+        #chartSheet .cs-go { color:#00d2ff; font-size:20px; line-height:1; opacity:.8; }
         /* 瀏覽人次：小字一行 */
         .vc-line { font-size:12px; color:#7f8a90; } .vc-line[hidden] { display:none; }
         .vc-k { margin-right:8px; opacity:.85; } .vc-num { font-family:'Roboto Mono', ui-monospace, Menlo, monospace; color:#b8c2c7; }
@@ -2063,7 +2076,7 @@
         <div class="wx-copt" id="wxCopt"><label class="wx-clbl"><span class="wx-cbox"><input type="checkbox" id="wxConsent" onchange="shareToggle(this)"></span><span class="wx-ctxt">匿名分享使用情形，一起讓五行動能更好用</span></label><i class="wx-cq" data-tip="1" data-tip-html="記錄功能使用次數、年齡層、性別、裝置系統，以及你在提詞自行輸入的文字，用來了解大家最需要哪些功能。<b class='tip-strong'>🔒 不記錄生日、八字、姓名或任何排盤內容，也無法辨識你是誰。</b>隨時可以取消勾選。">?</i></div>
     </div>
     <div class="act-row act-row1" id="aiBtnContainer" style="display:none;">
-        <button onclick="saveCurrentChartPrompt()" class="act-btn cs-save"><span class="ab-t"><i aria-hidden="true">💾</i>儲存這張命盤</span><small>存在這台裝置的瀏覽器，之後可在「我的命盤」一鍵切換</small></button>
+        <button onclick="saveCurrentChartPrompt()" class="act-btn cs-save"><span class="cs-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/><path d="M12 7v6M9 10h6"/></svg></span><span class="cs-tx"><span class="ab-t">儲存命盤</span><small>存在這台裝置，之後可在「我的命盤」切換</small></span><span class="cs-go" aria-hidden="true">›</span></button>
     </div>
 
     <div class="site-foot">
@@ -3018,6 +3031,8 @@ ${hpTxt}`;
         window.__strengthOverride = item.ov || null;
         window.__pendingName = item.name;
         calculateBazi();
+        // 舊存檔沒有四柱：載入後補上，清單就能顯示
+        try { const pz = String((window.currentBaziDataForAI || {}).pillars || '').replace(/[年月日時]/g, ''); if (pz && item.pz !== pz) { list[idx].pz = pz; setSavedCharts(list); renderSavedChartsList(); } } catch (e) {}
     }
 
     function deleteSavedChart(idx, el) {
@@ -3034,17 +3049,35 @@ ${hpTxt}`;
     function cmSub(it) {
         if (it.pz) return it.pz;
         const i = it.inputs || {};
-        if (i.mode === 'bazi') return [i.yg + i.yz, i.mg + i.mz, i.dg + i.dz, i.tg + i.tz].join(' ');
-        return (i.birthDate || '').replace(/-/g, '/') + (i.birthHour !== '' && i.birthHour != null ? ` ${i.birthHour}時` : '');
+        if (i.mode === 'bazi' && i.yg) return [i.yg + i.yz, i.mg + i.mz, i.dg + i.dz, i.tg + i.tz].join(' ');
+        const p2 = n => String(n).padStart(2, '0');
+        // 相容舊版存檔格式：birthDate／birthDateTime（datetime-local）／year、month、day 分開
+        let date = i.birthDate || '', hour = i.birthHour;
+        if (!date && i.birthDateTime) { const [dp, tp] = String(i.birthDateTime).split('T'); date = dp; hour = tp ? parseInt(tp) : ''; }
+        if (!date && i.year) { date = `${i.year}-${p2(i.month)}-${p2(i.day)}`; hour = i.hour != null ? parseInt(i.hour) : ''; }
+        return date ? date.replace(/-/g, '/') + (hour !== '' && hour != null && !isNaN(hour) ? ` ${hour}時` : '') : '';
+    }
+    const CM_IC = {
+        up: '<svg viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></svg>', down: '<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>',
+        edit: '<svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>',
+        del: '<svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12"/></svg>',
+        save: '<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/><path d="M12 7v6M9 10h6"/></svg>',
+        plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
+    };
+    const cmGz = pz => String(pz || '').split(/\s+/).filter(Boolean).map(p => `<span>${[...p].map(c => `<i style="color:${elementColors[ganElementMap[c] || zhiElementMap[c]] || '#8a959b'}">${c}</i>`).join('')}</span>`).join('');
+    function cmAv(it) {
+        const dg = String(it.pz || '').split(/\s+/)[2], g = dg && dg[0];
+        if (g && ganElementMap[g]) return `<span class="cm-av" style="--ec:${elementColors[ganElementMap[g]]}">${g}</span>`;
+        return `<span class="cm-av plain">${cmEsc((it.name || '?').trim().charAt(0).toUpperCase())}</span>`;
     }
     function cmRowsHtml(where) {
         const list = getSavedCharts(), edit = !!window.__cmEdit;
         if (!list.length) return `<div class="cm-empty">尚無儲存的命盤<small>排盤後按「儲存命盤」就會出現在這裡</small></div>`;
         return list.map((it, i) => {
-            const cur = it.name === window.__chartName, av = cmEsc((it.name || '?').trim().charAt(0).toUpperCase());
-            if (!edit) return `<button type="button" class="cm-row ${cur ? 'on' : ''}" onclick="cmLoad(${i})"><span class="cm-av">${av}</span><span class="cm-nm"><b>${cmEsc(it.name)}</b><small>${cmEsc(cmSub(it))}</small></span>${cur ? '<i class="cm-cur">目前</i>' : ''}</button>`;
-            return `<div class="cm-row edit ${cur ? 'on' : ''}"><span class="cm-av">${av}</span><span class="cm-nm"><b>${cmEsc(it.name)}</b><small>${cmEsc(cmSub(it))}</small></span>
-                <span class="cm-acts"><button type="button" aria-label="上移" ${i === 0 ? 'disabled' : ''} onclick="cmMove(event,${i},-1)">▲</button><button type="button" aria-label="下移" ${i === list.length - 1 ? 'disabled' : ''} onclick="cmMove(event,${i},1)">▼</button><button type="button" aria-label="改名" onclick="cmRename(event,${i})">✎</button><button type="button" class="cm-del" aria-label="刪除" onclick="cmDel(event,${i},this)">✕</button></span></div>`;
+            const cur = it.name === window.__chartName, sub = it.pz ? `<small class="cm-gz">${cmGz(it.pz)}</small>` : `<small>${cmEsc(cmSub(it))}</small>`;
+            if (!edit) return `<button type="button" class="cm-row ${cur ? 'on' : ''}" onclick="cmLoad(${i})">${cmAv(it)}<span class="cm-nm"><b>${cmEsc(it.name)}</b>${sub}</span>${cur ? '<i class="cm-cur">目前</i>' : ''}</button>`;
+            return `<div class="cm-row edit ${cur ? 'on' : ''}">${cmAv(it)}<span class="cm-nm"><b>${cmEsc(it.name)}</b>${sub}</span>
+                <span class="cm-acts"><button type="button" aria-label="上移" ${i === 0 ? 'disabled' : ''} onclick="cmMove(event,${i},-1)">${CM_IC.up}</button><button type="button" aria-label="下移" ${i === list.length - 1 ? 'disabled' : ''} onclick="cmMove(event,${i},1)">${CM_IC.down}</button><button type="button" aria-label="改名" onclick="cmRename(event,${i})">${CM_IC.edit}</button><button type="button" class="cm-del" aria-label="刪除" onclick="cmDel(event,${i},this)">${CM_IC.del}</button></span></div>`;
         }).join('');
     }
     function cmRefresh() { renderSavedChartsList(); const m = document.getElementById('whoMenu'); if (m && m.classList.contains('on')) whoMenuRender(); }
@@ -3062,7 +3095,8 @@ ${hpTxt}`;
         it.name = nm; setSavedCharts(list); cmRefresh();
     }
     function cmDel(e, i, el) {
-        e.stopPropagation(); if (!armTwice(el)) return;
+        e.stopPropagation();
+        if (!el.dataset.arm) { el.dataset.arm = '1'; const o = el.innerHTML; el.innerHTML = '刪除？'; el.classList.add('arm'); setTimeout(() => { if (el.isConnected) { delete el.dataset.arm; el.innerHTML = o; el.classList.remove('arm'); } }, 3000); return; }
         const list = getSavedCharts(), it = list[i]; if (!it) return;
         if (window.__chartName === it.name) { window.__chartName = ''; whoRender(); }
         list.splice(i, 1); setSavedCharts(list); if (!list.length) window.__cmEdit = false; cmRefresh();
@@ -8247,7 +8281,7 @@ ${hpTxt}`;
 
     // ===== 功能使用統計（勾選同意才記錄；只送功能名稱與次數，不含生日、八字、姓名） =====
     const SHARE_URL = 'https://script.google.com/macros/s/AKfycbz6hviKU79UvDF49wXPwR_jMRa6NEW0xQJw4oy7pNw4VocJJXfxFVZ4rkRWkKEvwq4/exec';
-    const APP_VER = 'V3.52';
+    const APP_VER = 'V3.52b';
     const __usage = { sid: Math.random().toString(36).slice(2, 10), ev: {} };
     function shareOn() { const cb = document.getElementById('wxConsent'); return !!(cb && cb.checked); }
     function shareToggle(cb) {
@@ -8931,7 +8965,7 @@ ${d.safetyScan || '無'}`;
         const m = document.getElementById('whoMenu'), list = getSavedCharts();
         m.innerHTML = `<div class="cm-head"><b>我的命盤</b>${list.length ? `<span class="cm-n">${list.length}</span><button type="button" class="cm-edit" onclick="cmToggleEdit(event)">${window.__cmEdit ? '完成' : '編輯'}</button>` : ''}</div>
             <div class="cm-list ${window.__cmEdit ? 'editing' : ''}">${cmRowsHtml('menu')}</div>
-            <div class="cm-foot">${window.__chartName ? '' : '<button type="button" class="cm-save" onclick="whoMenuClose(); saveCurrentChartPrompt()">💾 儲存目前命盤</button>'}<button type="button" class="cm-new" onclick="whoMenuClose(); sheetOpen()">＋ 新排盤</button></div>`;
+            <div class="cm-foot">${window.__chartName ? '' : `<button type="button" class="cm-save" onclick="whoMenuClose(); saveCurrentChartPrompt()">${CM_IC.save}儲存目前命盤</button>`}<button type="button" class="cm-new" onclick="whoMenuClose(); sheetOpen()">${CM_IC.plus}新排盤</button></div>`;
     }
     function whoMenuToggle() {
         const m = document.getElementById('whoMenu');
